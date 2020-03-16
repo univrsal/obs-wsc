@@ -17,28 +17,3 @@
  *************************************************************************/
 
 #pragma once
-#include <malloc.h>
-#include <string.h>
-
-#ifdef WINDOWS
-#define DECLSPEC __declspec(dllexport)
-#define LIB_CALL __cdecl
-#define FORCE_INLINE __forceinline
-#elif defined UNIX
-#define DECLSPEC
-#define LIB_CALL
-#define FORCE_INLINE __attribute__((always_inline)) static __inline__
-#endif
-
-#ifndef NULL
-#ifdef __cplusplus
-#define NULL 0
-#endif
-#endif
-
-static inline void *zalloc(size_t s)
-{
-    void * v = malloc(s);
-    memset(v, 0, s);
-    return v;
-}

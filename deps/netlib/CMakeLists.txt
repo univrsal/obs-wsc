@@ -1,3 +1,5 @@
+project (netlib C)
+
 if(MSVC)
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(netlib_PLATFORM_DEPS
@@ -17,6 +19,7 @@ elseif(UNIX)
 endif()
 
 set(NETLIB_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/netlib.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/netlib_select.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/netlib_tcp.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/netlib_udp.c)
@@ -39,3 +42,6 @@ add_library(netlib
 
 set(NETLIB_LIBRARIES netlib CACHE STRING "Netlib libraries")
 set(NETLIB_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src CACHE PATH "Netlib includes")
+
+target_include_directories(netlib
+        PUBLIC src "${CMAKE_CURRENT_BINARY_DIR}/src")

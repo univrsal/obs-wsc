@@ -23,23 +23,20 @@ extern "C" {
 
 #include "opaque.h"
 #include "misc_types.h"
-#include "util.h"
-#include <stdint.h>
-#include <stdbool.h>
-
+#include "external/base.h"
 /**
  * @brief Opens a new connection to an obs websocket instance
  * @param addr The address (ip or domain)
  * @param port The port
  * @return the new connection or NULL on error
  */
-DECLSPEC obs_wsc_connection_t * LIB_CALL obs_wsc_connect(const char *addr,
+EXPORT obs_wsc_connection_t * obs_wsc_connect(const char *addr,
                                                          uint16_t port);
 
 /**
  * @brief Close an active connection
  */
-DECLSPEC void LIB_CALL obs_wsc_disconnect(obs_wsc_connection_t *conn);
+EXPORT void obs_wsc_disconnect(obs_wsc_connection_t *conn);
 
 /**
  * @brief Checks if the connections needs a password
@@ -48,8 +45,8 @@ DECLSPEC void LIB_CALL obs_wsc_disconnect(obs_wsc_connection_t *conn);
  *        salt (optional)
  * @return true on success
  */
-DECLSPEC bool LIB_CALL obs_wsc_auth_required(const obs_wsc_connection_t *conn,
-                                             obs_wsc_auth_data_t *auth);
+EXPORT bool obs_wsc_auth_required(const obs_wsc_connection_t *conn,
+                                  obs_wsc_auth_data_t *auth);
 
 /**
  * @brief Tries to autenticate with the server with the provided data
@@ -58,8 +55,8 @@ DECLSPEC bool LIB_CALL obs_wsc_auth_required(const obs_wsc_connection_t *conn,
  * @see obs_wsc_prepare_auth
  * @return true on success
  */
-DECLSPEC bool LIB_CALL obs_wsc_authenticate(const obs_wsc_connection_t *conn,
-                                            const obs_wsc_auth_data_t *auth);
+EXPORT bool obs_wsc_authenticate(const obs_wsc_connection_t *conn,
+                                 const obs_wsc_auth_data_t *auth);
 
 /**
  * @brief Creates the auth response, by hashing the password and encoding it
@@ -70,8 +67,9 @@ DECLSPEC bool LIB_CALL obs_wsc_authenticate(const obs_wsc_connection_t *conn,
  * @param password The password to login
  * @return true on success
  */
-DECLSPEC bool LIB_CALL obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth,
-                                            const char *password);
+EXPORT bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth,
+                                 const char *password);
+
 #ifdef __cplusplus
 }
 #endif

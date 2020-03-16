@@ -16,18 +16,5 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#include "wsc_tests.h"
-#include <cheat.h>
-
-CHEAT_TEST(connect,
-    obs_wsc_connection_t *conn = NULL;
-    cheat_assert((conn = obs_wsc_connect(NULL, 4444)) != NULL);
-    obs_wsc_disconnect(conn);
-)
-
-CHEAT_TEST(auth_required,
-    obs_wsc_connection_t *conn = NULL;
-    obs_wsc_auth_data_t auth;
-    cheat_assert(obs_wsc_auth_required(conn, &auth));
-    obs_wsc_disconnect(conn);
-)
+#pragma once
+#include <obs_wsc.h>

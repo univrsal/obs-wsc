@@ -17,9 +17,11 @@
  *************************************************************************/
 
 #include "obs_wsc.h"
+#include "external/bmem.h"
+#include "external/base.h"
 #include <netlib.h>
 
-#define err(a) printf("%s: %s\n", #a, netlib_get_error())
+#define err(a) berr("%s: %s\n", #a, netlib_get_error())
 
 typedef struct obs_wsc_connection_s {
     tcp_socket sock;
@@ -29,12 +31,16 @@ typedef struct obs_wsc_connection_s {
 
 obs_wsc_connection_t *obs_wsc_connect(const char *addr, uint16_t port)
 {
+    static const char *local_host = "localhost";
     if (netlib_init() == -1) {
         err(netlib_init);
         return NULL;
     }
 
-    obs_wsc_connection_t *n = zalloc(sizeof(obs_wsc_connection_t));
+    if (!addr)
+        addr = local_host;
+
+    obs_wsc_connection_t *n = bzalloc(sizeof(obs_wsc_connection_t));
 
     if (netlib_resolve_host(&n->addr, addr, port) < 0) {
         err(netlib_resolve_host);
@@ -45,7 +51,7 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr, uint16_t port)
         err(netlib_tcp_open);
         goto fail;
     }
-    n->domain = strdup(addr);
+    n->domain = bstrdup(addr);
 
     return n;
     fail:
@@ -60,7 +66,16 @@ void obs_wsc_disconnect(obs_wsc_connection_t *conn)
     if (conn->sock)
         netlib_tcp_close(conn->sock);
     if (conn->domain)
-        free(conn->domain);
+        bfree(conn->domain);
 
-    free(conn);
+    bfree(conn);
+}
+
+bool obs_wsc_auth_required(const obs_wsc_connection_t *conn, obs_wsc_auth_data_t
+                           *auth)
+{
+    if (!conn)
+        return false;
+
+    return true;
 }
