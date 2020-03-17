@@ -16,7 +16,7 @@ external use.
 #define CHEAT_H
 
 #ifndef __BASE_FILE__ /* This is indented so that older compilers ignore it. */
-	#error "the __BASE_FILE__ preprocessor directive is not defined"
+#error "the __BASE_FILE__ preprocessor directive is not defined"
 #endif
 
 #ifndef __STDC_VERSION__
@@ -66,13 +66,13 @@ they do not need to be.
 */
 
 #include <ctype.h>
-#include <errno.h> /* errno */
+#include <errno.h>  /* errno */
 #include <limits.h> /* INT_MAX */
 #include <setjmp.h> /* jmp_buf */
 #include <signal.h> /* SIGABRT, SIGFPE, SIGILL, SIGSEGV, SIGTERM */
 #include <stdarg.h> /* va_list */
 #include <stddef.h> /* NULL, size_t */
-#include <stdio.h> /* BUFSIZ, FILE, stderr, stdout */
+#include <stdio.h>  /* BUFSIZ, FILE, stderr, stdout */
 #include <stdlib.h> /* EXIT_FAILURE, EXIT_SUCCESS */
 #include <string.h>
 
@@ -90,7 +90,7 @@ typedef int bool;
 #include <stdint.h> /* SIZE_MAX */
 #else
 #ifndef SIZE_MAX
-#define SIZE_MAX ((size_t )-1)
+#define SIZE_MAX ((size_t)-1)
 #endif
 #endif
 
@@ -122,15 +122,15 @@ This is used to truncate too long string literals.
 */
 #ifndef CHEAT_LIMIT
 #ifdef CHEAT_POSTMODERN
-#define CHEAT_LIMIT ((size_t )65535)
+#define CHEAT_LIMIT ((size_t)65535)
 #else
 #ifdef CHEAT_MODERN
-#define CHEAT_LIMIT ((size_t )4095)
+#define CHEAT_LIMIT ((size_t)4095)
 #else
 #ifdef CHEAT_WINDOWED
-#define CHEAT_LIMIT ((size_t )2047)
+#define CHEAT_LIMIT ((size_t)2047)
 #else
-#define CHEAT_LIMIT ((size_t )509)
+#define CHEAT_LIMIT ((size_t)509)
 #endif
 #endif
 #endif
@@ -140,11 +140,9 @@ This is used to truncate too long string literals.
 This is needed to be able to cast a void pointer to any other pointer type.
 */
 #ifdef CHEAT_POSTMODERN
-#define CHEAT_CAST(type, expression) \
-	((type )expression)
+#define CHEAT_CAST(type, expression) ((type)expression)
 #else
-#define CHEAT_CAST(type, expression) \
-	(expression)
+#define CHEAT_CAST(type, expression) (expression)
 #endif
 
 /*
@@ -205,11 +203,7 @@ communicating text attributes to terminal emulators.
 #define CHEAT_BACKGROUND_CYAN "\033[46;1m"
 #define CHEAT_BACKGROUND_GRAY "\033[47;1m"
 
-enum cheat_type {
-	CHEAT_TESTER,
-	CHEAT_UTILITY,
-	CHEAT_TERMINATOR
-};
+enum cheat_type { CHEAT_TESTER, CHEAT_UTILITY, CHEAT_TERMINATOR };
 
 enum cheat_subtype {
 	CHEAT_NORMAL_TEST,
@@ -220,17 +214,9 @@ enum cheat_subtype {
 	CHEAT_NOTHING
 };
 
-enum cheat_harness {
-	CHEAT_UNSAFE,
-	CHEAT_SAFE,
-	CHEAT_DANGEROUS
-};
+enum cheat_harness { CHEAT_UNSAFE, CHEAT_SAFE, CHEAT_DANGEROUS };
 
-enum cheat_style {
-	CHEAT_PLAIN,
-	CHEAT_COLORFUL,
-	CHEAT_MINIMAL
-};
+enum cheat_style { CHEAT_PLAIN, CHEAT_COLORFUL, CHEAT_MINIMAL };
 
 enum cheat_outcome {
 	CHEAT_SUCCESSFUL,
@@ -259,7 +245,7 @@ Therefore an
 maze is not necessary.
 */
 #ifndef CHEAT_OFFSET /* This can be set externally. */
-#define CHEAT_OFFSET ((int )40)
+#define CHEAT_OFFSET ((int)40)
 #endif
 
 /*
@@ -273,14 +259,16 @@ Isolated tests that take too long to send data are terminated after this time.
 Repeated tests are obviously not repeated forever.
 */
 #ifndef CHEAT_REPETITIONS
-#define CHEAT_REPETITIONS ((size_t )256)
+#define CHEAT_REPETITIONS ((size_t)256)
 #endif
 
 /*
 These make preprocessor directives work like statements.
 */
 #define CHEAT_BEGIN do {
-#define CHEAT_END } while (false)
+#define CHEAT_END \
+	}             \
+	while (false)
 
 /*
 This computes an upper bound for the string length of an unsigned integer type.
@@ -294,12 +282,9 @@ This prints an error message and terminates the program.
 The error number is context sensitive and
 might only contain the least significant bytes of the actual error code.
 */
-#define cheat_death(message, number) \
-	CHEAT_BEGIN \
-		(void )fprintf(stderr, \
-				"%s:%d: %s (0x%x)\n", \
-				__FILE__, __LINE__, message, (unsigned int )number); \
-		exit(EXIT_FAILURE); \
+#define cheat_death(message, number)                                                                            \
+	CHEAT_BEGIN(void) fprintf(stderr, "%s:%d: %s (0x%x)\n", __FILE__, __LINE__, message, (unsigned int)number); \
+	exit(EXIT_FAILURE);                                                                                         \
 	CHEAT_END /* Using cheat_print(), cheat_exit() and
 			cheat_suite is intentionally avoided here. */
 
@@ -308,9 +293,9 @@ These could be defined as function types instead of function pointer types, but
 that would be inconsistent with the standard library and
 confuse some compilers.
 */
-typedef void (* cheat_procedure)(void); /* A test or a utility procedure. */
-typedef void (* cheat_handler)(int); /* A recovery procedure. */
-typedef void (* cheat_copier)(char*, char const*, size_t); /* A procedure for
+typedef void (*cheat_procedure)(void);                      /* A test or a utility procedure. */
+typedef void (*cheat_handler)(int);                         /* A recovery procedure. */
+typedef void (*cheat_copier)(char *, char const *, size_t); /* A procedure for
 		copying strings. */
 
 /*
@@ -320,7 +305,7 @@ on any of these structures since they are only for internal use.
 */
 
 struct cheat_unit {
-	char const* name;
+	char const *name;
 	enum cheat_type const type;
 	enum cheat_subtype const subtype;
 	cheat_procedure const procedure;
@@ -336,41 +321,41 @@ arrays of primitive types have sizes.
 
 struct cheat_string_array {
 	size_t count;
-	char** elements;
+	char **elements;
 };
 
 struct cheat_character_array {
 	size_t size;
-	char* elements;
+	char *elements;
 };
 
 struct cheat_string_list {
 	size_t count;
 	size_t capacity;
-	char** items;
+	char **items;
 };
 
 struct cheat_character_array_list {
 	size_t count;
 	size_t capacity;
-	struct cheat_character_array* items;
+	struct cheat_character_array *items;
 };
 
 struct cheat_statistics {
-	size_t run; /* This includes tests that are ignored, but
+	size_t run;        /* This includes tests that are ignored, but
 			not tests that are skipped. */
 	size_t successful; /* This includes tests that did nothing. */
-	size_t failed; /* This includes tests that exited, crashed or timed out. */
+	size_t failed;     /* This includes tests that exited, crashed or timed out. */
 };
 
 struct cheat_suite {
-	struct cheat_unit const* units; /* All tests and
+	struct cheat_unit const *units; /* All tests and
 			utility procedures (changes for each compilation). */
 
 	cheat_handler handler; /* The procedure to handle the recovery from
 			a fatal signal (changes for each compilation). */
 
-	char* program; /* The name passed to
+	char *program;                       /* The name passed to
 			the entry point (changes for each execution). */
 	struct cheat_string_array arguments; /* The arguments passed to
 			the entry point (changes for each execution). */
@@ -393,19 +378,19 @@ struct cheat_suite {
 	struct cheat_statistics tests; /* The totals of
 			various test outcomes (changes for each test). */
 
-	char const* test_name; /* The name of
+	char const *test_name;      /* The name of
 			the most recently run test (changes for each test). */
 	enum cheat_outcome outcome; /* The outcome of
 			the most recently run test (changes for each test). */
 
-	FILE* message_stream; /* The auxiliary stream that
+	FILE *message_stream; /* The auxiliary stream that
 			gathers internal messages (changes for each test). */
 
 	struct cheat_character_array_list messages; /* The messages related to
 			the test suite (changes for each test). */
-	struct cheat_character_array_list outputs; /* The captured output from
+	struct cheat_character_array_list outputs;  /* The captured output from
 			stdout (changes for each test). */
-	struct cheat_character_array_list errors; /* The captured output from
+	struct cheat_character_array_list errors;   /* The captured output from
 			stderr (changes for each test). */
 
 	jmp_buf environment; /* The recovery point in case of
@@ -417,7 +402,7 @@ struct cheat_channel {
 	int reader;
 	int writer;
 	bool active;
-	struct cheat_character_array_list* list;
+	struct cheat_character_array_list *list;
 };
 #else
 #ifdef CHEAT_WINDOWED
@@ -425,7 +410,7 @@ struct cheat_channel { /* TODO Use this with pipes. */
 	HANDLE reader;
 	HANDLE writer;
 	bool active;
-	struct cheat_character_array_list* list;
+	struct cheat_character_array_list *list;
 };
 #endif
 #endif
@@ -438,9 +423,9 @@ more effectful and domain specific.
 /*
 Calculates the arithmetic mean of two sizes and returns it.
 */
-__attribute__ ((__const__, __warn_unused_result__))
-static size_t cheat_mean(size_t const size,
-		size_t const another_size) {
+__attribute__((__const__, __warn_unused_result__)) static size_t cheat_mean(size_t const size,
+																			size_t const another_size)
+{
 	if (another_size < size)
 		return another_size + (size - another_size) / 2;
 
@@ -451,10 +436,10 @@ static size_t cheat_mean(size_t const size,
 Returns a size that is incremented so that reallocation costs are minimized or
 returns the old size unchanged in case it is maximal.
 */
-__attribute__ ((__const__, __warn_unused_result__))
-static size_t cheat_expand(size_t const size) {
-	if (size < sizeof (int))
-		return sizeof (int);
+__attribute__((__const__, __warn_unused_result__)) static size_t cheat_expand(size_t const size)
+{
+	if (size < sizeof(int))
+		return sizeof(int);
 
 	if (size > SIZE_MAX / 2 + SIZE_MAX / 4)
 		return cheat_mean(size, SIZE_MAX);
@@ -466,17 +451,15 @@ static size_t cheat_expand(size_t const size) {
 Compares two strings and returns whether they are approximately equal.
 Letter case is ignored and only single byte characters are guaranteed to work.
 */
-__attribute__ ((__nonnull__, __pure__, __warn_unused_result__))
-static bool cheat_compare(char const* const first,
-		char const* const second) {
+__attribute__((__nonnull__, __pure__, __warn_unused_result__)) static bool cheat_compare(char const *const first,
+																						 char const *const second)
+{
 	size_t index;
 
 	if (second == first)
 		return true;
 
-	for (index = 0;
-			first[index] != '\0' && second[index] != '\0';
-			++index)
+	for (index = 0; first[index] != '\0' && second[index] != '\0'; ++index)
 		if (tolower(first[index]) != tolower(second[index]))
 			return false;
 
@@ -487,14 +470,13 @@ static bool cheat_compare(char const* const first,
 Finds the amount of conversion specifiers in a format string.
 Valid specifiers start with '%' and are not immediately followed by '%' or '\0'.
 */
-__attribute__ ((__nonnull__, __pure__, __warn_unused_result__))
-static size_t cheat_format_specifiers(char const* const format) {
+__attribute__((__nonnull__, __pure__, __warn_unused_result__)) static size_t
+cheat_format_specifiers(char const *const format)
+{
 	size_t index;
 	size_t count = 0;
 
-	for (index = 0;
-			format[index] != '\0';
-			++index)
+	for (index = 0; format[index] != '\0'; ++index)
 		if (format[index] == '%') {
 			if (!(format[index + 1] == '%' || format[index + 1] == '\0'))
 				++count;
@@ -508,16 +490,14 @@ static size_t cheat_format_specifiers(char const* const format) {
 Safely allocates memory for a block and returns a pointer to it or
 returns NULL and sets errno in case of a failure.
 */
-__attribute__ ((__malloc__, __warn_unused_result__))
-static void* cheat_allocate_total(size_t const count, ...) {
+__attribute__((__malloc__, __warn_unused_result__)) static void *cheat_allocate_total(size_t const count, ...)
+{
 	va_list list;
 	size_t index;
 	size_t size = 0;
 
 	va_start(list, count);
-	for (index = 0;
-			index < count;
-			++index) {
+	for (index = 0; index < count; ++index) {
 		size_t argument;
 
 		argument = va_arg(list, size_t);
@@ -536,10 +516,9 @@ static void* cheat_allocate_total(size_t const count, ...) {
 Safely reallocates memory for an array and returns a pointer to it or
 returns NULL and sets errno in case of a failure.
 */
-__attribute__ ((__warn_unused_result__))
-static void* cheat_reallocate_array(void* const pointer,
-		size_t const count,
-		size_t const size) {
+__attribute__((__warn_unused_result__)) static void *cheat_reallocate_array(void *const pointer, size_t const count,
+																			size_t const size)
+{
 	if (count > SIZE_MAX / size)
 		return NULL;
 
@@ -550,12 +529,11 @@ static void* cheat_reallocate_array(void* const pointer,
 Allocates a truncated string with a marker at its end if it is long enough or
 returns NULL and sets errno in case of a failure.
 */
-__attribute__ ((__malloc__, __nonnull__, __warn_unused_result__))
-static char* cheat_allocate_truncated(char const* const literal,
-		size_t const length,
-		char const* const marker) {
+__attribute__((__malloc__, __nonnull__, __warn_unused_result__)) static char *
+cheat_allocate_truncated(char const *const literal, size_t const length, char const *const marker)
+{
 	size_t literal_length;
-	char* result;
+	char *result;
 
 	literal_length = strlen(literal);
 	if (literal_length > length) {
@@ -566,7 +544,7 @@ static char* cheat_allocate_truncated(char const* const literal,
 		if (marker_length > length)
 			return NULL;
 
-		result = CHEAT_CAST(char*, malloc(length + 1));
+		result = CHEAT_CAST(char *, malloc(length + 1));
 		if (result == NULL)
 			return NULL;
 
@@ -574,7 +552,7 @@ static char* cheat_allocate_truncated(char const* const literal,
 		memcpy(result, literal, paste_length);
 		memcpy(&result[paste_length], marker, marker_length + 1);
 	} else {
-		result = CHEAT_CAST(char*, malloc(literal_length + 1));
+		result = CHEAT_CAST(char *, malloc(literal_length + 1));
 		if (result == NULL)
 			return NULL;
 
@@ -588,8 +566,8 @@ static char* cheat_allocate_truncated(char const* const literal,
 Strips out ISO/IEC 6429 escape sequences from a string and
 returns its new length.
 */
-__attribute__ ((__nonnull__))
-static size_t cheat_strip(char* const variable) {
+__attribute__((__nonnull__)) static size_t cheat_strip(char *const variable)
+{
 	size_t in = 0;
 	size_t out = 0;
 
@@ -598,9 +576,7 @@ static size_t cheat_strip(char* const variable) {
 			if (variable[in + 1] == '[') {
 				size_t off;
 
-				for (off = 2;
-						variable[in + off] < '@' || variable[in + off] > '~';
-						++off) {
+				for (off = 2; variable[in + off] < '@' || variable[in + off] > '~'; ++off) {
 					if (variable[in + off] == '\0') {
 						memmove(&variable[out], &variable[in], off);
 						out += off;
@@ -632,10 +608,9 @@ Builds a formatted string or
 fails safely in case the amount of conversion specifiers in
 the format string does not match the expected count.
 */
-__attribute__ ((__format__ (__printf__, 1, 4), __nonnull__ (1)))
-static int cheat_print_string(char* const destination,
-		char const* const format,
-		size_t const count, ...) {
+__attribute__((__format__(__printf__, 1, 4), __nonnull__(1))) static int
+cheat_print_string(char *const destination, char const *const format, size_t const count, ...)
+{
 	va_list list;
 	int result;
 
@@ -653,10 +628,9 @@ Prints a formatted string or
 fails safely in case the amount of conversion specifiers in
 the format string does not match the expected count.
 */
-__attribute__ ((__format__ (__printf__, 2, 4), __io__, __nonnull__ (1)))
-static int cheat_print(FILE* const stream,
-		char const* const format,
-		size_t const count, ...) {
+__attribute__((__format__(__printf__, 2, 4), __io__, __nonnull__(1))) static int
+cheat_print(FILE *const stream, char const *const format, size_t const count, ...)
+{
 	va_list list;
 	int result;
 
@@ -677,7 +651,8 @@ even though it uses cheat_death(), because it is reserved for failures.
 /*
 Converts an outcome into an exit status.
 */
-static int cheat_encode_outcome(enum cheat_outcome const outcome) {
+static int cheat_encode_outcome(enum cheat_outcome const outcome)
+{
 	switch (outcome) {
 	case CHEAT_SUCCESSFUL:
 		return 0;
@@ -701,8 +676,8 @@ static int cheat_encode_outcome(enum cheat_outcome const outcome) {
 /*
 Converts an exit status into an outcome.
 */
-__attribute__ ((__const__))
-static enum cheat_outcome cheat_decode_status(int const status) {
+__attribute__((__const__)) static enum cheat_outcome cheat_decode_status(int const status)
+{
 	switch (status) {
 	case 0:
 		return CHEAT_SUCCESSFUL;
@@ -727,15 +702,13 @@ static enum cheat_outcome cheat_decode_status(int const status) {
 Finds a test or a utility procedure by its name and returns a pointer to it or
 returns NULL in case of a failure.
 */
-__attribute__ ((__nonnull__, __pure__, __warn_unused_result__))
-static struct cheat_unit const* cheat_find(struct cheat_unit const* const units,
-		char const* const name) {
+__attribute__((__nonnull__, __pure__, __warn_unused_result__)) static struct cheat_unit const *
+cheat_find(struct cheat_unit const *const units, char const *const name)
+{
 	size_t index;
 
-	for (index = 0;
-			units[index].type != CHEAT_TERMINATOR;
-			++index) {
-		struct cheat_unit const* unit;
+	for (index = 0; units[index].type != CHEAT_TERMINATOR; ++index) {
+		struct cheat_unit const *unit;
 
 		unit = &units[index];
 		if (unit->name != NULL && strcmp(unit->name, name) == 0)
@@ -748,8 +721,8 @@ static struct cheat_unit const* cheat_find(struct cheat_unit const* const units,
 /*
 Initializes an undefined array of strings.
 */
-__attribute__ ((__nonnull__))
-static void cheat_initialize_string_array(struct cheat_string_array* const array) {
+__attribute__((__nonnull__)) static void cheat_initialize_string_array(struct cheat_string_array *const array)
+{
 	array->count = 0;
 	array->elements = NULL;
 }
@@ -757,8 +730,8 @@ static void cheat_initialize_string_array(struct cheat_string_array* const array
 /*
 Initializes an undefined list of strings.
 */
-__attribute__ ((__nonnull__))
-static void cheat_initialize_string_list(struct cheat_string_list* const list) {
+__attribute__((__nonnull__)) static void cheat_initialize_string_list(struct cheat_string_list *const list)
+{
 	list->count = 0;
 	list->capacity = 0;
 	list->items = NULL;
@@ -767,8 +740,8 @@ static void cheat_initialize_string_list(struct cheat_string_list* const list) {
 /*
 Initializes an undefined list of character arrays.
 */
-__attribute__ ((__nonnull__))
-static void cheat_initialize_list(struct cheat_character_array_list* const list) {
+__attribute__((__nonnull__)) static void cheat_initialize_list(struct cheat_character_array_list *const list)
+{
 	list->count = 0;
 	list->capacity = 0;
 	list->items = NULL;
@@ -777,8 +750,8 @@ static void cheat_initialize_list(struct cheat_character_array_list* const list)
 /*
 Initializes undefined statistics.
 */
-__attribute__ ((__nonnull__))
-static void cheat_initialize_statistics(struct cheat_statistics* const statistics) {
+__attribute__((__nonnull__)) static void cheat_initialize_statistics(struct cheat_statistics *const statistics)
+{
 	statistics->run = 0;
 	statistics->successful = 0;
 	statistics->failed = 0;
@@ -787,8 +760,8 @@ static void cheat_initialize_statistics(struct cheat_statistics* const statistic
 /*
 Initializes an undefined test suite.
 */
-__attribute__ ((__nonnull__))
-static void cheat_initialize(struct cheat_suite* const suite) {
+__attribute__((__nonnull__)) static void cheat_initialize(struct cheat_suite *const suite)
+{
 	suite->units = NULL;
 
 	/* Do not touch suite->handler. */
@@ -823,8 +796,8 @@ static void cheat_initialize(struct cheat_suite* const suite) {
 /*
 Clears a list of strings.
 */
-__attribute__ ((__nonnull__))
-static void cheat_clear_string_list(struct cheat_string_list* const list) {
+__attribute__((__nonnull__)) static void cheat_clear_string_list(struct cheat_string_list *const list)
+{
 	list->count = 0;
 	list->capacity = 0;
 	free(list->items);
@@ -834,8 +807,8 @@ static void cheat_clear_string_list(struct cheat_string_list* const list) {
 /*
 Clears a list of character arrays.
 */
-__attribute__ ((__nonnull__))
-static void cheat_clear_list(struct cheat_character_array_list* const list) {
+__attribute__((__nonnull__)) static void cheat_clear_list(struct cheat_character_array_list *const list)
+{
 	while (list->count > 0)
 		free(list->items[--list->count].elements);
 
@@ -847,8 +820,8 @@ static void cheat_clear_list(struct cheat_character_array_list* const list) {
 /*
 Clears all the character array lists in a test suite.
 */
-__attribute__ ((__nonnull__))
-static void cheat_clear_lists(struct cheat_suite* const suite) {
+__attribute__((__nonnull__)) static void cheat_clear_lists(struct cheat_suite *const suite)
+{
 	cheat_clear_list(&suite->messages);
 	cheat_clear_list(&suite->outputs);
 	cheat_clear_list(&suite->errors);
@@ -858,9 +831,9 @@ static void cheat_clear_lists(struct cheat_suite* const suite) {
 Adds a string to the end of a list or
 terminates the program in case of a failure.
 */
-__attribute__ ((__nonnull__ (1)))
-static void cheat_append_string_list(struct cheat_string_list* const list,
-		char* const item) {
+__attribute__((__nonnull__(1))) static void cheat_append_string_list(struct cheat_string_list *const list,
+																	 char *const item)
+{
 	size_t count;
 
 	if (list->count == SIZE_MAX)
@@ -869,14 +842,13 @@ static void cheat_append_string_list(struct cheat_string_list* const list,
 
 	if (list->count == list->capacity) {
 		size_t capacity;
-		char** items;
+		char **items;
 
 		capacity = cheat_expand(list->capacity);
 		if (capacity == list->capacity)
 			cheat_death("item capacity exceeded", list->capacity);
 
-		items = CHEAT_CAST(char**, cheat_reallocate_array(list->items,
-					capacity, sizeof *list->items));
+		items = CHEAT_CAST(char **, cheat_reallocate_array(list->items, capacity, sizeof *list->items));
 		if (items == NULL)
 			cheat_death("failed to allocate more memory", errno);
 
@@ -892,12 +864,11 @@ static void cheat_append_string_list(struct cheat_string_list* const list,
 Copies a message form a character array to the end of a list or
 terminates the program in case of a failure.
 */
-__attribute__ ((__nonnull__ (1)))
-static void cheat_append_list(struct cheat_character_array_list* const list,
-		char const* const buffer,
-		size_t const size) {
+__attribute__((__nonnull__(1))) static void cheat_append_list(struct cheat_character_array_list *const list,
+															  char const *const buffer, size_t const size)
+{
 	size_t count;
-	char* elements;
+	char *elements;
 
 	if (buffer == NULL || size == 0)
 		return;
@@ -908,14 +879,14 @@ static void cheat_append_list(struct cheat_character_array_list* const list,
 
 	if (list->count == list->capacity) {
 		size_t capacity;
-		struct cheat_character_array* items;
+		struct cheat_character_array *items;
 
 		capacity = cheat_expand(list->capacity);
 		if (capacity == list->capacity)
 			cheat_death("item capacity exceeded", list->capacity);
 
-		items = CHEAT_CAST(struct cheat_character_array*, cheat_reallocate_array(list->items,
-					capacity, sizeof *list->items));
+		items = CHEAT_CAST(struct cheat_character_array *,
+						   cheat_reallocate_array(list->items, capacity, sizeof *list->items));
 		if (items == NULL)
 			cheat_death("failed to allocate more memory", errno);
 
@@ -923,7 +894,7 @@ static void cheat_append_list(struct cheat_character_array_list* const list,
 		list->items = items;
 	}
 
-	elements = CHEAT_CAST(char*, malloc(size));
+	elements = CHEAT_CAST(char *, malloc(size));
 	if (elements == NULL)
 		cheat_death("failed to allocate memory", errno);
 	memcpy(elements, buffer, size);
@@ -936,9 +907,9 @@ static void cheat_append_list(struct cheat_character_array_list* const list,
 /*
 Checks whether a stream should be captured.
 */
-__attribute__ ((__pure__, __unused__, __warn_unused_result__))
-static bool cheat_capture(struct cheat_suite const* const suite,
-		FILE const* const stream) {
+__attribute__((__pure__, __unused__, __warn_unused_result__)) static bool
+cheat_capture(struct cheat_suite const *const suite, FILE const *const stream)
+{
 	return !suite->quiet && (stream == stdout || stream == stderr);
 }
 
@@ -946,9 +917,9 @@ static bool cheat_capture(struct cheat_suite const* const suite,
 Checks whether a stream should be hidden or
 terminates the program in case of a failure.
 */
-__attribute__ ((__nonnull__ (1), __unused__, __warn_unused_result__))
-static bool cheat_hide(struct cheat_suite const* const suite,
-		FILE const* const stream) {
+__attribute__((__nonnull__(1), __unused__, __warn_unused_result__)) static bool
+cheat_hide(struct cheat_suite const *const suite, FILE const *const stream)
+{
 	switch (suite->harness) {
 	case CHEAT_UNSAFE:
 	case CHEAT_DANGEROUS:
@@ -972,8 +943,8 @@ cheat_scan_output(bool (*)(char const*, size_t))
 Adds the outcome of a single test to a test suite or
 terminates the program in case of a failure.
 */
-__attribute__ ((__nonnull__))
-static void cheat_handle_outcome(struct cheat_suite* const suite) {
+__attribute__((__nonnull__)) static void cheat_handle_outcome(struct cheat_suite *const suite)
+{
 	switch (suite->outcome) {
 	case CHEAT_SUCCESSFUL:
 		++suite->tests.run;
@@ -999,8 +970,8 @@ static void cheat_handle_outcome(struct cheat_suite* const suite) {
 Registers a signal handler or
 terminates the program in case of a failure.
 */
-__attribute__ ((__nonnull__))
-static void cheat_register_handler(cheat_handler const handler) {
+__attribute__((__nonnull__)) static void cheat_register_handler(cheat_handler const handler)
+{
 	if (signal(SIGABRT, handler) == SIG_ERR)
 		cheat_death("failed to add a handler for SIGABRT", errno);
 	if (signal(SIGFPE, handler) == SIG_ERR)
@@ -1017,9 +988,8 @@ static void cheat_register_handler(cheat_handler const handler) {
 Stops a test or
 terminates the program in case of a failure.
 */
-__attribute__ ((__nonnull__))
-static void cheat_exit(struct cheat_suite* const suite,
-		int const status) {
+__attribute__((__nonnull__)) static void cheat_exit(struct cheat_suite *const suite, int const status)
+{
 	switch (suite->harness) {
 	case CHEAT_UNSAFE:
 		suite->outcome = CHEAT_EXITED;
@@ -1037,83 +1007,47 @@ static void cheat_exit(struct cheat_suite* const suite,
 Prints the contents of a list or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_print_list(struct cheat_character_array_list const* const list) {
+__attribute__((__io__, __nonnull__)) static void cheat_print_list(struct cheat_character_array_list const *const list)
+{
 	size_t index;
 
-	for (index = 0;
-			index < list->count;
-			++index)
-		(void )fwrite(list->items[index].elements, 1, list->items[index].size, stdout);
+	for (index = 0; index < list->count; ++index)
+		(void)fwrite(list->items[index].elements, 1, list->items[index].size, stdout);
 }
 
 /*
 Prints a summary of the usage or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_print_usage(struct cheat_suite const* const suite) {
+__attribute__((__io__, __nonnull__)) static void cheat_print_usage(struct cheat_suite const *const suite)
+{
 	bool strip = false;
 	bool print_usage = false;
 	bool print_options = false;
 	bool print_labels = false;
-	char usage_format[] = CHEAT_BOLD "%s"
-		CHEAT_RESET " [test or option] [another test or option] [...]";
-	char option_strings[][80] = { /* This length is a coincidence. */
-		CHEAT_BOLD "-c"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--colorful"
-			CHEAT_RESET "   Use ISO/IEC 6429 escape codes to color text",
-		CHEAT_BOLD "-d"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--dangerous"
-			CHEAT_RESET "  Pretend that crashing tests do nothing harmful",
-		CHEAT_BOLD "-e"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--eternal"
-			CHEAT_RESET "    Allow isolated tests to take their time",
-		CHEAT_BOLD "-h"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--help"
-			CHEAT_RESET "       Show this help",
-		CHEAT_BOLD "-l"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--list"
-			CHEAT_RESET "       List test cases",
-		CHEAT_BOLD "-m"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--minimal"
-			CHEAT_RESET "    Report things in a machine readable format",
-		CHEAT_BOLD "-n"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--noisy"
-			CHEAT_RESET "      Capture and display standard streams",
-		CHEAT_BOLD "-p"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--plain"
-			CHEAT_RESET "      Present everything in plain text",
-		CHEAT_BOLD "-s"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--safe"
-			CHEAT_RESET "       Run tests in isolated subprocesses",
-		CHEAT_BOLD "-t"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--timed"
-			CHEAT_RESET "      Terminate isolated tests that take too long",
-		CHEAT_BOLD "-u"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--unsafe"
-			CHEAT_RESET "     Let crashing tests bring down the test suite",
-		CHEAT_BOLD "-v"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--version"
-			CHEAT_RESET "    Print version information",
-		CHEAT_BOLD "-q"
-			CHEAT_RESET "  "
-			CHEAT_BOLD "--quiet"
-			CHEAT_RESET "      Do not capture standard streams",
-		""
-	};
+	char usage_format[] = CHEAT_BOLD "%s" CHEAT_RESET " [test or option] [another test or option] [...]";
+	char option_strings[][80] = {
+		/* This length is a coincidence. */
+		CHEAT_BOLD "-c" CHEAT_RESET "  " CHEAT_BOLD "--colorful" CHEAT_RESET
+				   "   Use ISO/IEC 6429 escape codes to color text",
+		CHEAT_BOLD "-d" CHEAT_RESET "  " CHEAT_BOLD "--dangerous" CHEAT_RESET
+				   "  Pretend that crashing tests do nothing harmful",
+		CHEAT_BOLD "-e" CHEAT_RESET "  " CHEAT_BOLD "--eternal" CHEAT_RESET
+				   "    Allow isolated tests to take their time",
+		CHEAT_BOLD "-h" CHEAT_RESET "  " CHEAT_BOLD "--help" CHEAT_RESET "       Show this help",
+		CHEAT_BOLD "-l" CHEAT_RESET "  " CHEAT_BOLD "--list" CHEAT_RESET "       List test cases",
+		CHEAT_BOLD "-m" CHEAT_RESET "  " CHEAT_BOLD "--minimal" CHEAT_RESET
+				   "    Report things in a machine readable format",
+		CHEAT_BOLD "-n" CHEAT_RESET "  " CHEAT_BOLD "--noisy" CHEAT_RESET "      Capture and display standard streams",
+		CHEAT_BOLD "-p" CHEAT_RESET "  " CHEAT_BOLD "--plain" CHEAT_RESET "      Present everything in plain text",
+		CHEAT_BOLD "-s" CHEAT_RESET "  " CHEAT_BOLD "--safe" CHEAT_RESET "       Run tests in isolated subprocesses",
+		CHEAT_BOLD "-t" CHEAT_RESET "  " CHEAT_BOLD "--timed" CHEAT_RESET
+				   "      Terminate isolated tests that take too long",
+		CHEAT_BOLD "-u" CHEAT_RESET "  " CHEAT_BOLD "--unsafe" CHEAT_RESET
+				   "     Let crashing tests bring down the test suite",
+		CHEAT_BOLD "-v" CHEAT_RESET "  " CHEAT_BOLD "--version" CHEAT_RESET "    Print version information",
+		CHEAT_BOLD "-q" CHEAT_RESET "  " CHEAT_BOLD "--quiet" CHEAT_RESET "      Do not capture standard streams",
+		""};
 
 	switch (suite->style) {
 	case CHEAT_PLAIN:
@@ -1136,29 +1070,26 @@ static void cheat_print_usage(struct cheat_suite const* const suite) {
 			cheat_strip(usage_format);
 
 		if (print_labels)
-			(void )fputs("Usage: ", stdout);
-		(void )cheat_print(stdout, usage_format, 1,
-				suite->program);
-		(void )fputc('\n', stdout);
+			(void)fputs("Usage: ", stdout);
+		(void)cheat_print(stdout, usage_format, 1, suite->program);
+		(void)fputc('\n', stdout);
 	}
 
 	if (print_options) {
 		size_t index;
 
-		for (index = 0;
-				option_strings[index][0] != '\0';
-				++index) {
+		for (index = 0; option_strings[index][0] != '\0'; ++index) {
 			if (strip)
 				cheat_strip(option_strings[index]);
 
 			if (print_labels) {
 				if (index == 0)
-					(void )fputs("Options: ", stdout);
+					(void)fputs("Options: ", stdout);
 				else
-					(void )fputs("         ", stdout);
+					(void)fputs("         ", stdout);
 			}
-			(void )fputs(option_strings[index], stdout);
-			(void )fputc('\n', stdout);
+			(void)fputs(option_strings[index], stdout);
+			(void)fputc('\n', stdout);
 		}
 	}
 }
@@ -1167,14 +1098,13 @@ static void cheat_print_usage(struct cheat_suite const* const suite) {
 Prints a list of the tests or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_print_tests(struct cheat_suite const* const suite) {
+__attribute__((__io__, __nonnull__)) static void cheat_print_tests(struct cheat_suite const *const suite)
+{
 	bool strip = false;
 	bool print_labels = false;
 	bool print_subtypes = false;
 	size_t index;
-	char name_format[] = CHEAT_BOLD "%s"
-		CHEAT_RESET;
+	char name_format[] = CHEAT_BOLD "%s" CHEAT_RESET;
 	bool first = true;
 
 	switch (suite->style) {
@@ -1191,9 +1121,7 @@ static void cheat_print_tests(struct cheat_suite const* const suite) {
 		cheat_death("invalid style", suite->style);
 	}
 
-	for (index = 0;
-			suite->units[index].type != CHEAT_TERMINATOR;
-			++index) {
+	for (index = 0; suite->units[index].type != CHEAT_TERMINATOR; ++index) {
 		if (suite->units[index].type != CHEAT_TESTER)
 			continue;
 
@@ -1202,26 +1130,25 @@ static void cheat_print_tests(struct cheat_suite const* const suite) {
 
 		if (print_labels) {
 			if (first) {
-				(void )fputs("Tests: ", stdout);
+				(void)fputs("Tests: ", stdout);
 				first = false;
 			} else
-				(void )fputs("       ", stdout);
+				(void)fputs("       ", stdout);
 		}
-		(void )cheat_print(stdout, name_format, 1,
-				suite->units[index].name);
+		(void)cheat_print(stdout, name_format, 1, suite->units[index].name);
 		if (print_subtypes)
 			switch (suite->units[index].subtype) {
 			case CHEAT_IGNORED_TEST:
-				(void )fputs(" (ignored)", stdout);
+				(void)fputs(" (ignored)", stdout);
 				break;
 			case CHEAT_SKIPPED_TEST:
-				(void )fputs(" (skipped)", stdout);
+				(void)fputs(" (skipped)", stdout);
 			case CHEAT_NORMAL_TEST:
 				break;
 			default:
 				cheat_death("invalid subtype", suite->style);
 			}
-		(void )fputc('\n', stdout);
+		(void)fputc('\n', stdout);
 	}
 }
 
@@ -1229,32 +1156,26 @@ static void cheat_print_tests(struct cheat_suite const* const suite) {
 Prints the version number string or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__))
-static void cheat_print_version(void) {
-	(void )fputs("CHEAT 1.0.4", stdout); /* This is always boring. */
-	(void )fputc('\n', stdout);
+__attribute__((__io__)) static void cheat_print_version(void)
+{
+	(void)fputs("CHEAT 1.0.4", stdout); /* This is always boring. */
+	(void)fputc('\n', stdout);
 }
 
 /*
 Prints the outcome of a single test or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_print_outcome(struct cheat_suite const* const suite) {
+__attribute__((__io__, __nonnull__)) static void cheat_print_outcome(struct cheat_suite const *const suite)
+{
 	bool strip = false;
 	bool print_outcome = false;
-	char successful_string[] = CHEAT_BACKGROUND_GREEN "."
-		CHEAT_RESET;
-	char failed_string[] = CHEAT_BACKGROUND_RED ":"
-		CHEAT_RESET;
-	char exited_string[] = CHEAT_BACKGROUND_RED "!"
-		CHEAT_RESET;
-	char crashed_string[] = CHEAT_BACKGROUND_RED "!"
-		CHEAT_RESET;
-	char timed_out_string[] = CHEAT_BACKGROUND_YELLOW "!"
-		CHEAT_RESET;
-	char ignored_string[] = CHEAT_BACKGROUND_YELLOW "?"
-		CHEAT_RESET;
+	char successful_string[] = CHEAT_BACKGROUND_GREEN "." CHEAT_RESET;
+	char failed_string[] = CHEAT_BACKGROUND_RED ":" CHEAT_RESET;
+	char exited_string[] = CHEAT_BACKGROUND_RED "!" CHEAT_RESET;
+	char crashed_string[] = CHEAT_BACKGROUND_RED "!" CHEAT_RESET;
+	char timed_out_string[] = CHEAT_BACKGROUND_YELLOW "!" CHEAT_RESET;
+	char ignored_string[] = CHEAT_BACKGROUND_YELLOW "?" CHEAT_RESET;
 	char skipped_string[] = "";
 
 	switch (suite->style) {
@@ -1270,7 +1191,7 @@ static void cheat_print_outcome(struct cheat_suite const* const suite) {
 	}
 
 	if (print_outcome) {
-		char* outcome_string;
+		char *outcome_string;
 
 		switch (suite->outcome) {
 		case CHEAT_SUCCESSFUL:
@@ -1301,8 +1222,8 @@ static void cheat_print_outcome(struct cheat_suite const* const suite) {
 		if (strip)
 			cheat_strip(outcome_string);
 
-		(void )fputs(outcome_string, stdout);
-		(void )fflush(stdout);
+		(void)fputs(outcome_string, stdout);
+		(void)fflush(stdout);
 	}
 }
 
@@ -1310,12 +1231,11 @@ static void cheat_print_outcome(struct cheat_suite const* const suite) {
 Prints a separator or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_print_separator(struct cheat_suite const* const suite) {
+__attribute__((__io__, __nonnull__)) static void cheat_print_separator(struct cheat_suite const *const suite)
+{
 	bool strip = false;
 	bool print_separator = false;
-	char separator_string[] = CHEAT_FOREGROUND_GRAY "---"
-		CHEAT_RESET;
+	char separator_string[] = CHEAT_FOREGROUND_GRAY "---" CHEAT_RESET;
 
 	switch (suite->style) {
 	case CHEAT_PLAIN:
@@ -1338,8 +1258,8 @@ static void cheat_print_separator(struct cheat_suite const* const suite) {
 		if (strip)
 			cheat_strip(separator_string);
 
-		(void )fputs(separator_string, stdout);
-		(void )fputc('\n', stdout);
+		(void)fputs(separator_string, stdout);
+		(void)fputc('\n', stdout);
 	}
 }
 
@@ -1347,8 +1267,8 @@ static void cheat_print_separator(struct cheat_suite const* const suite) {
 Prints a summary of tests or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_print_summary(struct cheat_suite const* const suite) {
+__attribute__((__io__, __nonnull__)) static void cheat_print_summary(struct cheat_suite const *const suite)
+{
 	bool strip = false;
 	bool regular = false;
 	bool print_outcomes = false;
@@ -1357,28 +1277,20 @@ static void cheat_print_summary(struct cheat_suite const* const suite) {
 	bool print_errors = false;
 	bool print_summary = false;
 	bool print_conclusion = false;
-	char long_successful_format[] = CHEAT_FOREGROUND_GREEN
-		CHEAT_SIZE_FORMAT " successful"
-		CHEAT_RESET;
+	char long_successful_format[] = CHEAT_FOREGROUND_GREEN CHEAT_SIZE_FORMAT " successful" CHEAT_RESET;
 	char long_and_string[] = " and ";
-	char long_failed_format[] = CHEAT_FOREGROUND_RED
-		CHEAT_SIZE_FORMAT " failed"
-		CHEAT_RESET;
+	char long_failed_format[] = CHEAT_FOREGROUND_RED CHEAT_SIZE_FORMAT " failed" CHEAT_RESET;
 	char long_of_string[] = " of ";
-	char long_run_format[] = CHEAT_FOREGROUND_YELLOW
-		CHEAT_SIZE_FORMAT " run"
-		CHEAT_RESET;
-	char success_string[] = CHEAT_FOREGROUND_GREEN "SUCCESS"
-		CHEAT_RESET;
-	char failure_string[] = CHEAT_FOREGROUND_RED "FAILURE"
-		CHEAT_RESET;
+	char long_run_format[] = CHEAT_FOREGROUND_YELLOW CHEAT_SIZE_FORMAT " run" CHEAT_RESET;
+	char success_string[] = CHEAT_FOREGROUND_GREEN "SUCCESS" CHEAT_RESET;
+	char failure_string[] = CHEAT_FOREGROUND_RED "FAILURE" CHEAT_RESET;
 	char short_format[] = CHEAT_SIZE_FORMAT;
 	char short_string[] = " ";
-	char* successful_format;
-	char* and_string;
-	char* failed_format;
-	char* of_string;
-	char* run_format;
+	char *successful_format;
+	char *and_string;
+	char *failed_format;
+	char *of_string;
+	char *run_format;
 	bool any_successes;
 	bool any_failures;
 	bool any_run;
@@ -1427,7 +1339,7 @@ static void cheat_print_summary(struct cheat_suite const* const suite) {
 	if (print_outcomes && any_run) {
 		separate = true;
 
-		(void )fputc('\n', stdout);
+		(void)fputc('\n', stdout);
 	}
 	if (print_messages && any_messages) {
 		if (separate)
@@ -1458,48 +1370,45 @@ static void cheat_print_summary(struct cheat_suite const* const suite) {
 			if (strip)
 				cheat_strip(successful_format);
 
-			(void )cheat_print(stdout, successful_format, 1,
-					(CHEAT_SIZE_TYPE )suite->tests.successful);
+			(void)cheat_print(stdout, successful_format, 1, (CHEAT_SIZE_TYPE)suite->tests.successful);
 		}
 		if (regular || (any_successes && any_failures)) {
 			if (strip)
 				cheat_strip(and_string);
 
-			(void )fputs(and_string, stdout);
+			(void)fputs(and_string, stdout);
 		}
 		if (regular || any_failures) {
 			if (strip)
 				cheat_strip(failed_format);
 
-			(void )cheat_print(stdout, failed_format, 1,
-					(CHEAT_SIZE_TYPE )suite->tests.failed);
+			(void)cheat_print(stdout, failed_format, 1, (CHEAT_SIZE_TYPE)suite->tests.failed);
 		}
 		if (regular || (any_successes || any_failures)) {
 			if (strip)
 				cheat_strip(of_string);
 
-			(void )fputs(of_string, stdout);
+			(void)fputs(of_string, stdout);
 		}
 		if (strip)
 			cheat_strip(run_format);
 
-		(void )cheat_print(stdout, run_format, 1,
-				(CHEAT_SIZE_TYPE )suite->tests.run);
-		(void )fputc('\n', stdout);
+		(void)cheat_print(stdout, run_format, 1, (CHEAT_SIZE_TYPE)suite->tests.run);
+		(void)fputc('\n', stdout);
 	}
 	if (print_conclusion) {
 		if (!any_failures) {
 			if (strip)
 				cheat_strip(success_string);
 
-			(void )fputs(success_string, stdout);
+			(void)fputs(success_string, stdout);
 		} else {
 			if (strip)
 				cheat_strip(failure_string);
 
-			(void )fputs(failure_string, stdout);
+			(void)fputs(failure_string, stdout);
 		}
-		(void )fputc('\n', stdout);
+		(void)fputc('\n', stdout);
 	}
 }
 
@@ -1507,20 +1416,15 @@ static void cheat_print_summary(struct cheat_suite const* const suite) {
 Prints an error message or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_print_failure(struct cheat_suite* const suite,
-		char const* const expression,
-		char const* const file,
-		size_t const line) {
+__attribute__((__io__, __nonnull__)) static void cheat_print_failure(struct cheat_suite *const suite,
+																	 char const *const expression,
+																	 char const *const file, size_t const line)
+{
 	bool strip = false;
 	bool print_assertion = false;
-	char assertion_format[] = CHEAT_BOLD "%s:"
-		CHEAT_SIZE_FORMAT ":"
-		CHEAT_RESET " assertion in '"
-		CHEAT_BOLD "%s"
-		CHEAT_RESET "' failed: '"
-		CHEAT_BOLD "%s"
-		CHEAT_RESET "'\n"; /* Mind the line break. */
+	char assertion_format[] = CHEAT_BOLD "%s:" CHEAT_SIZE_FORMAT ":" CHEAT_RESET " assertion in '" CHEAT_BOLD
+										 "%s" CHEAT_RESET "' failed: '" CHEAT_BOLD "%s" CHEAT_RESET
+										 "'\n"; /* Mind the line break. */
 
 	switch (suite->style) {
 	case CHEAT_PLAIN:
@@ -1535,8 +1439,8 @@ static void cheat_print_failure(struct cheat_suite* const suite,
 	}
 
 	if (print_assertion) {
-		char* truncation;
-		char* buffer;
+		char *truncation;
+		char *buffer;
 
 		truncation = cheat_allocate_truncated(expression, CHEAT_LIMIT, "...");
 		if (truncation == NULL)
@@ -1548,26 +1452,22 @@ static void cheat_print_failure(struct cheat_suite* const suite,
 		switch (suite->harness) {
 		case CHEAT_UNSAFE:
 		case CHEAT_DANGEROUS:
-			buffer = CHEAT_CAST(char*, cheat_allocate_total(6,
-						strlen(assertion_format), strlen(file),
-						CHEAT_INTEGER_LENGTH(line), strlen(suite->test_name),
-						strlen(truncation), (size_t )1));
+			buffer = CHEAT_CAST(char *, cheat_allocate_total(6, strlen(assertion_format), strlen(file),
+															 CHEAT_INTEGER_LENGTH(line), strlen(suite->test_name),
+															 strlen(truncation), (size_t)1));
 			if (buffer == NULL)
 				cheat_death("failed to allocate memory", errno);
 
-			if (cheat_print_string(buffer, assertion_format, 4,
-						file, (CHEAT_SIZE_TYPE )line,
-						suite->test_name, truncation) < 0)
+			if (cheat_print_string(buffer, assertion_format, 4, file, (CHEAT_SIZE_TYPE)line, suite->test_name,
+								   truncation) < 0)
 				cheat_death("failed to build a string", errno);
 			cheat_append_list(&suite->messages, buffer, strlen(buffer));
 
 			free(buffer);
 			break;
 		case CHEAT_SAFE:
-			(void )cheat_print(suite->message_stream, assertion_format, 4,
-					file, line,
-					suite->test_name, truncation);
-			(void )fflush(suite->message_stream); /* This prevents crashing from
+			(void)cheat_print(suite->message_stream, assertion_format, 4, file, line, suite->test_name, truncation);
+			(void)fflush(suite->message_stream); /* This prevents crashing from
 					absorbing messages. */
 			break;
 		default:
@@ -1582,8 +1482,8 @@ static void cheat_print_failure(struct cheat_suite* const suite,
 Figures out whether further checks should be carried out or
 terminates the program in case of a failure.
 */
-__attribute__ ((__warn_unused_result__))
-static bool cheat_further(enum cheat_outcome const outcome) {
+__attribute__((__warn_unused_result__)) static bool cheat_further(enum cheat_outcome const outcome)
+{
 	switch (outcome) {
 	case CHEAT_SUCCESSFUL:
 	case CHEAT_FAILED:
@@ -1603,12 +1503,10 @@ static bool cheat_further(enum cheat_outcome const outcome) {
 Checks a single assertion and prints an error message if it fails or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_check(struct cheat_suite* const suite,
-		bool const result,
-		char const* const expression,
-		char const* const file,
-		size_t const line) {
+__attribute__((__io__, __nonnull__)) static void cheat_check(struct cheat_suite *const suite, bool const result,
+															 char const *const expression, char const *const file,
+															 size_t const line)
+{
 	if (cheat_further(suite->outcome) && !result) {
 		suite->outcome = CHEAT_FAILED;
 
@@ -1620,16 +1518,13 @@ static void cheat_check(struct cheat_suite* const suite,
 Runs all utility procedures of a certain type or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__))
-static void cheat_run_utilities(struct cheat_suite* const suite,
-		enum cheat_subtype const subtype) {
+__attribute__((__io__)) static void cheat_run_utilities(struct cheat_suite *const suite,
+														enum cheat_subtype const subtype)
+{
 	size_t index;
 
-	for (index = 0;
-			suite->units[index].type != CHEAT_TERMINATOR;
-			++index)
-		if (suite->units[index].type == CHEAT_UTILITY
-				&& suite->units[index].subtype == subtype)
+	for (index = 0; suite->units[index].type != CHEAT_TERMINATOR; ++index)
+		if (suite->units[index].type == CHEAT_UTILITY && suite->units[index].subtype == subtype)
 			(suite->units[index].procedure)();
 }
 
@@ -1637,8 +1532,8 @@ static void cheat_run_utilities(struct cheat_suite* const suite,
 Runs a test procedure or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_run_test(struct cheat_unit const* const unit) {
+__attribute__((__io__, __nonnull__)) static void cheat_run_test(struct cheat_unit const *const unit)
+{
 	if (unit->type == CHEAT_TESTER)
 		(unit->procedure)();
 	else
@@ -1649,9 +1544,9 @@ static void cheat_run_test(struct cheat_unit const* const unit) {
 Runs a test from a test suite or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_run_coupled_test(struct cheat_suite* const suite,
-		struct cheat_unit const* const unit) {
+__attribute__((__io__, __nonnull__)) static void cheat_run_coupled_test(struct cheat_suite *const suite,
+																		struct cheat_unit const *const unit)
+{
 	cheat_run_utilities(suite, CHEAT_SET_UP_UTILITY);
 	cheat_run_test(unit);
 	cheat_run_utilities(suite, CHEAT_TEAR_DOWN_UTILITY);
@@ -1669,9 +1564,9 @@ static void cheat_run_coupled_test(struct cheat_suite* const suite,
 Creates a subprocess and runs a test in it or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_isolate_test(struct cheat_suite* const suite,
-		struct cheat_unit const* const test) {
+__attribute__((__io__, __nonnull__)) static void cheat_isolate_test(struct cheat_suite *const suite,
+																	struct cheat_unit const *const test)
+{
 
 #ifdef CHEAT_POSIXLY
 
@@ -1685,9 +1580,7 @@ static void cheat_isolate_test(struct cheat_suite* const suite,
 
 	channel_count = sizeof channels / sizeof *channels;
 
-	for (index = 0;
-			index < channel_count;
-			++index) {
+	for (index = 0; index < channel_count; ++index) {
 		if (pipe(fds) == -1)
 			cheat_death("failed to create a pipe", errno);
 		channels[index].reader = fds[0];
@@ -1703,9 +1596,7 @@ static void cheat_isolate_test(struct cheat_suite* const suite,
 	if (pid == -1)
 		cheat_death("failed to create a process", errno);
 	else if (pid == 0) {
-		for (index = 0;
-				index < channel_count;
-				++index)
+		for (index = 0; index < channel_count; ++index)
 			if (close(channels[index].reader) == -1)
 				cheat_death("failed to close the read end of a pipe", errno);
 
@@ -1736,18 +1627,14 @@ static void cheat_isolate_test(struct cheat_suite* const suite,
 		if (fflush(stderr) == EOF)
 			cheat_death("failed to flush the standard error stream", errno);
 
-		for (index = 0;
-				index < channel_count;
-				++index)
+		for (index = 0; index < channel_count; ++index)
 			if (close(channels[index].writer) == -1)
 				cheat_death("failed to close the write end of a pipe", errno);
 
 		exit(cheat_encode_outcome(suite->outcome));
 	}
 
-	for (index = 0;
-			index < channel_count;
-			++index)
+	for (index = 0; index < channel_count; ++index)
 		if (close(channels[index].writer) == -1)
 			cheat_death("failed to close the write end of a pipe", errno);
 
@@ -1758,15 +1645,11 @@ static void cheat_isolate_test(struct cheat_suite* const suite,
 		int result;
 
 		FD_ZERO(&set);
-		for (index = 0;
-				index < channel_count;
-				++index)
+		for (index = 0; index < channel_count; ++index)
 			FD_SET(channels[index].reader, &set);
 
 		maximum = channels[0].reader;
-		for (index = 1;
-				index < channel_count;
-				++index)
+		for (index = 1; index < channel_count; ++index)
 			if (channels[index].reader > maximum)
 				maximum = channels[index].reader;
 
@@ -1789,11 +1672,8 @@ static void cheat_isolate_test(struct cheat_suite* const suite,
 			char buffer[BUFSIZ];
 			ssize_t size;
 
-			for (index = 0;
-					index < channel_count;
-					++index)
-				if (channels[index].active
-						&& FD_ISSET(channels[index].reader, &set))
+			for (index = 0; index < channel_count; ++index)
+				if (channels[index].active && FD_ISSET(channels[index].reader, &set))
 					break;
 
 			if (index == channel_count)
@@ -1805,13 +1685,11 @@ static void cheat_isolate_test(struct cheat_suite* const suite,
 			if (size == 0)
 				channels[index].active = false;
 			else if (!(suite->quiet && (index == 1 || index == 2))) /* Urgh! */
-				cheat_append_list(channels[index].list, buffer, (size_t )size);
+				cheat_append_list(channels[index].list, buffer, (size_t)size);
 		}
 	} while (true);
 
-	for (index = 0;
-			index < channel_count;
-			++index)
+	for (index = 0; index < channel_count; ++index)
 		if (close(channels[index].reader) == -1)
 			cheat_death("failed to close the read end of a pipe", errno);
 
@@ -1833,7 +1711,7 @@ static void cheat_isolate_test(struct cheat_suite* const suite,
 
 #else
 
-/*
+	/*
 Windows makes working with pipes a hassle, so not all streams are captured.
 */
 
@@ -1883,26 +1761,22 @@ Windows makes working with pipes a hassle, so not all streams are captured.
 	startup.lpReserved2 = NULL;
 	startup.hStdInput = NULL;
 	startup.hStdOutput = error_writer; /* output_writer; */
-	startup.hStdError = NULL; /* error_writer; */
+	startup.hStdError = NULL;          /* error_writer; */
 
 	command_length = strlen(GetCommandLine());
 	option_length = strlen(CHEAT_OPTION);
 	name_length = strlen(test->name);
 
-	command = cheat_allocate_total(4,
-			command_length, option_length,
-			name_length, (size_t )3);
+	command = cheat_allocate_total(4, command_length, option_length, name_length, (size_t)3);
 	if (command == NULL)
 		cheat_death("failed to allocate memory", errno);
 
 	memcpy(command, GetCommandLine(), command_length);
 	memcpy(&command[command_length], " " CHEAT_OPTION " ", option_length + 2);
-	memcpy(&command[command_length + option_length + 2],
-			test->name, name_length + 1);
+	memcpy(&command[command_length + option_length + 2], test->name, name_length + 1);
 
-	if (!CreateProcess(NULL, command, NULL, NULL,
-				TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL,
-				&startup, &process)) /* There is CommandLineToArgvW(), but
+	if (!CreateProcess(NULL, command, NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startup,
+					   &process)) /* There is CommandLineToArgvW(), but
 			nothing like ArgvToCommandLineW() exists, so
 			GetCommandLine() is used even though it is not guaranteed to
 			return the correct result for file paths that
@@ -1960,7 +1834,7 @@ Windows makes working with pipes a hassle, so not all streams are captured.
 		if (size == 0)
 			break;
 
-		cheat_append_list(&suite->messages, buffer, (size_t )size);
+		cheat_append_list(&suite->messages, buffer, (size_t)size);
 	} while (TRUE);
 
 	/*
@@ -1996,7 +1870,6 @@ Windows makes working with pipes a hassle, so not all streams are captured.
 
 #endif
 #endif
-
 }
 
 #ifdef CHEAT_WINDOWED /* TODO Implement more pipes. */
@@ -2005,10 +1878,10 @@ Windows makes working with pipes a hassle, so not all streams are captured.
 Runs a single test and exits or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_run_hidden(struct cheat_suite* const suite,
-		char const* const name) {
-	struct cheat_unit const* unit;
+__attribute__((__io__, __nonnull__)) static void cheat_run_hidden(struct cheat_suite *const suite,
+																  char const *const name)
+{
+	struct cheat_unit const *unit;
 	DWORD pid;
 	LPTSTR pipe;
 
@@ -2049,9 +1922,9 @@ static void cheat_run_hidden(struct cheat_suite* const suite,
 Runs a single test from a test suite and prints its outcome or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_run_specific(struct cheat_suite* const suite,
-		struct cheat_unit const* const unit) {
+__attribute__((__io__, __nonnull__)) static void cheat_run_specific(struct cheat_suite *const suite,
+																	struct cheat_unit const *const unit)
+{
 	int status;
 
 	switch (suite->harness) {
@@ -2085,13 +1958,11 @@ static void cheat_run_specific(struct cheat_suite* const suite,
 Runs every test from a test suite and prints their outcomes or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_run_all(struct cheat_suite* const suite) {
+__attribute__((__io__, __nonnull__)) static void cheat_run_all(struct cheat_suite *const suite)
+{
 	size_t index;
 
-	for (index = 0;
-			suite->units[index].type != CHEAT_TERMINATOR;
-			++index)
+	for (index = 0; suite->units[index].type != CHEAT_TERMINATOR; ++index)
 		if (suite->units[index].type == CHEAT_TESTER)
 			cheat_run_specific(suite, &suite->units[index]);
 }
@@ -2100,15 +1971,13 @@ static void cheat_run_all(struct cheat_suite* const suite) {
 Runs some tests from a test suite and prints their outcomes or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_run_some(struct cheat_suite* const suite,
-		struct cheat_string_list const* const names) {
+__attribute__((__io__, __nonnull__)) static void cheat_run_some(struct cheat_suite *const suite,
+																struct cheat_string_list const *const names)
+{
 	size_t index;
 
-	for (index = 0;
-			index < names->count;
-			++index) {
-		struct cheat_unit const* unit;
+	for (index = 0; index < names->count; ++index) {
+		struct cheat_unit const *unit;
 
 		unit = cheat_find(suite->units, names->items[index]);
 		if (unit == NULL)
@@ -2122,9 +1991,9 @@ static void cheat_run_some(struct cheat_suite* const suite,
 Runs a test suite and prints a summary or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_run_suite(struct cheat_suite* const suite,
-		struct cheat_string_list const* const names) {
+__attribute__((__io__, __nonnull__)) static void cheat_run_suite(struct cheat_suite *const suite,
+																 struct cheat_string_list const *const names)
+{
 	suite->force = names->count != 0;
 
 	if (suite->force)
@@ -2139,8 +2008,8 @@ static void cheat_run_suite(struct cheat_suite* const suite,
 Parses the arguments of a test suite and delegates work or
 terminates the program in case of a failure.
 */
-__attribute__ ((__io__, __nonnull__))
-static void cheat_parse(struct cheat_suite* const suite) {
+__attribute__((__io__, __nonnull__)) static void cheat_parse(struct cheat_suite *const suite)
+{
 	struct cheat_string_list names;
 	size_t index;
 	bool options = true;
@@ -2163,54 +2032,39 @@ static void cheat_parse(struct cheat_suite* const suite) {
 
 	cheat_initialize_string_list(&names);
 
-	for (index = 0;
-			index < suite->arguments.count;
-			++index) {
-		char* argument;
+	for (index = 0; index < suite->arguments.count; ++index) {
+		char *argument;
 
 		argument = suite->arguments.elements[index];
 
 		if (options && argument[0] == '-') {
 			if (cheat_compare(argument, "--"))
 				options = false;
-			else if (cheat_compare(argument, "-c")
-					|| cheat_compare(argument, "--colorful"))
+			else if (cheat_compare(argument, "-c") || cheat_compare(argument, "--colorful"))
 				colorful = true;
-			else if (cheat_compare(argument, "-d")
-					|| cheat_compare(argument, "--dangerous"))
+			else if (cheat_compare(argument, "-d") || cheat_compare(argument, "--dangerous"))
 				dangerous = true;
-			else if (cheat_compare(argument, "-e")
-					|| cheat_compare(argument, "--eternal"))
+			else if (cheat_compare(argument, "-e") || cheat_compare(argument, "--eternal"))
 				eternal = true;
-			else if (cheat_compare(argument, "-h")
-					|| cheat_compare(argument, "--help"))
+			else if (cheat_compare(argument, "-h") || cheat_compare(argument, "--help"))
 				help = true;
-			else if (cheat_compare(argument, "-l")
-					|| cheat_compare(argument, "--list"))
+			else if (cheat_compare(argument, "-l") || cheat_compare(argument, "--list"))
 				list = true;
-			else if (cheat_compare(argument, "-m")
-					|| cheat_compare(argument, "--minimal"))
+			else if (cheat_compare(argument, "-m") || cheat_compare(argument, "--minimal"))
 				minimal = true;
-			else if (cheat_compare(argument, "-n")
-					|| cheat_compare(argument, "--noisy"))
+			else if (cheat_compare(argument, "-n") || cheat_compare(argument, "--noisy"))
 				noisy = true;
-			else if (cheat_compare(argument, "-p")
-					|| cheat_compare(argument, "--plain"))
+			else if (cheat_compare(argument, "-p") || cheat_compare(argument, "--plain"))
 				plain = true;
-			else if (cheat_compare(argument, "-s")
-					|| cheat_compare(argument, "--safe"))
+			else if (cheat_compare(argument, "-s") || cheat_compare(argument, "--safe"))
 				safe = true;
-			else if (cheat_compare(argument, "-t")
-					|| cheat_compare(argument, "--timed"))
+			else if (cheat_compare(argument, "-t") || cheat_compare(argument, "--timed"))
 				timed = true;
-			else if (cheat_compare(argument, "-u")
-					|| cheat_compare(argument, "--unsafe"))
+			else if (cheat_compare(argument, "-u") || cheat_compare(argument, "--unsafe"))
 				unsafe = true;
-			else if (cheat_compare(argument, "-v")
-					|| cheat_compare(argument, "--version"))
+			else if (cheat_compare(argument, "-v") || cheat_compare(argument, "--version"))
 				version = true;
-			else if (cheat_compare(argument, "-q")
-					|| cheat_compare(argument, "--quiet"))
+			else if (cheat_compare(argument, "-q") || cheat_compare(argument, "--quiet"))
 				quiet = true;
 #ifdef CHEAT_WINDOWED
 			else if (cheat_compare(argument, CHEAT_OPTION))
@@ -2244,27 +2098,15 @@ static void cheat_parse(struct cheat_suite* const suite) {
 		suite->quiet = true;
 
 	if (help && !(list || version /* No conflicting options. */
-				|| dangerous || eternal || noisy
-				|| safe || timed || unsafe || quiet))
+				  || dangerous || eternal || noisy || safe || timed || unsafe || quiet))
 		cheat_print_usage(suite);
-	else if (list && !(help || version
-				|| dangerous || eternal || noisy
-				|| safe || timed || unsafe || quiet))
+	else if (list && !(help || version || dangerous || eternal || noisy || safe || timed || unsafe || quiet))
 		cheat_print_tests(suite);
-	else if (version && !(help || list
-				|| dangerous || eternal || noisy
-				|| safe || timed || unsafe || quiet))
+	else if (version && !(help || list || dangerous || eternal || noisy || safe || timed || unsafe || quiet))
 		cheat_print_version();
-	else if (!(help || list || version)
-			&& !(colorful && minimal)
-			&& !(colorful && plain)
-			&& !(minimal && plain)
-			&& !(dangerous && safe)
-			&& !(dangerous && unsafe)
-			&& !(noisy && quiet)
-			&& !(safe && unsafe)
-			&& !(eternal && timed)
-			&& !(timed && (dangerous || unsafe))) {
+	else if (!(help || list || version) && !(colorful && minimal) && !(colorful && plain) && !(minimal && plain) &&
+			 !(dangerous && safe) && !(dangerous && unsafe) && !(noisy && quiet) && !(safe && unsafe) &&
+			 !(eternal && timed) && !(timed && (dangerous || unsafe))) {
 
 #ifdef CHEAT_WINDOWED
 
@@ -2293,7 +2135,8 @@ static void cheat_parse(struct cheat_suite* const suite) {
 Prepares the environment for running tests or
 terminates the program in case of a failure.
 */
-static void cheat_prepare(void) {
+static void cheat_prepare(void)
+{
 
 #ifdef CHEAT_WINDOWED
 
@@ -2320,7 +2163,6 @@ static void cheat_prepare(void) {
 
 #endif
 #endif
-
 }
 
 /*
@@ -2334,20 +2176,17 @@ static struct cheat_suite cheat_suite;
 These add source information to assertions.
 */
 
-#define cheat_assert(expression) \
-	cheat_check(&cheat_suite, expression, #expression, __FILE__, __LINE__)
+#define cheat_assert(expression) cheat_check(&cheat_suite, expression, #expression, __FILE__, __LINE__)
 
-#define cheat_assert_not(expression) \
-	cheat_check(&cheat_suite, !(expression), "!(" #expression ")", \
-		__FILE__, __LINE__)
+#define cheat_assert_not(expression) cheat_check(&cheat_suite, !(expression), "!(" #expression ")", __FILE__, __LINE__)
 
 /*
 This stops a test if it has already failed.
 */
-#define cheat_yield() \
-	CHEAT_BEGIN \
-		if (cheat_suite.outcome != CHEAT_SUCCESSFUL) \
-			return; \
+#define cheat_yield()                            \
+	CHEAT_BEGIN                                  \
+	if (cheat_suite.outcome != CHEAT_SUCCESSFUL) \
+		return;                                  \
 	CHEAT_END
 
 /*
@@ -2375,138 +2214,914 @@ or equivalent.
 #define CHEAT_COMMAS_8(x1, x2, x3, x4, x5, x6, x7, x8, x9) x1, x2, x3, x4, x5, x6, x7, x8, x9
 #define CHEAT_COMMAS_9(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10
 #define CHEAT_COMMAS_10(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11
-#define CHEAT_COMMAS_11(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12
-#define CHEAT_COMMAS_12(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13
-#define CHEAT_COMMAS_13(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14
-#define CHEAT_COMMAS_14(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15
-#define CHEAT_COMMAS_15(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16
-#define CHEAT_COMMAS_16(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17
-#define CHEAT_COMMAS_17(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18
-#define CHEAT_COMMAS_18(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19
-#define CHEAT_COMMAS_19(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20
-#define CHEAT_COMMAS_20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21
-#define CHEAT_COMMAS_21(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22
-#define CHEAT_COMMAS_22(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23
-#define CHEAT_COMMAS_23(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24
-#define CHEAT_COMMAS_24(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25
-#define CHEAT_COMMAS_25(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26
-#define CHEAT_COMMAS_26(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27
-#define CHEAT_COMMAS_27(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28
-#define CHEAT_COMMAS_28(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29
-#define CHEAT_COMMAS_29(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30
-#define CHEAT_COMMAS_30(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31
-#define CHEAT_COMMAS_31(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32
-#define CHEAT_COMMAS_32(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33
-#define CHEAT_COMMAS_33(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34
-#define CHEAT_COMMAS_34(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35
-#define CHEAT_COMMAS_35(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36
-#define CHEAT_COMMAS_36(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37
-#define CHEAT_COMMAS_37(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38
-#define CHEAT_COMMAS_38(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39
-#define CHEAT_COMMAS_39(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40
-#define CHEAT_COMMAS_40(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41
-#define CHEAT_COMMAS_41(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42
-#define CHEAT_COMMAS_42(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43
-#define CHEAT_COMMAS_43(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44
-#define CHEAT_COMMAS_44(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45
-#define CHEAT_COMMAS_45(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46
-#define CHEAT_COMMAS_46(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47
-#define CHEAT_COMMAS_47(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48
-#define CHEAT_COMMAS_48(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49
-#define CHEAT_COMMAS_49(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50
-#define CHEAT_COMMAS_50(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51
-#define CHEAT_COMMAS_51(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52
-#define CHEAT_COMMAS_52(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53
-#define CHEAT_COMMAS_53(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54
-#define CHEAT_COMMAS_54(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55
-#define CHEAT_COMMAS_55(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56
-#define CHEAT_COMMAS_56(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57
-#define CHEAT_COMMAS_57(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58
-#define CHEAT_COMMAS_58(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59
-#define CHEAT_COMMAS_59(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60
-#define CHEAT_COMMAS_60(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61
-#define CHEAT_COMMAS_61(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62
-#define CHEAT_COMMAS_62(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63
-#define CHEAT_COMMAS_63(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64
-#define CHEAT_COMMAS_64(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65
-#define CHEAT_COMMAS_65(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66
-#define CHEAT_COMMAS_66(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67
-#define CHEAT_COMMAS_67(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68
-#define CHEAT_COMMAS_68(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69
-#define CHEAT_COMMAS_69(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70
-#define CHEAT_COMMAS_70(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71
-#define CHEAT_COMMAS_71(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72
-#define CHEAT_COMMAS_72(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73
-#define CHEAT_COMMAS_73(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74
-#define CHEAT_COMMAS_74(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75
-#define CHEAT_COMMAS_75(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76
-#define CHEAT_COMMAS_76(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77
-#define CHEAT_COMMAS_77(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78
-#define CHEAT_COMMAS_78(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79
-#define CHEAT_COMMAS_79(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80
-#define CHEAT_COMMAS_80(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81
-#define CHEAT_COMMAS_81(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82
-#define CHEAT_COMMAS_82(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83
-#define CHEAT_COMMAS_83(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84
-#define CHEAT_COMMAS_84(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85
-#define CHEAT_COMMAS_85(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86
-#define CHEAT_COMMAS_86(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87
-#define CHEAT_COMMAS_87(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88
-#define CHEAT_COMMAS_88(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89
-#define CHEAT_COMMAS_89(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90
-#define CHEAT_COMMAS_90(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91
-#define CHEAT_COMMAS_91(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92
-#define CHEAT_COMMAS_92(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93
-#define CHEAT_COMMAS_93(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94
-#define CHEAT_COMMAS_94(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95
-#define CHEAT_COMMAS_95(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96
-#define CHEAT_COMMAS_96(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97
-#define CHEAT_COMMAS_97(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98
-#define CHEAT_COMMAS_98(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99
-#define CHEAT_COMMAS_99(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100
-#define CHEAT_COMMAS_100(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101
-#define CHEAT_COMMAS_101(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102
-#define CHEAT_COMMAS_102(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103
-#define CHEAT_COMMAS_103(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104
-#define CHEAT_COMMAS_104(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105
-#define CHEAT_COMMAS_105(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106
-#define CHEAT_COMMAS_106(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107
-#define CHEAT_COMMAS_107(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108
-#define CHEAT_COMMAS_108(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109
-#define CHEAT_COMMAS_109(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110
-#define CHEAT_COMMAS_110(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111
-#define CHEAT_COMMAS_111(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112
-#define CHEAT_COMMAS_112(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113
-#define CHEAT_COMMAS_113(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114
-#define CHEAT_COMMAS_114(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115
-#define CHEAT_COMMAS_115(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116
-#define CHEAT_COMMAS_116(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117
-#define CHEAT_COMMAS_117(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118
-#define CHEAT_COMMAS_118(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119
-#define CHEAT_COMMAS_119(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120
-#define CHEAT_COMMAS_120(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121
-#define CHEAT_COMMAS_121(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122
-#define CHEAT_COMMAS_122(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123
-#define CHEAT_COMMAS_123(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124
-#define CHEAT_COMMAS_124(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124, x125) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124, x125
-#define CHEAT_COMMAS_125(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124, x125, x126) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124, x125, x126
-#define CHEAT_COMMAS_126(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124, x125, x126, x127) x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124, x125, x126, x127
+#define CHEAT_COMMAS_11(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12
+#define CHEAT_COMMAS_12(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13
+#define CHEAT_COMMAS_13(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14
+#define CHEAT_COMMAS_14(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15
+#define CHEAT_COMMAS_15(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16
+#define CHEAT_COMMAS_16(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17
+#define CHEAT_COMMAS_17(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18
+#define CHEAT_COMMAS_18(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19
+#define CHEAT_COMMAS_19(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20
+#define CHEAT_COMMAS_20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21)                                                                                       \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21
+#define CHEAT_COMMAS_21(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22)                                                                                  \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22
+#define CHEAT_COMMAS_22(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23)                                                                             \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23
+#define CHEAT_COMMAS_23(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24)                                                                        \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24
+#define CHEAT_COMMAS_24(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25)                                                                   \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25
+#define CHEAT_COMMAS_25(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26)                                                              \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26
+#define CHEAT_COMMAS_26(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27)                                                         \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27
+#define CHEAT_COMMAS_27(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28)                                                    \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28
+#define CHEAT_COMMAS_28(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29)                                               \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28, x29
+#define CHEAT_COMMAS_29(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30)                                          \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28, x29, x30
+#define CHEAT_COMMAS_30(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31)                                     \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28, x29, x30, x31
+#define CHEAT_COMMAS_31(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32)                                \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28, x29, x30, x31, x32
+#define CHEAT_COMMAS_32(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33)                           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33
+#define CHEAT_COMMAS_33(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34)                      \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34
+#define CHEAT_COMMAS_34(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35)                 \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35
+#define CHEAT_COMMAS_35(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36)            \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36
+#define CHEAT_COMMAS_36(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37)       \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37
+#define CHEAT_COMMAS_37(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38)  \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38
+#define CHEAT_COMMAS_38(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39
+#define CHEAT_COMMAS_39(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40)                                                                                           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40
+#define CHEAT_COMMAS_40(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41)                                                                                      \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41
+#define CHEAT_COMMAS_41(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42)                                                                                 \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42
+#define CHEAT_COMMAS_42(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43)                                                                            \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43
+#define CHEAT_COMMAS_43(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44)                                                                       \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44
+#define CHEAT_COMMAS_44(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45)                                                                  \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45
+#define CHEAT_COMMAS_45(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46)                                                             \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46
+#define CHEAT_COMMAS_46(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47)                                                        \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47
+#define CHEAT_COMMAS_47(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48)                                                   \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48
+#define CHEAT_COMMAS_48(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49)                                              \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49
+#define CHEAT_COMMAS_49(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50)                                         \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50
+#define CHEAT_COMMAS_50(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51)                                    \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51
+#define CHEAT_COMMAS_51(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52)                               \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52
+#define CHEAT_COMMAS_52(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53)                          \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53
+#define CHEAT_COMMAS_53(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54)                     \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54
+#define CHEAT_COMMAS_54(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55)                \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55
+#define CHEAT_COMMAS_55(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56)           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56
+#define CHEAT_COMMAS_56(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57)      \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57
+#define CHEAT_COMMAS_57(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58
+#define CHEAT_COMMAS_58(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59)                                                                                           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59
+#define CHEAT_COMMAS_59(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60)                                                                                      \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60
+#define CHEAT_COMMAS_60(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61)                                                                                 \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61
+#define CHEAT_COMMAS_61(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62)                                                                            \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62
+#define CHEAT_COMMAS_62(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63)                                                                       \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63
+#define CHEAT_COMMAS_63(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64)                                                                  \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64
+#define CHEAT_COMMAS_64(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65)                                                             \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65
+#define CHEAT_COMMAS_65(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66)                                                        \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66
+#define CHEAT_COMMAS_66(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67)                                                   \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67
+#define CHEAT_COMMAS_67(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68)                                              \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68
+#define CHEAT_COMMAS_68(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69)                                         \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69
+#define CHEAT_COMMAS_69(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70)                                    \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70
+#define CHEAT_COMMAS_70(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71)                               \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71
+#define CHEAT_COMMAS_71(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72)                          \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72
+#define CHEAT_COMMAS_72(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73)                     \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73
+#define CHEAT_COMMAS_73(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74)                \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74
+#define CHEAT_COMMAS_74(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75)           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75
+#define CHEAT_COMMAS_75(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76)      \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76
+#define CHEAT_COMMAS_76(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77
+#define CHEAT_COMMAS_77(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78)                                                                                           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78
+#define CHEAT_COMMAS_78(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79)                                                                                      \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79
+#define CHEAT_COMMAS_79(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80)                                                                                 \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80
+#define CHEAT_COMMAS_80(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81)                                                                            \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81
+#define CHEAT_COMMAS_81(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82)                                                                       \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82
+#define CHEAT_COMMAS_82(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83)                                                                  \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83
+#define CHEAT_COMMAS_83(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84)                                                             \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84
+#define CHEAT_COMMAS_84(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85)                                                        \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85
+#define CHEAT_COMMAS_85(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86)                                                   \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86
+#define CHEAT_COMMAS_86(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87)                                              \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87
+#define CHEAT_COMMAS_87(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88)                                         \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88
+#define CHEAT_COMMAS_88(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89)                                    \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89
+#define CHEAT_COMMAS_89(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90)                               \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90
+#define CHEAT_COMMAS_90(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91)                          \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91
+#define CHEAT_COMMAS_91(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92)                     \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92
+#define CHEAT_COMMAS_92(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93)                \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93
+#define CHEAT_COMMAS_93(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94)           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94
+#define CHEAT_COMMAS_94(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95)      \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95
+#define CHEAT_COMMAS_95(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96) \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96
+#define CHEAT_COMMAS_96(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, \
+						x97)                                                                                           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97
+#define CHEAT_COMMAS_97(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, \
+						x97, x98)                                                                                      \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98
+#define CHEAT_COMMAS_98(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, \
+						x97, x98, x99)                                                                                 \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99
+#define CHEAT_COMMAS_99(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,     \
+						x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, \
+						x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, \
+						x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74, x75, x76, x77, \
+						x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92, x93, x94, x95, x96, \
+						x97, x98, x99, x100)                                                                           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100
+#define CHEAT_COMMAS_100(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,   \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,    \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,    \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,    \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,    \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101)                                               \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,    \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101
+#define CHEAT_COMMAS_101(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,   \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,    \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,    \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,    \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,    \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102)                                         \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,    \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102
+#define CHEAT_COMMAS_102(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,   \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,    \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,    \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,    \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,    \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103)                                   \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,    \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103
+#define CHEAT_COMMAS_103(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,   \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,    \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,    \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,    \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,    \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104)                             \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,    \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104
+#define CHEAT_COMMAS_104(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,   \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,    \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,    \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,    \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,    \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105)                       \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,    \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105
+#define CHEAT_COMMAS_105(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,   \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,    \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,    \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,    \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,    \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106)                 \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,    \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106
+#define CHEAT_COMMAS_106(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,   \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,    \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,    \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,    \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,    \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107)           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,    \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107
+#define CHEAT_COMMAS_107(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,   \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,    \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,    \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,    \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,    \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108)     \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,    \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108
+#define CHEAT_COMMAS_108(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,   \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,    \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,    \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,    \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,    \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,     \
+						 x109)                                                                                        \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,    \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109
+#define CHEAT_COMMAS_109(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,   \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,    \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,    \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,    \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,    \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,     \
+						 x109, x110)                                                                                  \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,    \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110
+#define CHEAT_COMMAS_110(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111)                                                                             \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111
+#define CHEAT_COMMAS_111(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112)                                                                       \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112
+#define CHEAT_COMMAS_112(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113)                                                                 \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113
+#define CHEAT_COMMAS_113(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114)                                                           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114
+#define CHEAT_COMMAS_114(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115)                                                     \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115
+#define CHEAT_COMMAS_115(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116)                                               \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116
+#define CHEAT_COMMAS_116(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117)                                         \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117
+#define CHEAT_COMMAS_117(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117, x118)                                   \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117, x118
+#define CHEAT_COMMAS_118(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119)                             \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117, x118, x119
+#define CHEAT_COMMAS_119(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120)                       \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117, x118, x119, x120
+#define CHEAT_COMMAS_120(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121)                 \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121
+#define CHEAT_COMMAS_121(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122)           \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122
+#define CHEAT_COMMAS_122(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123)     \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123
+#define CHEAT_COMMAS_123(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123,     \
+						 x124)                                                                                         \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124
+#define CHEAT_COMMAS_124(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123,     \
+						 x124, x125)                                                                                   \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124, x125
+#define CHEAT_COMMAS_125(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123,     \
+						 x124, x125, x126)                                                                             \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124, x125, x126
+#define CHEAT_COMMAS_126(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20,    \
+						 x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38,     \
+						 x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56,     \
+						 x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68, x69, x70, x71, x72, x73, x74,     \
+						 x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90, x91, x92,     \
+						 x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108,      \
+						 x109, x110, x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123,     \
+						 x124, x125, x126, x127)                                                                       \
+	x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24,     \
+		x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46,  \
+		x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63, x64, x65, x66, x67, x68,  \
+		x69, x70, x71, x72, x73, x74, x75, x76, x77, x78, x79, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90,  \
+		x91, x92, x93, x94, x95, x96, x97, x98, x99, x100, x101, x102, x103, x104, x105, x106, x107, x108, x109, x110, \
+		x111, x112, x113, x114, x115, x116, x117, x118, x119, x120, x121, x122, x123, x124, x125, x126, x127
 
 /*
 These determine the reserved names.
 */
 
-#define CHEAT_WRAP(name) \
-	(cheat_wrapped_##name)
+#define CHEAT_WRAP(name) (cheat_wrapped_##name)
 
-#define CHEAT_UNWRAP(name) \
-	(cheat_unwrapped_##name)
+#define CHEAT_UNWRAP(name) (cheat_unwrapped_##name)
 
-#define CHEAT_GET(name) \
-	(cheat_test_##name)
+#define CHEAT_GET(name) (cheat_test_##name)
 
-#define CHEAT_CALL(name) \
-	(CHEAT_GET(name)())
+#define CHEAT_CALL(name) (CHEAT_GET(name)())
 
 /*
 This pass declares the prototypes of test and utility procedures.
@@ -2519,45 +3134,33 @@ This pass declares the prototypes of test and utility procedures.
 These variations eliminate the comma problem.
 */
 
-#define CHEAT_TEST(name, ...) \
-	static void CHEAT_GET(name)(void);
+#define CHEAT_TEST(name, ...) static void CHEAT_GET(name)(void);
 
-#define CHEAT_IGNORE(name, ...) \
-	CHEAT_TEST(name, __VA_ARGS__)
+#define CHEAT_IGNORE(name, ...) CHEAT_TEST(name, __VA_ARGS__)
 
-#define CHEAT_SKIP(name, ...) \
-	CHEAT_TEST(name, __VA_ARGS__)
+#define CHEAT_SKIP(name, ...) CHEAT_TEST(name, __VA_ARGS__)
 
-#define CHEAT_REPEAT(name, ...) \
-	CHEAT_TEST(name, __VA_ARGS__)
+#define CHEAT_REPEAT(name, ...) CHEAT_TEST(name, __VA_ARGS__)
 
-#define CHEAT_SET_UP(...) \
-	static void cheat_set_up(void);
+#define CHEAT_SET_UP(...) static void cheat_set_up(void);
 
-#define CHEAT_TEAR_DOWN(...) \
-	static void cheat_tear_down(void);
+#define CHEAT_TEAR_DOWN(...) static void cheat_tear_down(void);
 
 #define CHEAT_DECLARE(...)
 
 #else
 
-#define CHEAT_TEST(name, body) \
-	static void CHEAT_GET(name)(void);
+#define CHEAT_TEST(name, body) static void CHEAT_GET(name)(void);
 
-#define CHEAT_IGNORE(name, body) \
-	CHEAT_TEST(name, body)
+#define CHEAT_IGNORE(name, body) CHEAT_TEST(name, body)
 
-#define CHEAT_SKIP(name, body) \
-	CHEAT_TEST(name, body)
+#define CHEAT_SKIP(name, body) CHEAT_TEST(name, body)
 
-#define CHEAT_REPEAT(name, body) \
-	CHEAT_TEST(name, body)
+#define CHEAT_REPEAT(name, body) CHEAT_TEST(name, body)
 
-#define CHEAT_SET_UP(body) \
-	static void cheat_set_up(void);
+#define CHEAT_SET_UP(body) static void cheat_set_up(void);
 
-#define CHEAT_TEAR_DOWN(body) \
-	static void cheat_tear_down(void);
+#define CHEAT_TEAR_DOWN(body) static void cheat_tear_down(void);
 
 #define CHEAT_DECLARE(body)
 
@@ -2582,95 +3185,33 @@ This pass generates a list of the previously declared procedures.
 
 #ifdef CHEAT_VARIADIC
 
-#define CHEAT_TEST(name, ...) \
-	{ \
-		#name, \
-		CHEAT_TESTER, \
-		CHEAT_NORMAL_TEST, \
-		CHEAT_GET(name) \
-	},
+#define CHEAT_TEST(name, ...) {#name, CHEAT_TESTER, CHEAT_NORMAL_TEST, CHEAT_GET(name)},
 
-#define CHEAT_IGNORE(name, ...) \
-	{ \
-		#name, \
-		CHEAT_TESTER, \
-		CHEAT_IGNORED_TEST, \
-		CHEAT_GET(name) \
-	},
+#define CHEAT_IGNORE(name, ...) {#name, CHEAT_TESTER, CHEAT_IGNORED_TEST, CHEAT_GET(name)},
 
-#define CHEAT_SKIP(name, ...) \
-	{ \
-		#name, \
-		CHEAT_TESTER, \
-		CHEAT_SKIPPED_TEST, \
-		CHEAT_GET(name) \
-	},
+#define CHEAT_SKIP(name, ...) {#name, CHEAT_TESTER, CHEAT_SKIPPED_TEST, CHEAT_GET(name)},
 
-#define CHEAT_REPEAT(name, ...) \
-	CHEAT_TEST(name, __VA_ARGS__)
+#define CHEAT_REPEAT(name, ...) CHEAT_TEST(name, __VA_ARGS__)
 
-#define CHEAT_SET_UP(...) \
-	{ \
-		NULL, \
-		CHEAT_UTILITY, \
-		CHEAT_SET_UP_UTILITY, \
-		cheat_set_up \
-	},
+#define CHEAT_SET_UP(...) {NULL, CHEAT_UTILITY, CHEAT_SET_UP_UTILITY, cheat_set_up},
 
-#define CHEAT_TEAR_DOWN(...) \
-	{ \
-		NULL, \
-		CHEAT_UTILITY, \
-		CHEAT_TEAR_DOWN_UTILITY, \
-		cheat_tear_down \
-	},
+#define CHEAT_TEAR_DOWN(...) {NULL, CHEAT_UTILITY, CHEAT_TEAR_DOWN_UTILITY, cheat_tear_down},
 
 #define CHEAT_DECLARE(...)
 
 #else
 
-#define CHEAT_TEST(name, body) \
-	{ \
-		#name, \
-		CHEAT_TESTER, \
-		CHEAT_NORMAL_TEST, \
-		CHEAT_GET(name) \
-	},
+#define CHEAT_TEST(name, body) {#name, CHEAT_TESTER, CHEAT_NORMAL_TEST, CHEAT_GET(name)},
 
-#define CHEAT_IGNORE(name, body) \
-	{ \
-		#name, \
-		CHEAT_TESTER, \
-		CHEAT_IGNORED_TEST, \
-		CHEAT_GET(name) \
-	},
+#define CHEAT_IGNORE(name, body) {#name, CHEAT_TESTER, CHEAT_IGNORED_TEST, CHEAT_GET(name)},
 
-#define CHEAT_SKIP(name, body) \
-	{ \
-		#name, \
-		CHEAT_TESTER, \
-		CHEAT_SKIPPED_TEST, \
-		CHEAT_GET(name) \
-	},
+#define CHEAT_SKIP(name, body) {#name, CHEAT_TESTER, CHEAT_SKIPPED_TEST, CHEAT_GET(name)},
 
-#define CHEAT_REPEAT(name, body) \
-	CHEAT_TEST(name, body)
+#define CHEAT_REPEAT(name, body) CHEAT_TEST(name, body)
 
-#define CHEAT_SET_UP(body) \
-	{ \
-		NULL, \
-		CHEAT_UTILITY, \
-		CHEAT_SET_UP_UTILITY, \
-		cheat_set_up \
-	},
+#define CHEAT_SET_UP(body) {NULL, CHEAT_UTILITY, CHEAT_SET_UP_UTILITY, cheat_set_up},
 
-#define CHEAT_TEAR_DOWN(body) \
-	{ \
-		NULL, \
-		CHEAT_UTILITY, \
-		CHEAT_TEAR_DOWN_UTILITY, \
-		cheat_tear_down \
-	},
+#define CHEAT_TEAR_DOWN(body) {NULL, CHEAT_UTILITY, CHEAT_TEAR_DOWN_UTILITY, cheat_tear_down},
 
 #define CHEAT_DECLARE(body)
 
@@ -2678,12 +3219,7 @@ This pass generates a list of the previously declared procedures.
 
 static struct cheat_unit const cheat_units[] = {
 #include __BASE_FILE__
-	{
-		NULL,
-		CHEAT_TERMINATOR,
-		0,
-		NULL
-	} /* This terminator exists to avoid
+	{NULL, CHEAT_TERMINATOR, 0, NULL} /* This terminator exists to avoid
 			the problems some compilers have with
 			trailing commas or arrays with zero size, but
 			also helps avoid having to
@@ -2708,121 +3244,114 @@ This pass defines and wraps up the previously listed procedures.
 
 #ifdef CHEAT_VARIADIC
 
-#define CHEAT_TEST(name, ...) \
-	static void CHEAT_GET(name)(void) { \
-		cheat_suite.test_name = #name; \
+#define CHEAT_TEST(name, ...)                   \
+	static void CHEAT_GET(name)(void)           \
+	{                                           \
+		cheat_suite.test_name = #name;          \
 		cheat_suite.outcome = CHEAT_SUCCESSFUL; \
-		{ \
-			__VA_ARGS__ \
-		} \
+		{                                       \
+			__VA_ARGS__                         \
+		}                                       \
 	}
 
-#define CHEAT_IGNORE(name, ...) \
-	static void CHEAT_GET(name)(void) { \
-		cheat_suite.test_name = #name; \
-		cheat_suite.outcome = CHEAT_SUCCESSFUL; \
-		{ \
-			__VA_ARGS__ \
-		} \
-		if (!cheat_suite.force) \
+#define CHEAT_IGNORE(name, ...)                  \
+	static void CHEAT_GET(name)(void)            \
+	{                                            \
+		cheat_suite.test_name = #name;           \
+		cheat_suite.outcome = CHEAT_SUCCESSFUL;  \
+		{                                        \
+			__VA_ARGS__                          \
+		}                                        \
+		if (!cheat_suite.force)                  \
 			cheat_suite.outcome = CHEAT_IGNORED; \
 	}
 
-#define CHEAT_SKIP(name, ...) \
-	static void CHEAT_GET(name)(void) { \
-		cheat_suite.test_name = #name; \
-		cheat_suite.outcome = CHEAT_SUCCESSFUL; \
-		if (cheat_suite.force) {\
-			__VA_ARGS__ \
-		} else \
+#define CHEAT_SKIP(name, ...)                    \
+	static void CHEAT_GET(name)(void)            \
+	{                                            \
+		cheat_suite.test_name = #name;           \
+		cheat_suite.outcome = CHEAT_SUCCESSFUL;  \
+		if (cheat_suite.force) {                 \
+			__VA_ARGS__                          \
+		} else                                   \
 			cheat_suite.outcome = CHEAT_SKIPPED; \
 	}
 
-#define CHEAT_REPEAT(name, ...) \
-	static void CHEAT_GET(name)(void) { \
-		size_t cheat_index; \
-		\
-		cheat_suite.test_name = #name; \
-		cheat_suite.outcome = CHEAT_SUCCESSFUL; \
-		for (cheat_index = 0; \
-				cheat_index < CHEAT_REPETITIONS; \
-				++cheat_index) { \
-			__VA_ARGS__ \
-			cheat_yield(); \
-		} \
+#define CHEAT_REPEAT(name, ...)                                                 \
+	static void CHEAT_GET(name)(void)                                           \
+	{                                                                           \
+		size_t cheat_index;                                                     \
+                                                                                \
+		cheat_suite.test_name = #name;                                          \
+		cheat_suite.outcome = CHEAT_SUCCESSFUL;                                 \
+		for (cheat_index = 0; cheat_index < CHEAT_REPETITIONS; ++cheat_index) { \
+			__VA_ARGS__                                                         \
+			cheat_yield();                                                      \
+		}                                                                       \
 	}
 
 #define CHEAT_SET_UP(...) \
-	static void cheat_set_up(void) { \
-		__VA_ARGS__ \
-	}
+	static void cheat_set_up(void) { __VA_ARGS__ }
 
 #define CHEAT_TEAR_DOWN(...) \
-	static void cheat_tear_down(void) { \
-		__VA_ARGS__ \
-	}
+	static void cheat_tear_down(void) { __VA_ARGS__ }
 
-#define CHEAT_DECLARE(...) \
-	__VA_ARGS__
+#define CHEAT_DECLARE(...) __VA_ARGS__
 
 #else
 
-#define CHEAT_TEST(name, body) \
-	static void CHEAT_GET(name)(void) { \
-		cheat_suite.test_name = #name; \
+#define CHEAT_TEST(name, body)                  \
+	static void CHEAT_GET(name)(void)           \
+	{                                           \
+		cheat_suite.test_name = #name;          \
 		cheat_suite.outcome = CHEAT_SUCCESSFUL; \
-		{ \
-			body \
-		} \
+		{                                       \
+			body                                \
+		}                                       \
 	}
 
-#define CHEAT_IGNORE(name, body) \
-	static void CHEAT_GET(name)(void) { \
-		cheat_suite.test_name = #name; \
-		cheat_suite.outcome = CHEAT_SUCCESSFUL; \
-		{ \
-			body \
-		} \
-		if (!cheat_suite.force) \
+#define CHEAT_IGNORE(name, body)                 \
+	static void CHEAT_GET(name)(void)            \
+	{                                            \
+		cheat_suite.test_name = #name;           \
+		cheat_suite.outcome = CHEAT_SUCCESSFUL;  \
+		{                                        \
+			body                                 \
+		}                                        \
+		if (!cheat_suite.force)                  \
 			cheat_suite.outcome = CHEAT_IGNORED; \
 	}
 
-#define CHEAT_SKIP(name, body) \
-	static void CHEAT_GET(name)(void) { \
-		cheat_suite.test_name = #name; \
-		cheat_suite.outcome = CHEAT_SUCCESSFUL; \
-		if (cheat_suite.force) {\
-			body \
-		} else \
+#define CHEAT_SKIP(name, body)                   \
+	static void CHEAT_GET(name)(void)            \
+	{                                            \
+		cheat_suite.test_name = #name;           \
+		cheat_suite.outcome = CHEAT_SUCCESSFUL;  \
+		if (cheat_suite.force) {                 \
+			body                                 \
+		} else                                   \
 			cheat_suite.outcome = CHEAT_SKIPPED; \
 	}
 
-#define CHEAT_REPEAT(name, body) \
-	static void CHEAT_GET(name)(void) { \
-		size_t cheat_index; \
-		\
-		cheat_suite.test_name = #name; \
-		cheat_suite.outcome = CHEAT_SUCCESSFUL; \
-		for (cheat_index = 0; \
-				cheat_index < CHEAT_REPETITIONS; \
-				++cheat_index) { \
-			body \
-			cheat_yield(); \
-		} \
+#define CHEAT_REPEAT(name, body)                                                \
+	static void CHEAT_GET(name)(void)                                           \
+	{                                                                           \
+		size_t cheat_index;                                                     \
+                                                                                \
+		cheat_suite.test_name = #name;                                          \
+		cheat_suite.outcome = CHEAT_SUCCESSFUL;                                 \
+		for (cheat_index = 0; cheat_index < CHEAT_REPETITIONS; ++cheat_index) { \
+			body cheat_yield();                                                 \
+		}                                                                       \
 	}
 
 #define CHEAT_SET_UP(body) \
-	static void cheat_set_up(void) { \
-		body \
-	}
+	static void cheat_set_up(void) { body }
 
 #define CHEAT_TEAR_DOWN(body) \
-	static void cheat_tear_down(void) { \
-		body \
-	}
+	static void cheat_tear_down(void) { body }
 
-#define CHEAT_DECLARE(body) \
-	body
+#define CHEAT_DECLARE(body) body
 
 #endif
 
@@ -2835,8 +3364,8 @@ the definitions for it end here.
 Suppresses a signal and
 returns to a recovery point.
 */
-__attribute__ ((__noreturn__))
-static void cheat_handle_signal(int const number) {
+__attribute__((__noreturn__)) static void cheat_handle_signal(int const number)
+{
 	enum cheat_outcome outcome = CHEAT_CRASHED;
 
 	if (number == SIGTERM)
@@ -2852,15 +3381,15 @@ Runs tests from the main test suite and
 returns EXIT_SUCCESS in case all tests passed or
 EXIT_FAILURE in case of a failure.
 */
-int main(int const count,
-		char** const arguments) {
+int main(int const count, char **const arguments)
+{
 	cheat_prepare();
 
 	cheat_initialize(&cheat_suite);
 	cheat_suite.units = cheat_units;
 	cheat_suite.handler = cheat_handle_signal;
 	cheat_suite.program = arguments[0];
-	cheat_suite.arguments.count = (size_t )(count - 1);
+	cheat_suite.arguments.count = (size_t)(count - 1);
 	cheat_suite.arguments.elements = &arguments[1];
 	cheat_suite.harness = CHEAT_DANGEROUS;
 #ifdef CHEAT_POSIXLY
@@ -2894,25 +3423,25 @@ that is a problem for the user to solve.
 
 #ifndef CHEAT_NO_WRAP
 
-__attribute__ ((__noreturn__, __unused__))
-static void CHEAT_UNWRAP(abort)(void) {
+__attribute__((__noreturn__, __unused__)) static void CHEAT_UNWRAP(abort)(void)
+{
 	abort();
 }
 
-__attribute__ ((__unused__))
-static void CHEAT_WRAP(abort)(void) {
+__attribute__((__unused__)) static void CHEAT_WRAP(abort)(void)
+{
 	cheat_exit(&cheat_suite, CHEAT_CRASHED);
 }
 
 #define abort CHEAT_WRAP(abort)
 
-__attribute__ ((__noreturn__, __unused__))
-static void CHEAT_UNWRAP(exit)(int const status) {
+__attribute__((__noreturn__, __unused__)) static void CHEAT_UNWRAP(exit)(int const status)
+{
 	exit(status);
 }
 
-__attribute__ ((__unused__))
-static void CHEAT_WRAP(exit)(int const status) {
+__attribute__((__unused__)) static void CHEAT_WRAP(exit)(int const status)
+{
 	cheat_exit(&cheat_suite, CHEAT_EXITED);
 }
 
@@ -2920,13 +3449,13 @@ static void CHEAT_WRAP(exit)(int const status) {
 
 #ifdef CHEAT_MODERN
 
-__attribute__ ((__noreturn__, __unused__))
-static void CHEAT_UNWRAP(_Exit)(int const status) {
+__attribute__((__noreturn__, __unused__)) static void CHEAT_UNWRAP(_Exit)(int const status)
+{
 	_Exit(status);
 }
 
-__attribute__ ((__unused__))
-static void CHEAT_WRAP(_Exit)(int const status) {
+__attribute__((__unused__)) static void CHEAT_WRAP(_Exit)(int const status)
+{
 	cheat_exit(&cheat_suite, CHEAT_EXITED);
 }
 
@@ -2936,13 +3465,13 @@ static void CHEAT_WRAP(_Exit)(int const status) {
 
 #ifdef CHEAT_POSIXLY
 
-__attribute__ ((__noreturn__, __unused__))
-static void CHEAT_UNWRAP(_exit)(int const status) {
+__attribute__((__noreturn__, __unused__)) static void CHEAT_UNWRAP(_exit)(int const status)
+{
 	_exit(status);
 }
 
-__attribute__ ((__unused__))
-static void CHEAT_WRAP(_exit)(int const status) {
+__attribute__((__unused__)) static void CHEAT_WRAP(_exit)(int const status)
+{
 	cheat_exit(&cheat_suite, CHEAT_EXITED);
 }
 
@@ -2952,41 +3481,36 @@ static void CHEAT_WRAP(_exit)(int const status) {
 
 #ifdef CHEAT_MODERN
 
-__attribute__ ((__unused__))
-static size_t cheat_printed_length(char const* const format,
-		va_list list) {
+__attribute__((__unused__)) static size_t cheat_printed_length(char const *const format, va_list list)
+{
 	va_list another_list;
 
 	va_copy(another_list, list); /* This is a big compatibility bottleneck. */
-	return (size_t )vsnprintf(NULL, 0, format, another_list);
-
+	return (size_t)vsnprintf(NULL, 0, format, another_list);
 }
 
 #endif
 
-__attribute__ ((__unused__))
-static int CHEAT_UNWRAP(vfprintf)(FILE* const stream,
-		char const* const format,
-		va_list list) {
+__attribute__((__unused__)) static int CHEAT_UNWRAP(vfprintf)(FILE *const stream, char const *const format,
+															  va_list list)
+{
 	return vfprintf(stream, format, list);
 }
 
-__attribute__ ((__unused__))
-static int CHEAT_WRAP(vfprintf)(FILE* const stream,
-		char const* const format,
-		va_list list) {
+__attribute__((__unused__)) static int CHEAT_WRAP(vfprintf)(FILE *const stream, char const *const format, va_list list)
+{
 	if (cheat_hide(&cheat_suite, stream)) {
 
 #ifdef CHEAT_MODERN
 
 		size_t length;
-		char* buffer;
+		char *buffer;
 		int result;
 
 		length = cheat_printed_length(format, list);
 
 		if (cheat_capture(&cheat_suite, stream)) {
-			buffer = CHEAT_CAST(char*, malloc(length + 1));
+			buffer = CHEAT_CAST(char *, malloc(length + 1));
 			if (buffer == NULL)
 				return -1;
 
@@ -3006,7 +3530,6 @@ static int CHEAT_WRAP(vfprintf)(FILE* const stream,
 		return -1;
 
 #endif
-
 	}
 
 	return vfprintf(stream, format, list);
@@ -3014,23 +3537,20 @@ static int CHEAT_WRAP(vfprintf)(FILE* const stream,
 
 #define vfprintf CHEAT_WRAP(vfprintf)
 
-__attribute__ ((__unused__))
-static int CHEAT_UNWRAP(vprintf)(char const* const format,
-		va_list list) {
+__attribute__((__unused__)) static int CHEAT_UNWRAP(vprintf)(char const *const format, va_list list)
+{
 	return vprintf(format, list);
 }
 
-__attribute__ ((__unused__))
-static int CHEAT_WRAP(vprintf)(char const* const format,
-		va_list list) {
+__attribute__((__unused__)) static int CHEAT_WRAP(vprintf)(char const *const format, va_list list)
+{
 	return CHEAT_WRAP(vfprintf)(stdout, format, list);
 }
 
 #define vprintf CHEAT_WRAP(vprintf)
 
-__attribute__ ((__unused__))
-static int CHEAT_UNWRAP(fprintf)(FILE* const stream,
-		char const* const format, ...) {
+__attribute__((__unused__)) static int CHEAT_UNWRAP(fprintf)(FILE *const stream, char const *const format, ...)
+{
 	va_list list;
 	int result;
 
@@ -3040,9 +3560,8 @@ static int CHEAT_UNWRAP(fprintf)(FILE* const stream,
 	return result;
 }
 
-__attribute__ ((__unused__))
-static int CHEAT_WRAP(fprintf)(FILE* const stream,
-		char const* const format, ...) {
+__attribute__((__unused__)) static int CHEAT_WRAP(fprintf)(FILE *const stream, char const *const format, ...)
+{
 	va_list list;
 	int result;
 
@@ -3054,8 +3573,8 @@ static int CHEAT_WRAP(fprintf)(FILE* const stream,
 
 #define fprintf CHEAT_WRAP(fprintf)
 
-__attribute__ ((__unused__))
-static int CHEAT_UNWRAP(printf)(char const* const format, ...) {
+__attribute__((__unused__)) static int CHEAT_UNWRAP(printf)(char const *const format, ...)
+{
 	va_list list;
 	int result;
 
@@ -3065,8 +3584,8 @@ static int CHEAT_UNWRAP(printf)(char const* const format, ...) {
 	return result;
 }
 
-__attribute__ ((__unused__))
-static int CHEAT_WRAP(printf)(char const* const format, ...) {
+__attribute__((__unused__)) static int CHEAT_WRAP(printf)(char const *const format, ...)
+{
 	va_list list;
 	int result;
 
@@ -3078,15 +3597,13 @@ static int CHEAT_WRAP(printf)(char const* const format, ...) {
 
 #define printf CHEAT_WRAP(printf)
 
-__attribute__ ((__unused__))
-static int CHEAT_UNWRAP(fputs)(char const* const message,
-		FILE* const stream) {
+__attribute__((__unused__)) static int CHEAT_UNWRAP(fputs)(char const *const message, FILE *const stream)
+{
 	return fputs(message, stream);
 }
 
-__attribute__ ((__unused__))
-static int CHEAT_WRAP(fputs)(char const* const message,
-		FILE* const stream) {
+__attribute__((__unused__)) static int CHEAT_WRAP(fputs)(char const *const message, FILE *const stream)
+{
 	int result;
 
 	result = CHEAT_WRAP(fprintf)(stream, "%s", message);
@@ -3099,15 +3616,13 @@ static int CHEAT_WRAP(fputs)(char const* const message,
 
 #define fputs CHEAT_WRAP(fputs)
 
-__attribute__ ((__unused__))
-static int CHEAT_UNWRAP(fputc)(int const character,
-		FILE* const stream) {
+__attribute__((__unused__)) static int CHEAT_UNWRAP(fputc)(int const character, FILE *const stream)
+{
 	return fputc(character, stream);
 }
 
-__attribute__ ((__unused__))
-static int CHEAT_WRAP(fputc)(int const character,
-		FILE* const stream) {
+__attribute__((__unused__)) static int CHEAT_WRAP(fputc)(int const character, FILE *const stream)
+{
 	int result;
 
 	result = CHEAT_WRAP(fprintf)(stream, "%c", character);
@@ -3115,7 +3630,7 @@ static int CHEAT_WRAP(fputc)(int const character,
 	if (result < 0)
 		return EOF;
 
-	return (int )(unsigned char )result;
+	return (int)(unsigned char)result;
 }
 
 #define fputc CHEAT_WRAP(fputc)
@@ -3127,15 +3642,13 @@ This is needed if putc() is defined as a preprocessor directive.
 #undef putc
 #endif
 
-__attribute__ ((__unused__))
-static int CHEAT_UNWRAP(putc)(int const character,
-		FILE* const stream) {
+__attribute__((__unused__)) static int CHEAT_UNWRAP(putc)(int const character, FILE *const stream)
+{
 	return putc(character, stream);
 }
 
-__attribute__ ((__unused__))
-static int CHEAT_WRAP(putc)(int const character,
-		FILE* const stream) {
+__attribute__((__unused__)) static int CHEAT_WRAP(putc)(int const character, FILE *const stream)
+{
 	return CHEAT_WRAP(fputc)(character, stream);
 }
 
@@ -3145,27 +3658,26 @@ static int CHEAT_WRAP(putc)(int const character,
 #undef putchar
 #endif
 
-__attribute__ ((__unused__))
-static int CHEAT_UNWRAP(putchar)(int const character) {
+__attribute__((__unused__)) static int CHEAT_UNWRAP(putchar)(int const character)
+{
 	return putchar(character);
 }
 
-__attribute__ ((__unused__))
-static int CHEAT_WRAP(putchar)(int const character) {
+__attribute__((__unused__)) static int CHEAT_WRAP(putchar)(int const character)
+{
 	return CHEAT_WRAP(putc)(character, stdout);
 }
 
 #define putchar CHEAT_WRAP(putchar)
 
-__attribute__ ((__unused__))
-static int CHEAT_UNWRAP(puts)(char const* const message) {
+__attribute__((__unused__)) static int CHEAT_UNWRAP(puts)(char const *const message)
+{
 	return puts(message);
 }
 
-__attribute__ ((__unused__))
-static int CHEAT_WRAP(puts)(char const* const message) {
-	if (CHEAT_WRAP(fputs)(message, stdout) == EOF
-			|| CHEAT_WRAP(putchar)('\n') == EOF)
+__attribute__((__unused__)) static int CHEAT_WRAP(puts)(char const *const message)
+{
+	if (CHEAT_WRAP(fputs)(message, stdout) == EOF || CHEAT_WRAP(putchar)('\n') == EOF)
 		return EOF;
 
 	return 0;
@@ -3173,19 +3685,15 @@ static int CHEAT_WRAP(puts)(char const* const message) {
 
 #define puts CHEAT_WRAP(puts)
 
-__attribute__ ((__unused__))
-static size_t CHEAT_UNWRAP(fwrite)(void const* const buffer,
-		size_t const size,
-		size_t const count,
-		FILE* const stream) {
+__attribute__((__unused__)) static size_t CHEAT_UNWRAP(fwrite)(void const *const buffer, size_t const size,
+															   size_t const count, FILE *const stream)
+{
 	return fwrite(buffer, size, count, stream);
 }
 
-__attribute__ ((__unused__))
-static size_t CHEAT_WRAP(fwrite)(void const* const buffer,
-		size_t const size,
-		size_t const count,
-		FILE* const stream) {
+__attribute__((__unused__)) static size_t CHEAT_WRAP(fwrite)(void const *const buffer, size_t const size,
+															 size_t const count, FILE *const stream)
+{
 	if (cheat_hide(&cheat_suite, stream)) {
 
 #ifdef CHEAT_MODERN
@@ -3204,7 +3712,6 @@ static size_t CHEAT_WRAP(fwrite)(void const* const buffer,
 		return 0; /* This is consistent with CHEAT_WRAP(vfprintf)(). */
 
 #endif
-
 	}
 
 	return fwrite(buffer, size, count, stream);
@@ -3212,13 +3719,13 @@ static size_t CHEAT_WRAP(fwrite)(void const* const buffer,
 
 #define fwrite CHEAT_WRAP(fwrite)
 
-__attribute__ ((__unused__))
-static int CHEAT_UNWRAP(fflush)(FILE* const stream) {
+__attribute__((__unused__)) static int CHEAT_UNWRAP(fflush)(FILE *const stream)
+{
 	return fflush(stream);
 }
 
-__attribute__ ((__unused__))
-static int CHEAT_WRAP(fflush)(FILE* const stream) {
+__attribute__((__unused__)) static int CHEAT_WRAP(fflush)(FILE *const stream)
+{
 	if (cheat_hide(&cheat_suite, stream))
 		return 0;
 
@@ -3227,13 +3734,13 @@ static int CHEAT_WRAP(fflush)(FILE* const stream) {
 
 #define fflush CHEAT_WRAP(fflush)
 
-__attribute__ ((__unused__))
-static void CHEAT_UNWRAP(perror)(char const* const message) {
+__attribute__((__unused__)) static void CHEAT_UNWRAP(perror)(char const *const message)
+{
 	perror(message);
 }
 
-__attribute__ ((__unused__))
-static void CHEAT_WRAP(perror)(char const* const message) {
+__attribute__((__unused__)) static void CHEAT_WRAP(perror)(char const *const message)
+{
 	if (cheat_hide(&cheat_suite, stderr)) {
 
 #ifdef CHEAT_MODERN
@@ -3245,7 +3752,6 @@ static void CHEAT_WRAP(perror)(char const* const message) {
 #endif
 
 		return;
-
 	}
 
 	perror(message);
@@ -3255,18 +3761,15 @@ static void CHEAT_WRAP(perror)(char const* const message) {
 
 #ifdef CHEAT_POSIXLY
 
-__attribute__ ((__unused__))
-static ssize_t CHEAT_UNWRAP(write)(int const fd,
-		void const* const buffer,
-		size_t const size) {
+__attribute__((__unused__)) static ssize_t CHEAT_UNWRAP(write)(int const fd, void const *const buffer,
+															   size_t const size)
+{
 	return write(fd, buffer, size);
 }
 
-__attribute__ ((__unused__))
-static ssize_t CHEAT_WRAP(write)(int const fd,
-		void const* const buffer,
-		size_t const size) {
-	FILE* stream;
+__attribute__((__unused__)) static ssize_t CHEAT_WRAP(write)(int const fd, void const *const buffer, size_t const size)
+{
+	FILE *stream;
 
 	stream = fdopen(fd, "w");
 	if (stream != NULL && cheat_hide(&cheat_suite, stream)) {
@@ -3277,7 +3780,7 @@ static ssize_t CHEAT_WRAP(write)(int const fd,
 		if (result == 0)
 			return -1;
 
-		return (ssize_t )result;
+		return (ssize_t)result;
 	}
 
 	return write(fd, buffer, size);

@@ -20,14 +20,14 @@
 #include "external/c99defs.h"
 
 typedef struct obs_wsc_auth_data_s {
-    const char *challenge;
-    const char *salt;
-    const char *password;
-    bool required;
+	const char *challenge;
+	const char *salt;
+	const char *password;
+	bool required;
 } obs_wsc_auth_data_t;
 
 struct base_allocator {
-    void *(*malloc)(size_t);
-    void *(*realloc)(void *, size_t);
-    void (*free)(void *);
+	void *(*malloc)(size_t);
+	void *(*realloc)(void *, size_t);
+	void (*free)(void *);
 };

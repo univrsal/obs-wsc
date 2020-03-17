@@ -89,8 +89,7 @@
 #define CS_PLATFORM CS_P_ESP32
 #elif defined(ICACHE_FLASH)
 #define CS_PLATFORM CS_P_ESP8266
-#elif defined(TARGET_IS_TM4C129_RA0) || defined(TARGET_IS_TM4C129_RA1) || \
-    defined(TARGET_IS_TM4C129_RA2)
+#elif defined(TARGET_IS_TM4C129_RA0) || defined(TARGET_IS_TM4C129_RA1) || defined(TARGET_IS_TM4C129_RA2)
 #define CS_PLATFORM CS_P_TM4C129
 #elif defined(RS14100)
 #define CS_PLATFORM CS_P_RS14100
@@ -145,9 +144,7 @@
 #endif
 
 #if !defined(WEAK)
-#if (defined(__GNUC__) || defined(__clang__) || \
-     defined(__TI_COMPILER_VERSION__)) &&       \
-    !defined(_WIN32)
+#if (defined(__GNUC__) || defined(__clang__) || defined(__TI_COMPILER_VERSION__)) && !defined(_WIN32)
 #define WEAK __attribute__((weak))
 #else
 #define WEAK
@@ -295,10 +292,10 @@ typedef uint32_t in_addr_t;
 #define SIZE_T_FMT "Iu"
 typedef struct _stati64 cs_stat_t;
 #ifndef S_ISDIR
-#define S_ISDIR(x) (((x) &_S_IFMT) == _S_IFDIR)
+#define S_ISDIR(x) (((x)&_S_IFMT) == _S_IFDIR)
 #endif
 #ifndef S_ISREG
-#define S_ISREG(x) (((x) &_S_IFMT) == _S_IFREG)
+#define S_ISREG(x) (((x)&_S_IFMT) == _S_IFREG)
 #endif
 #define DIRSEP '\\'
 #define CS_DEFINE_DIRENT
@@ -352,10 +349,10 @@ unsigned int sleep(unsigned int seconds);
 /* https://stackoverflow.com/questions/16647819/timegm-cross-platform */
 #define timegm _mkgmtime
 
-#define gmtime_r(a, b) \
-  do {                 \
-    *(b) = *gmtime(a); \
-  } while (0)
+#define gmtime_r(a, b)     \
+	do {                   \
+		*(b) = *gmtime(a); \
+	} while (0)
 
 #endif /* CS_PLATFORM == CS_P_WINDOWS */
 #endif /* CS_COMMON_PLATFORMS_PLATFORM_WINDOWS_H_ */
@@ -433,8 +430,7 @@ unsigned int sleep(unsigned int seconds);
  * We require strtoll, and if your embedded pre-c99 compiler lacks one, please
  * implement a shim.
  */
-#if !(defined(__cplusplus) && __cplusplus >= 201103L) && \
-    !(defined(__DARWIN_C_LEVEL) && __DARWIN_C_LEVEL >= 200809L)
+#if !(defined(__cplusplus) && __cplusplus >= 201103L) && !(defined(__DARWIN_C_LEVEL) && __DARWIN_C_LEVEL >= 200809L)
 long long strtoll(const char *, char **, int);
 #endif
 
@@ -597,11 +593,9 @@ typedef struct stat cs_stat_t;
 #define CS_ENABLE_STDIO 1
 #endif
 
-#define inet_ntop(af, src, dst, size)                                          \
-  (((af) == AF_INET) ? ipaddr_ntoa_r((const ip_addr_t *) (src), (dst), (size)) \
-                     : NULL)
-#define inet_pton(af, src, dst) \
-  (((af) == AF_INET) ? ipaddr_aton((src), (ip_addr_t *) (dst)) : 0)
+#define inet_ntop(af, src, dst, size) \
+	(((af) == AF_INET) ? ipaddr_ntoa_r((const ip_addr_t *)(src), (dst), (size)) : NULL)
+#define inet_pton(af, src, dst) (((af) == AF_INET) ? ipaddr_aton((src), (ip_addr_t *)(dst)) : 0)
 
 #endif /* CS_PLATFORM == CS_P_ESP8266 */
 #endif /* CS_COMMON_PLATFORMS_PLATFORM_ESP8266_H_ */
@@ -720,11 +714,11 @@ typedef size_t _off_t;
 typedef long ssize_t;
 
 struct stat {
-  int st_ino;
-  mode_t st_mode;
-  int st_nlink;
-  time_t st_mtime;
-  off_t st_size;
+	int st_ino;
+	mode_t st_mode;
+	int st_nlink;
+	time_t st_mtime;
+	off_t st_size;
 };
 
 int _stat(const char *pathname, struct stat *st);
@@ -736,7 +730,7 @@ int stat(const char *pathname, struct stat *st);
 #define __S_IFCHR 0020000
 #define __S_IFREG 0100000
 
-#define __S_ISTYPE(mode, mask) (((mode) &__S_IFMT) == (mask))
+#define __S_ISTYPE(mode, mask) (((mode)&__S_IFMT) == (mask))
 
 #define S_IFDIR __S_IFDIR
 #define S_IFCHR __S_IFCHR
@@ -755,8 +749,7 @@ int stat(const char *pathname, struct stat *st);
 #define MG_FS_SLFS
 #endif
 
-#if (defined(CC3200_FS_SPIFFS) || defined(CC3200_FS_SLFS)) && \
-    !defined(MG_ENABLE_FILESYSTEM)
+#if (defined(CC3200_FS_SPIFFS) || defined(CC3200_FS_SLFS)) && !defined(MG_ENABLE_FILESYSTEM)
 #define MG_ENABLE_FILESYSTEM 1
 #define CS_DEFINE_DIRENT
 #endif
@@ -843,11 +836,11 @@ typedef size_t _off_t;
 typedef long ssize_t;
 
 struct stat {
-  int st_ino;
-  mode_t st_mode;
-  int st_nlink;
-  time_t st_mtime;
-  off_t st_size;
+	int st_ino;
+	mode_t st_mode;
+	int st_nlink;
+	time_t st_mtime;
+	off_t st_size;
 };
 
 int _stat(const char *pathname, struct stat *st);
@@ -859,7 +852,7 @@ int stat(const char *pathname, struct stat *st);
 #define __S_IFCHR 0020000
 #define __S_IFREG 0100000
 
-#define __S_ISTYPE(mode, mask) (((mode) &__S_IFMT) == (mask))
+#define __S_ISTYPE(mode, mask) (((mode)&__S_IFMT) == (mask))
 
 #define S_IFDIR __S_IFDIR
 #define S_IFCHR __S_IFCHR
@@ -939,11 +932,11 @@ typedef size_t _off_t;
 typedef long ssize_t;
 
 struct stat {
-  int st_ino;
-  mode_t st_mode;
-  int st_nlink;
-  time_t st_mtime;
-  off_t st_size;
+	int st_ino;
+	mode_t st_mode;
+	int st_nlink;
+	time_t st_mtime;
+	off_t st_size;
 };
 
 int _stat(const char *pathname, struct stat *st);
@@ -955,7 +948,7 @@ int _stat(const char *pathname, struct stat *st);
 #define __S_IFCHR 0020000
 #define __S_IFREG 0100000
 
-#define __S_ISTYPE(mode, mask) (((mode) &__S_IFMT) == (mask))
+#define __S_ISTYPE(mode, mask) (((mode)&__S_IFMT) == (mask))
 
 #define S_IFDIR __S_IFDIR
 #define S_IFCHR __S_IFCHR
@@ -972,8 +965,7 @@ int _stat(const char *pathname, struct stat *st);
 #define CS_ENABLE_STDIO 1
 #endif
 
-#if (defined(CC3200_FS_SPIFFS) || defined(CC3200_FS_SLFS)) && \
-    !defined(MG_ENABLE_FILESYSTEM)
+#if (defined(CC3200_FS_SPIFFS) || defined(CC3200_FS_SLFS)) && !defined(MG_ENABLE_FILESYSTEM)
 #define MG_ENABLE_FILESYSTEM 1
 #endif
 
@@ -1087,8 +1079,8 @@ typedef struct stat cs_stat_t;
 /* copied from GCC on ARM; for some reason useconds are signed */
 typedef long suseconds_t; /* microseconds (signed) */
 struct timeval {
-  time_t tv_sec;       /* seconds */
-  suseconds_t tv_usec; /* and microseconds */
+	time_t tv_sec;       /* seconds */
+	suseconds_t tv_usec; /* and microseconds */
 };
 
 #endif
@@ -1323,8 +1315,7 @@ int sl_set_ssl_opts(int sock, struct mg_connection *nc);
 #define SL_ERROR_BSD_ESECDATEERROR SL_ESECDATEERROR
 #define SL_ERROR_BSD_ESECSNOVERIFY SL_ESECSNOVERIFY
 #define SL_ERROR_FS_FAILED_TO_ALLOCATE_MEM SL_FS_ERR_FAILED_TO_ALLOCATE_MEM
-#define SL_ERROR_FS_FILE_HAS_NOT_BEEN_CLOSE_CORRECTLY \
-  SL_FS_FILE_HAS_NOT_BEEN_CLOSE_CORRECTLY
+#define SL_ERROR_FS_FILE_HAS_NOT_BEEN_CLOSE_CORRECTLY SL_FS_FILE_HAS_NOT_BEEN_CLOSE_CORRECTLY
 #define SL_ERROR_FS_FILE_NAME_EXIST SL_FS_FILE_NAME_EXIST
 #define SL_ERROR_FS_FILE_NOT_EXISTS SL_FS_ERR_FILE_NOT_EXISTS
 #define SL_ERROR_FS_NO_AVAILABLE_NV_INDEX SL_FS_ERR_NO_AVAILABLE_NV_INDEX
@@ -1352,8 +1343,7 @@ int sl_set_ssl_opts(int sock, struct mg_connection *nc);
 
 #else /* SL_MAJOR_VERSION_NUM >= 2 */
 
-#define FS_MODE_OPEN_CREATE(max_size, flag) \
-  (SL_FS_CREATE | SL_FS_CREATE_MAX_SIZE(max_size))
+#define FS_MODE_OPEN_CREATE(max_size, flag) (SL_FS_CREATE | SL_FS_CREATE_MAX_SIZE(max_size))
 #define SL_FI_FILE_SIZE(fi) ((fi).Len)
 #define SL_FI_FILE_MAX_SIZE(fi) ((fi).MaxSize)
 
@@ -1434,7 +1424,7 @@ int slfs_open(const unsigned char *fname, uint32_t flags, uint32_t *token);
 #define snprintf _snprintf
 #define fileno _fileno
 #define vsnprintf _vsnprintf
-#define sleep(x) Sleep((x) *1000)
+#define sleep(x) Sleep((x)*1000)
 #define to64(x) _atoi64(x)
 #define rmdir _rmdir
 
@@ -1528,9 +1518,9 @@ typedef uint32_t in_addr_t;
 #endif
 
 typedef struct _stati64 {
-  uint32_t st_mtime;
-  uint32_t st_size;
-  uint32_t st_mode;
+	uint32_t st_mtime;
+	uint32_t st_size;
+	uint32_t st_mode;
 } cs_stat_t;
 
 /*
@@ -1558,11 +1548,11 @@ typedef unsigned int *uintptr_t;
 #define _S_IFDIR 4
 
 #ifndef S_ISDIR
-#define S_ISDIR(x) (((x) &_S_IFDIR) != 0)
+#define S_ISDIR(x) (((x)&_S_IFDIR) != 0)
 #endif
 
 #ifndef S_ISREG
-#define S_ISREG(x) (((x) &_S_IFREG) != 0)
+#define S_ISREG(x) (((x)&_S_IFREG) != 0)
 #endif
 
 int open(const char *filename, int oflag, int pmode);
@@ -1830,8 +1820,7 @@ typedef int sock_t;
 #if MG_NET_IF == MG_NET_IF_LWIP_LOW_LEVEL
 struct mg_mgr;
 struct mg_connection;
-void mg_lwip_set_keepalive_params(struct mg_connection *nc, int idle,
-                                  int interval, int count);
+void mg_lwip_set_keepalive_params(struct mg_connection *nc, int idle, int interval, int count);
 #endif
 
 /* For older version of LWIP */
@@ -1860,9 +1849,9 @@ extern "C" {
 #endif /* __cplusplus */
 
 typedef struct {
-  uint32_t buf[4];
-  uint32_t bits[2];
-  unsigned char in[64];
+	uint32_t buf[4];
+	uint32_t bits[2];
+	unsigned char in[64];
 } cs_md5_ctx;
 
 void cs_md5_init(cs_md5_ctx *c);
@@ -1894,17 +1883,16 @@ extern "C" {
 #endif /* __cplusplus */
 
 typedef struct {
-  uint32_t state[5];
-  uint32_t count[2];
-  unsigned char buffer[64];
+	uint32_t state[5];
+	uint32_t count[2];
+	unsigned char buffer[64];
 } cs_sha1_ctx;
 
 void cs_sha1_init(cs_sha1_ctx *);
 void cs_sha1_update(cs_sha1_ctx *, const unsigned char *data, uint32_t len);
 void cs_sha1_final(unsigned char digest[20], cs_sha1_ctx *);
-void cs_hmac_sha1(const unsigned char *key, size_t key_len,
-                  const unsigned char *text, size_t text_len,
-                  unsigned char out[20]);
+void cs_hmac_sha1(const unsigned char *key, size_t key_len, const unsigned char *text, size_t text_len,
+				  unsigned char out[20]);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
@@ -1956,8 +1944,8 @@ extern "C" {
 
 /* Describes chunk of memory */
 struct mg_str {
-  const char *p; /* Memory chunk pointer */
-  size_t len;    /* Memory chunk length */
+	const char *p; /* Memory chunk pointer */
+	size_t len;    /* Memory chunk length */
 };
 
 /*
@@ -1972,12 +1960,18 @@ struct mg_str mg_mk_str(const char *s);
 struct mg_str mg_mk_str_n(const char *s, size_t len);
 
 /* Macro for initializing mg_str. */
-#define MG_MK_STR(str_literal) \
-  { str_literal, sizeof(str_literal) - 1 }
+#define MG_MK_STR(str_literal)               \
+	{                                        \
+		str_literal, sizeof(str_literal) - 1 \
+	}
 #define MG_MK_STR_N(str_literal, len) \
-  { str_literal, len }
+	{                                 \
+		str_literal, len              \
+	}
 #define MG_NULL_STR \
-  { NULL, 0 }
+	{               \
+		NULL, 0     \
+	}
 
 /*
  * Cross-platform version of `strcmp()` where where first string is
@@ -2076,9 +2070,9 @@ extern "C" {
 
 /* Memory buffer descriptor */
 struct mbuf {
-  char *buf;   /* Buffer pointer */
-  size_t len;  /* Data length. Data is located between offset 0 and len. */
-  size_t size; /* Buffer size allocated by realloc(1). Must be >= len */
+	char *buf;   /* Buffer pointer */
+	size_t len;  /* Data length. Data is located between offset 0 and len. */
+	size_t size; /* Buffer size allocated by realloc(1). Must be >= len */
 };
 
 /*
@@ -2161,15 +2155,14 @@ extern "C" {
 typedef void (*cs_base64_putc_t)(char, void *);
 
 struct cs_base64_ctx {
-  /* cannot call it putc because it's a macro on some environments */
-  cs_base64_putc_t b64_putc;
-  unsigned char chunk[3];
-  int chunk_size;
-  void *user_data;
+	/* cannot call it putc because it's a macro on some environments */
+	cs_base64_putc_t b64_putc;
+	unsigned char chunk[3];
+	int chunk_size;
+	void *user_data;
 };
 
-void cs_base64_init(struct cs_base64_ctx *ctx, cs_base64_putc_t putc,
-                    void *user_data);
+void cs_base64_init(struct cs_base64_ctx *ctx, cs_base64_putc_t putc, void *user_data);
 void cs_base64_update(struct cs_base64_ctx *ctx, const char *str, size_t len);
 void cs_base64_finish(struct cs_base64_ctx *ctx);
 
@@ -2246,8 +2239,7 @@ size_t c_strnlen(const char *s, size_t maxlen);
 /*
  * Equivalent of standard `snprintf()`.
  */
-int c_snprintf(char *buf, size_t buf_size, const char *format, ...)
-    PRINTF_LIKE(3, 4);
+int c_snprintf(char *buf, size_t buf_size, const char *format, ...) PRINTF_LIKE(3, 4);
 
 /*
  * Equivalent of standard `vsnprintf()`.
@@ -2315,8 +2307,7 @@ int mg_casecmp(const char *s1, const char *s2);
  *
  * The purpose of this is to avoid malloc-ing if generated strings are small.
  */
-int mg_asprintf(char **buf, size_t size, const char *fmt, ...)
-    PRINTF_LIKE(3, 4);
+int mg_asprintf(char **buf, size_t size, const char *fmt, ...) PRINTF_LIKE(3, 4);
 
 /* Same as mg_asprintf, but takes varargs list. */
 int mg_avprintf(char **buf, size_t size, const char *fmt, va_list ap);
@@ -2334,16 +2325,14 @@ int mg_avprintf(char **buf, size_t size, const char *fmt, va_list ap);
  * The purpose of this function is to parse comma separated string without
  * any copying/memory allocation.
  */
-const char *mg_next_comma_list_entry(const char *list, struct mg_str *val,
-                                     struct mg_str *eq_val);
+const char *mg_next_comma_list_entry(const char *list, struct mg_str *val, struct mg_str *eq_val);
 
 /*
  * Like `mg_next_comma_list_entry()`, but takes `list` as `struct mg_str`.
  * NB: Test return value's .p, not .len. On last itreation that yields result
  * .len will be 0 but .p will not. When finished, .p will be NULL.
  */
-struct mg_str mg_next_comma_list_entry_n(struct mg_str list, struct mg_str *val,
-                                         struct mg_str *eq_val);
+struct mg_str mg_next_comma_list_entry_n(struct mg_str list, struct mg_str *val, struct mg_str *eq_val);
 
 /*
  * Matches 0-terminated string (mg_match_prefix) or string with given length

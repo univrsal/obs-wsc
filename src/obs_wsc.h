@@ -30,7 +30,7 @@ typedef struct obs_wsc_connection_s obs_wsc_connection_t;
  * @param addr The address (eg. ws://127.0.0.1:4444)
  * @return the new connection or NULL on error
  */
-EXPORT obs_wsc_connection_t * obs_wsc_connect(const char *addr);
+EXPORT obs_wsc_connection_t *obs_wsc_connect(const char *addr);
 
 /**
  * @brief Close an active connection
@@ -61,8 +61,7 @@ EXPORT void obs_wsc_set_timeout(obs_wsc_connection_t *conn, int32_t ms);
  *        salt or required will be set to false
  * @return true on success
  */
-EXPORT bool obs_wsc_auth_required(obs_wsc_connection_t *conn,
-                                  obs_wsc_auth_data_t *auth);
+EXPORT bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth);
 
 /**
  * @brief Tries to autenticate with the server with the provided data
@@ -71,8 +70,7 @@ EXPORT bool obs_wsc_auth_required(obs_wsc_connection_t *conn,
  * @see obs_wsc_prepare_auth
  * @return true on success
  */
-EXPORT bool obs_wsc_authenticate(obs_wsc_connection_t *conn,
-                                 const obs_wsc_auth_data_t *auth);
+EXPORT bool obs_wsc_authenticate(obs_wsc_connection_t *conn, const obs_wsc_auth_data_t *auth);
 
 /**
  * @brief Creates the auth response, by hashing the password and encoding it
@@ -83,8 +81,7 @@ EXPORT bool obs_wsc_authenticate(obs_wsc_connection_t *conn,
  * @param password The password to login
  * @return true on success
  */
-EXPORT bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth,
-                                 const char *password);
+EXPORT bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password);
 
 /**
  * @brief Initialize obs_wsc

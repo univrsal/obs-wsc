@@ -23,29 +23,29 @@
 
 char *util_random_id(const obs_wsc_connection_t *conn)
 {
-    char *new_id = bmalloc(sizeof(char) * 17);
-    int idx = 0;
-    bool unique = false;
+	char *new_id = bmalloc(sizeof(char) * 17);
+	int idx = 0;
+	bool unique = false;
 
-    while (!unique) {
-        while(idx < 16) {
-            int rnd = rand() % (26 + 26 + 10);
-            if (rnd < 26)
-                 new_id[idx] = 'a' + rnd;
-            else if (rnd < 26+26)
-                 new_id[idx] = 'A' + rnd - 26;
-            else
-                 new_id[idx] = '0' + rnd - 26 - 26;
-            idx++;
-        }
-        unique = true;
-        for (size_t i = 0; i < conn->message_ids_len; i++) {
-            if (strcmp(conn->message_ids[i], new_id) == 0) {
-                unique = false;
-                break;
-            }
-        }
-    }
+	while (!unique) {
+		while (idx < 16) {
+			int rnd = rand() % (26 + 26 + 10);
+			if (rnd < 26)
+				new_id[idx] = 'a' + rnd;
+			else if (rnd < 26 + 26)
+				new_id[idx] = 'A' + rnd - 26;
+			else
+				new_id[idx] = '0' + rnd - 26 - 26;
+			idx++;
+		}
+		unique = true;
+		for (size_t i = 0; i < conn->message_ids_len; i++) {
+			if (strcmp(conn->message_ids[i], new_id) == 0) {
+				unique = false;
+				break;
+			}
+		}
+	}
 
-    return new_id;
+	return new_id;
 }

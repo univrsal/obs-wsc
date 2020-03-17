@@ -38,52 +38,52 @@
 static void *a_malloc(size_t size)
 {
 #ifdef ALIGNED_MALLOC
-    return _aligned_malloc(size, ALIGNMENT);
+	return _aligned_malloc(size, ALIGNMENT);
 #elif ALIGNMENT_HACK
-    void *ptr = NULL;
-    long diff;
+	void *ptr = NULL;
+	long diff;
 
-    ptr = malloc(size + ALIGNMENT);
-    if (ptr) {
-        diff = ((~(long)ptr) & (ALIGNMENT - 1)) + 1;
-        ptr = (char *)ptr + diff;
-        ((char *)ptr)[-1] = (char)diff;
-    }
+	ptr = malloc(size + ALIGNMENT);
+	if (ptr) {
+		diff = ((~(long)ptr) & (ALIGNMENT - 1)) + 1;
+		ptr = (char *)ptr + diff;
+		((char *)ptr)[-1] = (char)diff;
+	}
 
-    return ptr;
+	return ptr;
 #else
-    return malloc(size);
+	return malloc(size);
 #endif
 }
 
 static void *a_realloc(void *ptr, size_t size)
 {
 #ifdef ALIGNED_MALLOC
-    return _aligned_realloc(ptr, size, ALIGNMENT);
+	return _aligned_realloc(ptr, size, ALIGNMENT);
 #elif ALIGNMENT_HACK
-    long diff;
+	long diff;
 
-    if (!ptr)
-        return a_malloc(size);
-    diff = ((char *)ptr)[-1];
-    ptr = realloc((char *)ptr - diff, size + diff);
-    if (ptr)
-        ptr = (char *)ptr + diff;
-    return ptr;
+	if (!ptr)
+		return a_malloc(size);
+	diff = ((char *)ptr)[-1];
+	ptr = realloc((char *)ptr - diff, size + diff);
+	if (ptr)
+		ptr = (char *)ptr + diff;
+	return ptr;
 #else
-    return realloc(ptr, size);
+	return realloc(ptr, size);
 #endif
 }
 
 static void a_free(void *ptr)
 {
 #ifdef ALIGNED_MALLOC
-    _aligned_free(ptr);
+	_aligned_free(ptr);
 #elif ALIGNMENT_HACK
-    if (ptr)
-        free((char *)ptr - ((char *)ptr)[-1]);
+	if (ptr)
+		free((char *)ptr - ((char *)ptr)[-1]);
 #else
-    free(ptr);
+	free(ptr);
 #endif
 }
 
@@ -92,63 +92,61 @@ static long num_allocs = 0;
 
 void base_set_allocator(struct base_allocator *defs)
 {
-    memcpy(&alloc, defs, sizeof(struct base_allocator));
+	memcpy(&alloc, defs, sizeof(struct base_allocator));
 }
 
 void *bmalloc(size_t size)
 {
-    void *ptr = alloc.malloc(size);
-    if (!ptr && !size)
-        ptr = alloc.malloc(1);
-    if (!ptr) {
-        os_breakpoint();
-        bcrash("Out of memory while trying to allocate %lu bytes",
-               (unsigned long)size);
-    }
+	void *ptr = alloc.malloc(size);
+	if (!ptr && !size)
+		ptr = alloc.malloc(1);
+	if (!ptr) {
+		os_breakpoint();
+		bcrash("Out of memory while trying to allocate %lu bytes", (unsigned long)size);
+	}
 
-    os_atomic_inc_long(&num_allocs);
-    return ptr;
+	os_atomic_inc_long(&num_allocs);
+	return ptr;
 }
 
 void *brealloc(void *ptr, size_t size)
 {
-    if (!ptr)
-        os_atomic_inc_long(&num_allocs);
+	if (!ptr)
+		os_atomic_inc_long(&num_allocs);
 
-    ptr = alloc.realloc(ptr, size);
-    if (!ptr && !size)
-        ptr = alloc.realloc(ptr, 1);
-    if (!ptr) {
-        os_breakpoint();
-        bcrash("Out of memory while trying to allocate %lu bytes",
-               (unsigned long)size);
-    }
+	ptr = alloc.realloc(ptr, size);
+	if (!ptr && !size)
+		ptr = alloc.realloc(ptr, 1);
+	if (!ptr) {
+		os_breakpoint();
+		bcrash("Out of memory while trying to allocate %lu bytes", (unsigned long)size);
+	}
 
-    return ptr;
+	return ptr;
 }
 
 void bfree(void *ptr)
 {
-    if (ptr)
-        os_atomic_dec_long(&num_allocs);
-    alloc.free(ptr);
+	if (ptr)
+		os_atomic_dec_long(&num_allocs);
+	alloc.free(ptr);
 }
 
 long bnum_allocs(void)
 {
-    return num_allocs;
+	return num_allocs;
 }
 
 int base_get_alignment(void)
 {
-    return ALIGNMENT;
+	return ALIGNMENT;
 }
 
 void *bmemdup(const void *ptr, size_t size)
 {
-    void *out = bmalloc(size);
-    if (size)
-        memcpy(out, ptr, size);
+	void *out = bmalloc(size);
+	if (size)
+		memcpy(out, ptr, size);
 
-    return out;
+	return out;
 }
