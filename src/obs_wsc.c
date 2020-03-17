@@ -23,6 +23,9 @@
 #include "external/bmem.h"
 #include "external/platform.h"
 #include "external/threading.h"
+#include "external/dstr.h"
+#include "external/sha256.h"
+#include "external/base64.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -206,7 +209,7 @@ bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth
 			json_unpack_ex(response, &err, 0, "{sb}", "authRequired", &auth->required) == 0) {
 
 			if (auth->required) {
-				if (json_unpack_ex(response, &err, 0, "{ss,ss}", "challange", &challenge, "salt", &salt) == 0) {
+				if (json_unpack_ex(response, &err, 0, "{ss,ss}", "challenge", &challenge, "salt", &salt) == 0) {
 					auth->challenge = bstrdup(challenge);
 					auth->salt = bstrdup(salt);
 					result = true;
@@ -224,6 +227,65 @@ bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth
 		bfree(last_msg_id);
 	}
 	return result;
+}
+
+void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data)
+{
+	if (data) {
+		bfree(data->salt);
+		bfree(data->challenge);
+	}
+}
+
+EXPORT bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password)
+{
+	struct dstr pw_salt, pw_salt_hash, pw_salt_hash_b64, final;
+	dstr_init(&pw_salt);
+	dstr_init(&pw_salt_hash);
+	dstr_init(&pw_salt_hash_b64);
+	dstr_init(&final);
+	BYTE sha256[SHA256_BLOCK_SIZE];
+
+	/* Step 1: Concatenate password with salt */
+	dstr_copy(&pw_salt, password);
+	dstr_cat(&pw_salt, auth->salt);
+
+	/* Step 2: Hash it */
+	SHA256_CTX ctx;
+	sha256_init(&ctx);
+	sha256_update(&ctx, pw_salt.array, pw_salt.len);
+	sha256_final(&ctx, sha256);
+	dstr_from_sha256(&pw_salt_hash, sha256);
+
+	/* Step 3: base64 encode it */
+	size_t len = base64_encode((BYTE *)pw_salt_hash.array, NULL, pw_salt_hash.len, 1);
+	dstr_resize(&pw_salt_hash_b64, len);
+	base64_encode((BYTE *)pw_salt_hash.array, (BYTE *)pw_salt_hash_b64.array, pw_salt_hash.len, 1);
+
+	/* Step 4: Concatenate it with the challenge */
+	dstr_cat(&pw_salt_hash_b64, auth->challenge);
+
+	/* Step 5: Hash it again */
+	sha256_init(&ctx);
+	sha256_update(&ctx, (BYTE *)pw_salt_hash_b64.array, pw_salt_hash_b64.len);
+	sha256_final(&ctx, sha256);
+	dstr_free(&pw_salt_hash);
+	dstr_from_sha256(&pw_salt_hash, sha256);
+
+	/* Step 6: base64 encode it again */
+	len = base64_encode((BYTE *)pw_salt_hash.array, NULL, pw_salt_hash.len, 0);
+	dstr_reserve(&final, len);
+	base64_encode((BYTE *)pw_salt_hash.array, (BYTE *)final.array, pw_salt_hash.len, 1);
+
+	auth->auth_response = bstrdup(final.array);
+
+	dstr_free(&pw_salt);
+	dstr_free(&pw_salt_hash);
+	dstr_free(&pw_salt_hash_b64);
+	dstr_free(&final);
+	bfree(auth->salt);
+	bfree(auth->challenge);
+	return strlen(auth->auth_response) > 0;
 }
 
 bool obs_wsc_authenticate(obs_wsc_connection_t *conn, const obs_wsc_auth_data_t *auth)

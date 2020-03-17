@@ -58,10 +58,18 @@ EXPORT void obs_wsc_set_timeout(obs_wsc_connection_t *conn, int32_t ms);
  * @brief Checks if the connections needs a password
  * @param conn The connection
  * @param auth Pointer to a data struct which will receive a challange and a
- *        salt or required will be set to false
+ *        salt or required will be set to false.
+ *        The salt and challange have to be freed with obs_wsc_free_auth_data
+ *        if it's not used for obs_wsc_prepare_auth
  * @return true on success
  */
 EXPORT bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth);
+
+/**
+ * @brief Frees the challange and salt strings
+ * @param data the data to free
+ */
+void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data);
 
 /**
  * @brief Tries to autenticate with the server with the provided data
@@ -74,7 +82,8 @@ EXPORT bool obs_wsc_authenticate(obs_wsc_connection_t *conn, const obs_wsc_auth_
 
 /**
  * @brief Creates the auth response, by hashing the password and encoding it
- *        as required by the protocol
+ *        as required by the protocol. This will free the salt and challange
+ *        returned in obs_wsc_auth_required afterwards
  * @param auth The auth data struct containing a challange and a salt from
  *        obs_wcs_auth_required
  * @see obs_wcs_auth_required
