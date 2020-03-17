@@ -21,13 +21,13 @@
 #include <jansson.h>
 #include "opaque.h"
 
-json_t *send_request(obs_wsc_connection_t *conn, const char *request,
+bool send_request(obs_wsc_connection_t *conn, const char *request,
                   const json_t *additional_data);
 
 bool send_json(const obs_wsc_connection_t *conn, const json_t *json);
 
 bool send_str(const obs_wsc_connection_t *conn, const char *str);
 
-json_t *recv_json(const obs_wsc_connection_t *conn);
+json_t *recv_json(unsigned char *data, size_t len);
 
-bool wait_timeout(const obs_wsc_connection_t *conn);
+bool wait_timeout(obs_wsc_connection_t *conn);

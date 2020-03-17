@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *random_id(const obs_wsc_connection_t *conn)
+char *util_random_id(const obs_wsc_connection_t *conn)
 {
     char *new_id = bmalloc(sizeof(char) * 17);
     int idx = 0;
@@ -48,4 +48,9 @@ char *random_id(const obs_wsc_connection_t *conn)
     }
 
     return new_id;
+}
+
+time_t util_epoch()
+{
+    return time(NULL);
 }

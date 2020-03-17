@@ -23,16 +23,16 @@
 #include "external/bmem.h"
 #include <string.h>
 
-json_t *send_request(obs_wsc_connection_t *conn, const char *request,
+bool send_request(obs_wsc_connection_t *conn, const char *request,
                   const json_t *additional_data)
 {
-    json_t *response = NULL, *req = NULL;
+    json_t *req = NULL;
     json_error_t err;
 
     if (!conn || !conn->connection || !request)
         return NULL;
 
-    char *msg_id = random_id(conn);
+    char *msg_id = util_random_id(conn);
     req = json_pack_ex(&err, 0, "{ss,ss}", "request-type", request,
                        "message-id", msg_id);
     if (req) {
@@ -50,11 +50,6 @@ json_t *send_request(obs_wsc_connection_t *conn, const char *request,
 
         if (!wait_timeout(conn))
             goto fail;
-
-        response = recv_json(conn);
-
-        if (!response)
-            berr("Couldn't receive response for request %s", request);
     } else {
         berr("Packing request json for %s failed with %s at line %i",
              request, err.text, err.line);
@@ -62,13 +57,13 @@ json_t *send_request(obs_wsc_connection_t *conn, const char *request,
     }
 
     json_decref(req);
-    return response;
+    return true;
 
     free:
     bfree(msg_id);
     fail:
     json_decref(req);
-    return NULL;
+    return false;
 }
 
 bool send_json(const obs_wsc_connection_t *conn, const json_t *json)
@@ -84,36 +79,54 @@ bool send_json(const obs_wsc_connection_t *conn, const json_t *json)
 
 bool send_str(const obs_wsc_connection_t *conn, const char *str)
 {
-    /* TODO: Are strings sent with length attached? */
     size_t len = strlen(str) + 1; /* Include \0 */
 
-    if (!conn || !conn->connection || !str || len < 1)
+    if (!conn || !conn->connection || !conn->connected || !str || len < 1)
         return false;
 
-    if (len > INT32_MAX) {
-        berr("String length exceeds int32 max");
-        return false;
-    }
+    mg_send_websocket_frame(conn->connection, WEBSOCKET_OP_TEXT, str, len);
 
-    return false;
+    return true;
 }
 
-json_t *recv_json(const obs_wsc_connection_t *conn)
+json_t *recv_json(unsigned char *data, size_t len)
 {
-    if (!conn || !conn->connection)
+    json_error_t err;
+    json_t *loaded = json_loadb((char *) data, len, 0, &err);
+
+    if (!loaded) {
+        berr("Failed to parse response json: %s at line %i",
+             err.text, err.line);
         return NULL;
-    char buf[32];
-    return NULL;
+    }
+    return loaded;
 }
 
-bool wait_timeout(const obs_wsc_connection_t *conn)
+bool wait_timeout(obs_wsc_connection_t *conn)
 {
     bool keep_waiting = true;
+    int32_t max_timeout = conn->timeout;
     int32_t timeout = 0;
+    long start_time = util_epoch();
 
-    if (!keep_waiting) {
-        berr("Waiting for response exceeded timeout of %i ms",
-             conn->timeout);
+    while (keep_waiting) {
+        if (timeout >= max_timeout)
+            keep_waiting = false;
+
+        if (!keep_waiting) {
+            berr("Waiting for response exceeded timeout of %i ms",
+                 max_timeout);
+        }
+
+        pthread_mutex_lock(&conn->poll_mutex);
+        if (conn->last_message.time > start_time) {
+            bdebug("Received message within timeout");
+            break;
+        }
+        pthread_mutex_unlock(&conn->poll_mutex);
+
+        timeout += 10;
+        os_sleep_ms(10);
     }
     return keep_waiting;
 }

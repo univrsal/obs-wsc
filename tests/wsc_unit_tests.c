@@ -25,12 +25,12 @@ CHEAT_TEST(init,
 
 CHEAT_TEST(connect,
     obs_wsc_connection_t *conn = NULL;
-    cheat_assert((conn = obs_wsc_connect(NULL, 4444)) != NULL);
+    cheat_assert((conn = obs_wsc_connect(NULL)) != NULL);
     obs_wsc_disconnect(conn);
 )
 
 CHEAT_TEST(auth_required,
-    obs_wsc_connection_t *conn = obs_wsc_connect(NULL, 4444);
+    obs_wsc_connection_t *conn = obs_wsc_connect(NULL);
     obs_wsc_auth_data_t auth;
     cheat_assert(obs_wsc_auth_required(conn, &auth));
     obs_wsc_disconnect(conn);

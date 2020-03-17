@@ -19,7 +19,7 @@
 #include "obs_wsc.h"
 #include "opaque.h"
 #include "send.h"
-#include "websocket.h"
+#include "util.h"
 #include "external/bmem.h"
 #include "external/platform.h"
 #include <stdlib.h>
@@ -50,9 +50,51 @@ void obs_wsc_set_allocator(struct base_allocator *defs)
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
 {
     obs_wsc_connection_t *conn = nc->user_data;
-    switch (ev) {
+    int status;
+    struct http_message *msg;
+    struct websocket_message *wm;
 
+    pthread_mutex_lock(&conn->poll_mutex);
+    switch (ev) {
+        case MG_EV_CONNECT:
+            status = *((int *) ev_data);
+            if (status != 0) {
+                berr("Connection for %s failed with code %i", conn->domain,
+                     status);
+            }
+            conn->connected = true;
+            break;
+        case MG_EV_WEBSOCKET_HANDSHAKE_DONE:
+            msg = (struct http_message *) ev_data;
+            if (msg->resp_code == 101)
+                binfo("Connected to %s", conn->domain);
+            break;
+        case MG_EV_CLOSE:
+            if (conn->connected)
+                binfo("Disconnected from %s", conn->domain);
+            conn->connected = false;
+            conn->thread_flag = false;
+            break;
+        case MG_EV_WEBSOCKET_FRAME:
+            wm = ev_data;
+            binfo("Received message: %.*s", (int) wm->size, wm->data);
+            json_decref(conn->last_message.data);
+            conn->last_message.data = recv_json(wm->data, wm->size);
+            conn->last_message.time = util_epoch();
+            break;
     }
+    pthread_mutex_unlock(&conn->poll_mutex);
+}
+
+static void *wsc_thread(void *arg)
+{
+    obs_wsc_connection_t *conn = arg;
+
+    while (conn->thread_flag) {
+        mg_mgr_poll(&conn->manager, conn->timeout);
+    }
+
+    return NULL;
 }
 
 obs_wsc_connection_t *obs_wsc_connect(const char *addr)
@@ -66,14 +108,39 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr)
     n->timeout = 500;
 
     mg_mgr_init(&n->manager, n);
-    n->connection = mg_connect_ws(&n->manager, ev_handler, addr, "obs-websocket", NULL);
+    n->connection = mg_connect_ws(&n->manager, ev_handler, addr, "websocket", NULL);
 
     if (!n->connection) {
         berr("mg_connect_ws faild for %s", addr);
         goto fail;
     }
 
+    if (pthread_mutex_init(&n->poll_mutex, NULL)) {
+        berr("Couldn't initialize poll mutex");
+        goto fail;
+    }
+
+    n->thread_flag = true;
+    n->connection->user_data = n;
     n->domain = bstrdup(addr);
+
+    if (pthread_create(&n->poll_thread, NULL, wsc_thread, n)) {
+        berr("Couldn't initialize poll thread");
+        goto fail;
+    }
+
+    /* Wait for connection */
+    uint32_t wait = 0;
+    while (!n->connected && wait < 1000) {
+        wait += 10;
+        os_sleep_ms(10);
+    }
+
+    if (wait >= 1000) {
+        berr("Timed out while waiting for handshake response");
+        goto fail;
+    }
+
     return n;
 
     fail:
@@ -91,28 +158,38 @@ void obs_wsc_disconnect(obs_wsc_connection_t *conn)
 {
     if (!conn)
         return;
-    if (conn->sock)
-        netlib_tcp_close(conn->sock);
-    if (conn->domain)
-        bfree(conn->domain);
 
     for (size_t i = 0; i < conn->message_ids_len; i++)
         bfree(conn->message_ids[i]);
-
     bfree(conn->message_ids);
+
+    mg_mgr_free(&conn->manager);
+
+    pthread_mutex_lock(&conn->poll_mutex);
+    conn->thread_flag = false;
+    pthread_mutex_unlock(&conn->poll_mutex);
+
+    if (pthread_join(conn->poll_thread, NULL))
+        berr("Failed to join poll thread for %s", conn->domain);
+
+    pthread_mutex_destroy(&conn->poll_mutex);
+    if (conn->domain)
+        bfree(conn->domain);
     bfree(conn);
 }
 
 bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t
                            *auth)
 {
-    if (!conn || !conn->sock)
+    if (!conn || !conn->connection)
         return false;
     bool result = false;
-    json_t *response = send_request(conn, "GetAuthRequired", NULL);
-    if (response) {
+    if (send_request(conn, "GetAuthRequired", NULL)) {
         result = true;
         /* TODO: parse salt and challenge */
+        json_t *response = json_copy(conn->last_message.data);
+
+
         json_decref(response);
     }
     return true;

@@ -15,6 +15,7 @@
  */
 
 #pragma once
+#include <pthread.h>
 
 static inline long os_atomic_inc_long(volatile long *val)
 {

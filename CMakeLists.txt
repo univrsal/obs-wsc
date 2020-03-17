@@ -8,9 +8,13 @@ set(obs_wsc_SRC
     src/obs_wsc.h
     src/opaque.h
     src/util.h
+    src/util.c
     src/misc_types.h
     src/send.c
     src/send.h
+    src/external/mongoose.h
+    src/external/mongoose.c
+    src/external/bmem.h
     src/external/bmem.c
     src/external/bmem.h
     src/external/c99defs.h
@@ -28,22 +32,28 @@ elseif (UNIX)
         src/external/platform-nix.c
         src/external/threading-posix.h)
     add_definitions(-DUNIX=1)
+    set(obs_wsc_PLATFORM_DEPS
+        pthread)
 endif()
 
 add_library("obs_wsc" SHARED
     ${obs_wsc_SRC}
     ${obs_wsc_PLATFORM_SRC})
+
 target_include_directories("obs_wsc" PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/
-    ${JANSSON_INCLUDE_DIRS}
-    ${NETLIB_INCLUDE_DIRS})
+    ${JANSSON_INCLUDE_DIRS})
 
-target_link_libraries("obs_wsc" ${NETLIB_IMPORT} ${JANSSON_IMPORT})
+target_link_libraries("obs_wsc" ${JANSSON_IMPORT} ${obs_wsc_PLATFORM_DEPS})
 
-# Test
-add_executable("wsc_tests"
-    tests/wsc_tests.c
-    tests/wsc_tests.h)
-add_dependencies("wsc_tests" "obs_wsc")
-target_link_libraries("wsc_tests" "obs_wsc")
-target_include_directories("wsc_tests" PUBLIC ${CHEAT_INCLUDE_DIRS})
+# Tests
+add_executable("wsc_unit_tests"
+    tests/wsc_unit_tests.c)
+add_dependencies("wsc_unit_tests" "obs_wsc")
+target_link_libraries("wsc_unit_tests" "obs_wsc")
+target_include_directories("wsc_unit_tests" PUBLIC ${CHEAT_INCLUDE_DIRS})
+
+add_executable("wsc_test"
+    tests/wsc_test.c)
+add_dependencies("wsc_test" "obs_wsc")
+target_link_libraries("wsc_test" "obs_wsc")

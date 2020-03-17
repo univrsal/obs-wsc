@@ -20,6 +20,12 @@
 
 #include "external/base.h"
 #include "external/mongoose.h"
+#include <jansson.h>
+
+typedef struct obs_wsc_msg_s {
+    json_t *data;
+    long time;
+} obs_wsc_msg_t;
 
 typedef struct obs_wsc_connection_s {
     int32_t timeout;
@@ -28,4 +34,9 @@ typedef struct obs_wsc_connection_s {
     struct mg_connection *connection;
     char **message_ids;
     size_t message_ids_len;
+    volatile bool thread_flag;
+    volatile bool connected;
+    pthread_t poll_thread;
+    pthread_mutex_t poll_mutex;
+    obs_wsc_msg_t last_message;
 } obs_wsc_connection_t;
