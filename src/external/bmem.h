@@ -18,6 +18,7 @@
 
 #include "c99defs.h"
 #include "base.h"
+#include "../misc_types.h"
 #include <wchar.h>
 #include <string.h>
 
@@ -25,70 +26,65 @@
 extern "C" {
 #endif
 
-struct base_allocator {
-	void *(*malloc)(size_t);
-	void *(*realloc)(void *, size_t);
-	void (*free)(void *);
-};
 
-EXPORT void base_set_allocator(struct base_allocator *defs);
+void base_set_allocator(struct base_allocator *defs);
 
-EXPORT void *bmalloc(size_t size);
-EXPORT void *brealloc(void *ptr, size_t size);
-EXPORT void bfree(void *ptr);
+void *bmalloc(size_t size);
+void *brealloc(void *ptr, size_t size);
+void bfree(void *ptr);
 
-EXPORT int base_get_alignment(void);
+int base_get_alignment(void);
 
-EXPORT long bnum_allocs(void);
+long bnum_allocs(void);
 
-EXPORT void *bmemdup(const void *ptr, size_t size);
+void *bmemdup(const void *ptr, size_t size);
 
 static inline void *bzalloc(size_t size)
 {
-	void *mem = bmalloc(size);
-	if (mem)
-		memset(mem, 0, size);
-	return mem;
+    void *mem = bmalloc(size);
+    if (mem)
+        memset(mem, 0, size);
+    return mem;
 }
 
 static inline char *bstrdup_n(const char *str, size_t n)
 {
-	char *dup;
-	if (!str)
-		return NULL;
+    char *dup;
+    if (!str)
+        return NULL;
 
-	dup = (char *)bmemdup(str, n + 1);
-	dup[n] = 0;
+    dup = (char *)bmemdup(str, n + 1);
+    dup[n] = 0;
 
-	return dup;
+    return dup;
 }
 
 static inline wchar_t *bwstrdup_n(const wchar_t *str, size_t n)
 {
-	wchar_t *dup;
-	if (!str)
-		return NULL;
+    wchar_t *dup;
+    if (!str)
+        return NULL;
 
-	dup = (wchar_t *)bmemdup(str, (n + 1) * sizeof(wchar_t));
-	dup[n] = 0;
+    dup = (wchar_t *)bmemdup(str, (n + 1) * sizeof(wchar_t));
+    dup[n] = 0;
 
-	return dup;
+    return dup;
 }
 
 static inline char *bstrdup(const char *str)
 {
-	if (!str)
-		return NULL;
+    if (!str)
+        return NULL;
 
-	return bstrdup_n(str, strlen(str));
+    return bstrdup_n(str, strlen(str));
 }
 
 static inline wchar_t *bwstrdup(const wchar_t *str)
 {
-	if (!str)
-		return NULL;
+    if (!str)
+        return NULL;
 
-	return bwstrdup_n(str, wcslen(str));
+    return bwstrdup_n(str, wcslen(str));
 }
 
 #ifdef __cplusplus

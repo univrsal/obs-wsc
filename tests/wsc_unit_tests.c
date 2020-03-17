@@ -16,18 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#pragma once
-#include <stdbool.h>
-#include <jansson.h>
-#include "opaque.h"
+#include <cheat.h>
+#include <obs_wsc.h>
 
-json_t *send_request(obs_wsc_connection_t *conn, const char *request,
-                  const json_t *additional_data);
+CHEAT_TEST(init,
+    cheat_assert(obs_wsc_init());
+)
 
-bool send_json(const obs_wsc_connection_t *conn, const json_t *json);
+CHEAT_TEST(connect,
+    obs_wsc_connection_t *conn = NULL;
+    cheat_assert((conn = obs_wsc_connect(NULL, 4444)) != NULL);
+    obs_wsc_disconnect(conn);
+)
 
-bool send_str(const obs_wsc_connection_t *conn, const char *str);
+CHEAT_TEST(auth_required,
+    obs_wsc_connection_t *conn = obs_wsc_connect(NULL, 4444);
+    obs_wsc_auth_data_t auth;
+    cheat_assert(obs_wsc_auth_required(conn, &auth));
+    obs_wsc_disconnect(conn);
+)
 
-json_t *recv_json(const obs_wsc_connection_t *conn);
-
-bool wait_timeout(const obs_wsc_connection_t *conn);
+CHEAT_TEST(shutdown,
+    obs_wsc_shutdown();
+)

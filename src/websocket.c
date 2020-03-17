@@ -16,18 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#include "wsc_tests.h"
-#include <cheat.h>
+#include "websocket.h"
+#include "send.h"
 
-CHEAT_TEST(connect,
-    obs_wsc_connection_t *conn = NULL;
-    cheat_assert((conn = obs_wsc_connect(NULL, 4444)) != NULL);
-    obs_wsc_disconnect(conn);
-)
+bool ws_handshake(const obs_wsc_connection_t *conn)
+{
+    static char *header =
+           "GET /chat HTTP/1.1\r\n"
+           "Host: server.example.com\r\n"
+           "Upgrade: websocket\r\n"
+           "Connection: Upgrade\r\n"
+           "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+           "Origin: http://example.com\r\n"
+           "Sec-WebSocket-Protocol: chat, superchat\r\n"
+           "Sec-WebSocket-Version: 13\r\n";
 
-CHEAT_TEST(auth_required,
-    obs_wsc_connection_t *conn = NULL;
-    obs_wsc_auth_data_t auth;
-    cheat_assert(obs_wsc_auth_required(conn, &auth));
-    obs_wsc_disconnect(conn);
-)
+    if (send_str(conn, header)) {
+        if (wait_timeout(conn)) {
+            json_t *response = recv_json(conn);
+        }
+    }
+    return false;
+}

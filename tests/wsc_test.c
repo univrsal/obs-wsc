@@ -16,5 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#pragma once
 #include <obs_wsc.h>
+#include <assert.h>
+
+int main()
+{
+    obs_wsc_connection_t *c = obs_wsc_connect(NULL);
+    obs_wsc_auth_data_t auth;
+    assert(c);
+
+    assert(obs_wsc_auth_required(c, &auth));
+    return 0;
+}

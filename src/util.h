@@ -17,3 +17,7 @@
  *************************************************************************/
 
 #pragma once
+
+#include "opaque.h"
+
+char *random_id(const obs_wsc_connection_t *conn);

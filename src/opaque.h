@@ -18,4 +18,14 @@
 
 #pragma once
 
-typedef struct obs_wsc_connection_s obs_wsc_connection_t;
+#include "external/base.h"
+#include "external/mongoose.h"
+
+typedef struct obs_wsc_connection_s {
+    int32_t timeout;
+    char *domain;
+    struct mg_mgr manager;
+    struct mg_connection *connection;
+    char **message_ids;
+    size_t message_ids_len;
+} obs_wsc_connection_t;

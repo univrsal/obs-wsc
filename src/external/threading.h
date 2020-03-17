@@ -14,7 +14,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
+#include "base.h"
 #ifdef _WIN32
 #include "threading-windows.h"
 #else

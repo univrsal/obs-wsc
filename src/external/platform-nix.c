@@ -14,9 +14,16 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include "c99defs.h"
 #include <signal.h>
+#include <unistd.h>
 
 void os_breakpoint()
 {
     raise(SIGTRAP);
+}
+
+void os_sleep_ms(uint32_t duration)
+{
+    usleep(duration * 1000);
 }

@@ -16,18 +16,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#pragma once
-#include <stdbool.h>
-#include <jansson.h>
-#include "opaque.h"
+#include "util.h"
+#include "external/bmem.h"
+#include <stdlib.h>
+#include <string.h>
 
-json_t *send_request(obs_wsc_connection_t *conn, const char *request,
-                  const json_t *additional_data);
+char *random_id(const obs_wsc_connection_t *conn)
+{
+    char *new_id = bmalloc(sizeof(char) * 17);
+    int idx = 0;
+    bool unique = false;
 
-bool send_json(const obs_wsc_connection_t *conn, const json_t *json);
+    while (!unique) {
+        while(idx < 16) {
+            int rnd = rand() % (26 + 26 + 10);
+            if (rnd < 26)
+                 new_id[idx] = 'a' + rnd;
+            else if (rnd < 26+26)
+                 new_id[idx] = 'A' + rnd - 26;
+            else
+                 new_id[idx] = '0' + rnd - 26 - 26;
+            idx++;
+        }
+        unique = true;
+        for (size_t i = 0; i < conn->message_ids_len; i++) {
+            if (strcmp(conn->message_ids[i], new_id) == 0) {
+                unique = false;
+                break;
+            }
+        }
+    }
 
-bool send_str(const obs_wsc_connection_t *conn, const char *str);
-
-json_t *recv_json(const obs_wsc_connection_t *conn);
-
-bool wait_timeout(const obs_wsc_connection_t *conn);
+    return new_id;
+}

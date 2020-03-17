@@ -17,46 +17,74 @@
  *************************************************************************/
 
 #include "obs_wsc.h"
+#include "opaque.h"
+#include "send.h"
+#include "websocket.h"
 #include "external/bmem.h"
-#include "external/base.h"
-#include <netlib.h>
+#include "external/platform.h"
+#include <stdlib.h>
+#include <time.h>
 
-#define err(a) berr("%s: %s\n", #a, netlib_get_error())
+typedef struct obs_wsc_connection_s obs_wsc_connection_t;
 
-typedef struct obs_wsc_connection_s {
-    tcp_socket sock;
-    ip_address addr;
-    char *domain;
-} obs_wsc_connection_t;
-
-obs_wsc_connection_t *obs_wsc_connect(const char *addr, uint16_t port)
+bool obs_wsc_init()
 {
-    static const char *local_host = "localhost";
-    if (netlib_init() == -1) {
-        err(netlib_init);
-        return NULL;
+    /* rand() is only used for generating message ids */
+    time_t t;
+    srand((unsigned) time(&t));
+
+    return true;
+}
+
+void obs_wsc_shutdown()
+{
+    if (bnum_allocs() > 0)
+        bwarn("Number of memory leaks: %li", bnum_allocs());
+}
+
+void obs_wsc_set_allocator(struct base_allocator *defs)
+{
+    base_set_allocator(defs);
+}
+
+static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
+{
+    obs_wsc_connection_t *conn = nc->user_data;
+    switch (ev) {
+
     }
+}
+
+obs_wsc_connection_t *obs_wsc_connect(const char *addr)
+{
+    static const char *local_host = "ws://127.0.0.1:4444";
 
     if (!addr)
         addr = local_host;
 
     obs_wsc_connection_t *n = bzalloc(sizeof(obs_wsc_connection_t));
+    n->timeout = 500;
 
-    if (netlib_resolve_host(&n->addr, addr, port) < 0) {
-        err(netlib_resolve_host);
+    mg_mgr_init(&n->manager, n);
+    n->connection = mg_connect_ws(&n->manager, ev_handler, addr, "obs-websocket", NULL);
+
+    if (!n->connection) {
+        berr("mg_connect_ws faild for %s", addr);
         goto fail;
     }
 
-    if ((n->sock = netlib_tcp_open(&n->addr)) == NULL) {
-        err(netlib_tcp_open);
-        goto fail;
-    }
     n->domain = bstrdup(addr);
-
     return n;
+
     fail:
     obs_wsc_disconnect(n);
     return NULL;
+}
+
+void obs_wcs_set_timeout(obs_wsc_connection_t *conn, int32_t ms)
+{
+    if (conn)
+        conn->timeout = ms;
 }
 
 void obs_wsc_disconnect(obs_wsc_connection_t *conn)
@@ -68,14 +96,30 @@ void obs_wsc_disconnect(obs_wsc_connection_t *conn)
     if (conn->domain)
         bfree(conn->domain);
 
+    for (size_t i = 0; i < conn->message_ids_len; i++)
+        bfree(conn->message_ids[i]);
+
+    bfree(conn->message_ids);
     bfree(conn);
 }
 
-bool obs_wsc_auth_required(const obs_wsc_connection_t *conn, obs_wsc_auth_data_t
+bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t
                            *auth)
 {
-    if (!conn)
+    if (!conn || !conn->sock)
         return false;
-
+    bool result = false;
+    json_t *response = send_request(conn, "GetAuthRequired", NULL);
+    if (response) {
+        result = true;
+        /* TODO: parse salt and challenge */
+        json_decref(response);
+    }
     return true;
+}
+
+bool obs_wsc_authenticate(obs_wsc_connection_t *conn,
+                                 const obs_wsc_auth_data_t *auth)
+{
+    return false;
 }

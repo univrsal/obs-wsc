@@ -14,8 +14,18 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <intrin.h>
+#include <Windows.h>
 
 void os_breakpoint(void)
 {
     __debugbreak();
+}
+
+void os_sleep_ms(uint32_t duration)
+{
+    /* windows 8+ appears to have decreased sleep precision */
+    if (get_winver() >= 0x0602 && duration > 0)
+        duration--;
+
+    Sleep(duration);
 }

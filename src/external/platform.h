@@ -14,4 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include "c99defs.h"
+
 void os_breakpoint(void);
+
+void os_sleep_ms(uint32_t duratiion);
