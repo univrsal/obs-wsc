@@ -21,10 +21,14 @@
 
 int main()
 {
+    obs_wsc_init();
     obs_wsc_connection_t *c = obs_wsc_connect(NULL);
     obs_wsc_auth_data_t auth;
     assert(c);
 
     assert(obs_wsc_auth_required(c, &auth));
+
+    obs_wsc_disconnect(c);
+    obs_wsc_shutdown();
     return 0;
 }

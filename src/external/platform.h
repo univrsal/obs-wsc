@@ -19,3 +19,5 @@
 void os_breakpoint(void);
 
 void os_sleep_ms(uint32_t duratiion);
+
+uint64_t os_get_time_ns(void);

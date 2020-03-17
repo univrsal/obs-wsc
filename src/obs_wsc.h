@@ -21,7 +21,8 @@
 extern "C" {
 #endif
 
-#include "opaque.h"
+typedef struct obs_wsc_connection_s obs_wsc_connection_t;
+
 #include "misc_types.h"
 #include "external/base.h"
 /**
@@ -57,7 +58,7 @@ EXPORT void obs_wsc_set_timeout(obs_wsc_connection_t *conn, int32_t ms);
  * @brief Checks if the connections needs a password
  * @param conn The connection
  * @param auth Pointer to a data struct which will receive a challange and a
- *        salt (optional)
+ *        salt or required will be set to false
  * @return true on success
  */
 EXPORT bool obs_wsc_auth_required(obs_wsc_connection_t *conn,
@@ -86,15 +87,16 @@ EXPORT bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth,
                                  const char *password);
 
 /**
- * @brief Initialize network
+ * @brief Initialize obs_wsc
  * @return true on success
  */
-EXPORT bool obs_wsc_init();
+EXPORT void obs_wsc_init();
 
 /**
- * @brief Shutdown network and check for memory leaks
+ * @brief Check for memory leaks
+ * @return The amount of memory leaks
  */
-EXPORT void obs_wsc_shutdown();
+EXPORT long obs_wsc_shutdown();
 
 /**
  * @brief Make obs-wsc use different allocators

@@ -30,4 +30,6 @@ bool send_str(const obs_wsc_connection_t *conn, const char *str);
 
 json_t *recv_json(unsigned char *data, size_t len);
 
-bool wait_timeout(obs_wsc_connection_t *conn);
+bool parse_basic_json(json_t *j, const char *last_msg_id);
+
+bool wait_timeout(obs_wsc_connection_t *conn, uint64_t start);

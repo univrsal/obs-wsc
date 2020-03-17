@@ -49,8 +49,3 @@ char *util_random_id(const obs_wsc_connection_t *conn)
 
     return new_id;
 }
-
-time_t util_epoch()
-{
-    return time(NULL);
-}

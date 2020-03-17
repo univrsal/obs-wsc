@@ -28,6 +28,7 @@ if (MSVC)
         src/external/platform-windows.c
         src/external/threading-windows.h)
 elseif (UNIX)
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
     set(obs_wsc_PLATFORM_SRC
         src/external/platform-nix.c
         src/external/threading-posix.h)

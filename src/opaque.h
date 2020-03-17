@@ -24,7 +24,8 @@
 
 typedef struct obs_wsc_msg_s {
     json_t *data;
-    long time;
+    uint64_t time;
+    char *message_id;
 } obs_wsc_msg_t;
 
 typedef struct obs_wsc_connection_s {

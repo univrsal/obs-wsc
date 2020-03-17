@@ -29,7 +29,7 @@ bool send_request(obs_wsc_connection_t *conn, const char *request,
     json_t *req = NULL;
     json_error_t err;
 
-    if (!conn || !conn->connection || !request)
+    if (!conn || !conn->connection || !conn->connected || !request)
         return NULL;
 
     char *msg_id = util_random_id(conn);
@@ -39,16 +39,19 @@ bool send_request(obs_wsc_connection_t *conn, const char *request,
         if (additional_data) {
             /* TODO: append json */
         }
+
         conn->message_ids = brealloc(conn->message_ids,sizeof(char*)
                                      * (conn->message_ids_len + 1));
         conn->message_ids[conn->message_ids_len++] = msg_id;
 
+        uint64_t request_start = os_get_time_ns();
         if (!send_json(conn, req)) {
             berr("Sending request json failed");
             goto fail;
         }
+        conn->last_message.message_id = msg_id;
 
-        if (!wait_timeout(conn))
+        if (!wait_timeout(conn, request_start))
             goto fail;
     } else {
         berr("Packing request json for %s failed with %s at line %i",
@@ -73,7 +76,7 @@ bool send_json(const obs_wsc_connection_t *conn, const json_t *json)
 
     char *dmp = json_dumps(json, 0);
     bool result = send_str(conn, dmp);
-    bfree(dmp);
+    free(dmp); /* jansson doesn't use bmem */
     return result;
 }
 
@@ -102,12 +105,13 @@ json_t *recv_json(unsigned char *data, size_t len)
     return loaded;
 }
 
-bool wait_timeout(obs_wsc_connection_t *conn)
+bool wait_timeout(obs_wsc_connection_t *conn, uint64_t start)
 {
     bool keep_waiting = true;
     int32_t max_timeout = conn->timeout;
     int32_t timeout = 0;
-    long start_time = util_epoch();
+
+    bdebug("Waiting for message after %li", start);
 
     while (keep_waiting) {
         if (timeout >= max_timeout)
@@ -119,8 +123,9 @@ bool wait_timeout(obs_wsc_connection_t *conn)
         }
 
         pthread_mutex_lock(&conn->poll_mutex);
-        if (conn->last_message.time > start_time) {
+        if (conn->last_message.time > start) {
             bdebug("Received message within timeout");
+            pthread_mutex_unlock(&conn->poll_mutex);
             break;
         }
         pthread_mutex_unlock(&conn->poll_mutex);
@@ -129,4 +134,30 @@ bool wait_timeout(obs_wsc_connection_t *conn)
         os_sleep_ms(10);
     }
     return keep_waiting;
+}
+
+
+bool parse_basic_json(json_t *j, const char *last_msg_id)
+{
+    if (!j)
+        return false;
+    json_error_t err;
+    char *msg_id = NULL, *status = NULL;
+
+    if (json_unpack_ex(j, &err, 0, "{ss, ss}", "message-id", &msg_id,
+                       "status", &status) != 0) {
+        berr("Error while parsing basic json: '%s' at line %i",
+             err.text, err.line);
+    }
+    bool match_id = strcmp(msg_id, last_msg_id) == 0;
+    bool status_ok = strcmp(status, "ok") == 0;
+
+    if (!match_id) {
+        berr("Mismatching id between sent (%s) and received (%s)!",
+             last_msg_id, msg_id);
+    }
+
+    if (!status_ok)
+        berr("Status %s is not ok", status);
+    return match_id && status_ok ;
 }

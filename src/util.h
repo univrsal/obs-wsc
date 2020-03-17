@@ -21,5 +21,3 @@
 #include "opaque.h"
 
 char *util_random_id(const obs_wsc_connection_t *conn);
-
-time_t util_epoch();

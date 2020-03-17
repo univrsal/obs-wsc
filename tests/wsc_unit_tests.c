@@ -20,7 +20,7 @@
 #include <obs_wsc.h>
 
 CHEAT_TEST(init,
-    cheat_assert(obs_wsc_init());
+    obs_wsc_init();
 )
 
 CHEAT_TEST(connect,
