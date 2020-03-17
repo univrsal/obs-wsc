@@ -78,7 +78,7 @@ void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data);
  * @see obs_wsc_prepare_auth
  * @return true on success
  */
-EXPORT bool obs_wsc_authenticate(obs_wsc_connection_t *conn, const obs_wsc_auth_data_t *auth);
+EXPORT bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth);
 
 /**
  * @brief Creates the auth response, by hashing the password and encoding it

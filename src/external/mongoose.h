@@ -350,9 +350,9 @@ unsigned int sleep(unsigned int seconds);
 #define timegm _mkgmtime
 
 #define gmtime_r(a, b)     \
-	do {                   \
-		*(b) = *gmtime(a); \
-	} while (0)
+    do {                   \
+        *(b) = *gmtime(a); \
+    } while (0)
 
 #endif /* CS_PLATFORM == CS_P_WINDOWS */
 #endif /* CS_COMMON_PLATFORMS_PLATFORM_WINDOWS_H_ */
@@ -594,7 +594,7 @@ typedef struct stat cs_stat_t;
 #endif
 
 #define inet_ntop(af, src, dst, size) \
-	(((af) == AF_INET) ? ipaddr_ntoa_r((const ip_addr_t *)(src), (dst), (size)) : NULL)
+    (((af) == AF_INET) ? ipaddr_ntoa_r((const ip_addr_t *)(src), (dst), (size)) : NULL)
 #define inet_pton(af, src, dst) (((af) == AF_INET) ? ipaddr_aton((src), (ip_addr_t *)(dst)) : 0)
 
 #endif /* CS_PLATFORM == CS_P_ESP8266 */
@@ -714,11 +714,11 @@ typedef size_t _off_t;
 typedef long ssize_t;
 
 struct stat {
-	int st_ino;
-	mode_t st_mode;
-	int st_nlink;
-	time_t st_mtime;
-	off_t st_size;
+    int st_ino;
+    mode_t st_mode;
+    int st_nlink;
+    time_t st_mtime;
+    off_t st_size;
 };
 
 int _stat(const char *pathname, struct stat *st);
@@ -836,11 +836,11 @@ typedef size_t _off_t;
 typedef long ssize_t;
 
 struct stat {
-	int st_ino;
-	mode_t st_mode;
-	int st_nlink;
-	time_t st_mtime;
-	off_t st_size;
+    int st_ino;
+    mode_t st_mode;
+    int st_nlink;
+    time_t st_mtime;
+    off_t st_size;
 };
 
 int _stat(const char *pathname, struct stat *st);
@@ -932,11 +932,11 @@ typedef size_t _off_t;
 typedef long ssize_t;
 
 struct stat {
-	int st_ino;
-	mode_t st_mode;
-	int st_nlink;
-	time_t st_mtime;
-	off_t st_size;
+    int st_ino;
+    mode_t st_mode;
+    int st_nlink;
+    time_t st_mtime;
+    off_t st_size;
 };
 
 int _stat(const char *pathname, struct stat *st);
@@ -1079,8 +1079,8 @@ typedef struct stat cs_stat_t;
 /* copied from GCC on ARM; for some reason useconds are signed */
 typedef long suseconds_t; /* microseconds (signed) */
 struct timeval {
-	time_t tv_sec;       /* seconds */
-	suseconds_t tv_usec; /* and microseconds */
+    time_t tv_sec;       /* seconds */
+    suseconds_t tv_usec; /* and microseconds */
 };
 
 #endif
@@ -1518,9 +1518,9 @@ typedef uint32_t in_addr_t;
 #endif
 
 typedef struct _stati64 {
-	uint32_t st_mtime;
-	uint32_t st_size;
-	uint32_t st_mode;
+    uint32_t st_mtime;
+    uint32_t st_size;
+    uint32_t st_mode;
 } cs_stat_t;
 
 /*
@@ -1849,9 +1849,9 @@ extern "C" {
 #endif /* __cplusplus */
 
 typedef struct {
-	uint32_t buf[4];
-	uint32_t bits[2];
-	unsigned char in[64];
+    uint32_t buf[4];
+    uint32_t bits[2];
+    unsigned char in[64];
 } cs_md5_ctx;
 
 void cs_md5_init(cs_md5_ctx *c);
@@ -1883,16 +1883,16 @@ extern "C" {
 #endif /* __cplusplus */
 
 typedef struct {
-	uint32_t state[5];
-	uint32_t count[2];
-	unsigned char buffer[64];
+    uint32_t state[5];
+    uint32_t count[2];
+    unsigned char buffer[64];
 } cs_sha1_ctx;
 
 void cs_sha1_init(cs_sha1_ctx *);
 void cs_sha1_update(cs_sha1_ctx *, const unsigned char *data, uint32_t len);
 void cs_sha1_final(unsigned char digest[20], cs_sha1_ctx *);
 void cs_hmac_sha1(const unsigned char *key, size_t key_len, const unsigned char *text, size_t text_len,
-				  unsigned char out[20]);
+                  unsigned char out[20]);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
@@ -1944,8 +1944,8 @@ extern "C" {
 
 /* Describes chunk of memory */
 struct mg_str {
-	const char *p; /* Memory chunk pointer */
-	size_t len;    /* Memory chunk length */
+    const char *p; /* Memory chunk pointer */
+    size_t len;    /* Memory chunk length */
 };
 
 /*
@@ -1961,17 +1961,17 @@ struct mg_str mg_mk_str_n(const char *s, size_t len);
 
 /* Macro for initializing mg_str. */
 #define MG_MK_STR(str_literal)               \
-	{                                        \
-		str_literal, sizeof(str_literal) - 1 \
-	}
+    {                                        \
+        str_literal, sizeof(str_literal) - 1 \
+    }
 #define MG_MK_STR_N(str_literal, len) \
-	{                                 \
-		str_literal, len              \
-	}
+    {                                 \
+        str_literal, len              \
+    }
 #define MG_NULL_STR \
-	{               \
-		NULL, 0     \
-	}
+    {               \
+        NULL, 0     \
+    }
 
 /*
  * Cross-platform version of `strcmp()` where where first string is
@@ -2070,9 +2070,9 @@ extern "C" {
 
 /* Memory buffer descriptor */
 struct mbuf {
-	char *buf;   /* Buffer pointer */
-	size_t len;  /* Data length. Data is located between offset 0 and len. */
-	size_t size; /* Buffer size allocated by realloc(1). Must be >= len */
+    char *buf;   /* Buffer pointer */
+    size_t len;  /* Data length. Data is located between offset 0 and len. */
+    size_t size; /* Buffer size allocated by realloc(1). Must be >= len */
 };
 
 /*
@@ -2155,11 +2155,11 @@ extern "C" {
 typedef void (*cs_base64_putc_t)(char, void *);
 
 struct cs_base64_ctx {
-	/* cannot call it putc because it's a macro on some environments */
-	cs_base64_putc_t b64_putc;
-	unsigned char chunk[3];
-	int chunk_size;
-	void *user_data;
+    /* cannot call it putc because it's a macro on some environments */
+    cs_base64_putc_t b64_putc;
+    unsigned char chunk[3];
+    int chunk_size;
+    void *user_data;
 };
 
 void cs_base64_init(struct cs_base64_ctx *ctx, cs_base64_putc_t putc, void *user_data);

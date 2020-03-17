@@ -32,6 +32,7 @@ int main()
         assert(auth.salt);
         assert(auth.challenge);
         assert(obs_wsc_prepare_auth(&auth, "1234qwer"));
+        assert(obs_wsc_authenticate(c, &auth));
     }
     obs_wsc_disconnect(c);
     obs_wsc_shutdown();

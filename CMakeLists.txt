@@ -16,11 +16,22 @@ set(obs_wsc_SRC
     src/external/mongoose.c
     src/external/bmem.h
     src/external/bmem.c
+    src/external/dstr.h
+    src/external/dstr.c
+    src/external/utf8.c
+    src/external/utf8.h
+    src/external/lexer.c
+    src/external/lexer.h
+    src/external/base64.h
+    src/external/base64.c
+    src/external/sha256.h
+    src/external/sha256.c
     src/external/bmem.h
     src/external/c99defs.h
     src/external/base.c
     src/external/base.h
     src/external/platform.h
+    src/external/platform.c
     src/external/threading.h)
 
 if (MSVC)

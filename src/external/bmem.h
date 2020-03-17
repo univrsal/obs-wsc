@@ -40,50 +40,50 @@ void *bmemdup(const void *ptr, size_t size);
 
 static inline void *bzalloc(size_t size)
 {
-	void *mem = bmalloc(size);
-	if (mem)
-		memset(mem, 0, size);
-	return mem;
+    void *mem = bmalloc(size);
+    if (mem)
+        memset(mem, 0, size);
+    return mem;
 }
 
 static inline char *bstrdup_n(const char *str, size_t n)
 {
-	char *dup;
-	if (!str)
-		return NULL;
+    char *dup;
+    if (!str)
+        return NULL;
 
-	dup = (char *)bmemdup(str, n + 1);
-	dup[n] = 0;
+    dup = (char *)bmemdup(str, n + 1);
+    dup[n] = 0;
 
-	return dup;
+    return dup;
 }
 
 static inline wchar_t *bwstrdup_n(const wchar_t *str, size_t n)
 {
-	wchar_t *dup;
-	if (!str)
-		return NULL;
+    wchar_t *dup;
+    if (!str)
+        return NULL;
 
-	dup = (wchar_t *)bmemdup(str, (n + 1) * sizeof(wchar_t));
-	dup[n] = 0;
+    dup = (wchar_t *)bmemdup(str, (n + 1) * sizeof(wchar_t));
+    dup[n] = 0;
 
-	return dup;
+    return dup;
 }
 
 static inline char *bstrdup(const char *str)
 {
-	if (!str)
-		return NULL;
+    if (!str)
+        return NULL;
 
-	return bstrdup_n(str, strlen(str));
+    return bstrdup_n(str, strlen(str));
 }
 
 static inline wchar_t *bwstrdup(const wchar_t *str)
 {
-	if (!str)
-		return NULL;
+    if (!str)
+        return NULL;
 
-	return bwstrdup_n(str, wcslen(str));
+    return bwstrdup_n(str, wcslen(str));
 }
 
 #ifdef __cplusplus
