@@ -261,6 +261,9 @@ void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data)
 
 bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password)
 {
+    if (!auth || !auth->required || !password || !auth->salt || !auth->challenge)
+        return false;
+
     struct dstr pw_salt, pw_salt_hash, pw_salt_hash_b64, final;
     dstr_init(&pw_salt);
     dstr_init(&pw_salt_hash);

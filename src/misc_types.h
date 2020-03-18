@@ -21,6 +21,8 @@
 
 typedef void (*log_handler_t)(int lvl, const char *msg, va_list args, void *p);
 
+#define obs_wsc_auth_init() { .salt = NULL, .required = false, .challenge = NULL, .auth_response = NULL}
+
 typedef struct obs_wsc_auth_data_s {
     char *challenge;
     char *salt;

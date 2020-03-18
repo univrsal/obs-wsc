@@ -64,9 +64,11 @@ static inline void pthread_mutex_unlock(pthread_mutex_t *m)
         berr("Error while unlocking mutex: %d\n", GetLastError());
 }
 
-static inline int pthread_create(pthread_t *t, void *args, void *(*method)(void *), void *user_args)
+static inline int pthread_create(pthread_t *t, void *args,
+                                  void *(*method)(void *),
+                                  void *user_args)
 {
-    *t = CreateThread(args, 0, (LPTHREAD_START_ROUTINE)method, user_args, 0, NULL);
+    *t = CreateThread(args, 0, (LPTHREAD_START_ROUTINE) method, user_args, 0, NULL);
     if (*t == NULL)
         berr("CreateThread failed: %d\n", GetLastError());
     return *t ? 0 : -1;

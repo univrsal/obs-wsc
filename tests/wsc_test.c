@@ -23,11 +23,7 @@ int main()
 {
     obs_wsc_init();
     obs_wsc_connection_t *c = obs_wsc_connect(NULL);
-    obs_wsc_auth_data_t auth;
-    auth.salt = NULL;
-    auth.required = false;
-    auth.challenge = NULL;
-    auth.auth_response = NULL;
+    obs_wsc_auth_data_t auth = obs_wsc_auth_init();
 
     assert(c);
     assert(obs_wsc_auth_required(c, &auth));
