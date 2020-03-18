@@ -20,7 +20,7 @@ void os_breakpoint(void);
 
 void os_sleep_ms(uint32_t duratiion);
 
-uint64_t os_get_time_ns(void);
+uint64_t os_gettime_ns(void);
 
 size_t os_mbs_to_wcs(const char *str, size_t str_len, wchar_t *dst, size_t dst_size);
 size_t os_utf8_to_wcs(const char *str, size_t len, wchar_t *dst, size_t dst_size);

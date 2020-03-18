@@ -789,6 +789,7 @@ void dstr_from_sha256(struct dstr *str, const uint8_t sha[SHA256_BLOCK_SIZE])
 {
     if (!str)
         return;
+
     dstr_resize(str, (SHA256_BLOCK_SIZE * 2));
     for (int i = 0; i < SHA256_BLOCK_SIZE; i++) {
         if (i == 0) /* Somehow first one get's cut off with catf */

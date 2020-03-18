@@ -17,7 +17,7 @@
 #pragma once
 
 #include <stdarg.h>
-#include "c99defs.h"
+#include "misc_types.h"
 
 /*
  * Just contains logging/crash related stuff
@@ -68,8 +68,6 @@ enum {
      */
     LOG_DEBUG = 400
 };
-
-typedef void (*log_handler_t)(int lvl, const char *msg, va_list args, void *p);
 
 void base_get_log_handler(log_handler_t *handler, void **param);
 void base_set_log_handler(log_handler_t handler, void *param);

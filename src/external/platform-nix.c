@@ -29,7 +29,7 @@ void os_sleep_ms(uint32_t duration)
     usleep(duration * 1000);
 }
 
-uint64_t os_get_time_ns(void)
+uint64_t os_gettime_ns(void)
 {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC_RAW, &ts);

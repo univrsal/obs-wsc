@@ -1,5 +1,11 @@
+cmake_minimum_required(VERSION 3.10)
 project(obs_wsc)
-cmake_minimum_required(VERSION 2.8)
+
+if (MSVC)
+        cmake_minimum_required(VERSION 3.16)
+endif()
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 add_subdirectory(deps)
 
@@ -38,6 +44,7 @@ if (MSVC)
     set(obs_wsc_PLATFORM_SRC
         src/external/platform-windows.c
         src/external/threading-windows.h)
+
 elseif (UNIX)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
     set(obs_wsc_PLATFORM_SRC

@@ -46,6 +46,11 @@ static inline void *bzalloc(size_t size)
     return mem;
 }
 
+static inline void *bcalloc(size_t nitems, size_t size)
+{
+    return bzalloc(nitems * size);
+}
+
 static inline char *bstrdup_n(const char *str, size_t n)
 {
     char *dup;

@@ -17,6 +17,62 @@
 #pragma once
 
 #include <intrin.h>
+#include <Windows.h>
+#include "base.h"
+
+/* Windows Threading -> pthread hacks */
+
+typedef HANDLE pthread_t;
+typedef HANDLE pthread_mutex_t;
+
+static inline int pthread_mutex_init(pthread_mutex_t *m, void *args)
+{
+    *m = CreateMutex(args, FALSE, NULL);
+    if (*m == NULL) {
+        berr("Create Mutex error: %d\n", GetLastError());
+        return -1;
+    }
+    return 0;
+}
+
+static inline void pthread_mutex_destroy(pthread_mutex_t *m)
+{
+    if (!CloseHandle(*m))
+        berr("Close mutex failed: %d\n", GetLastError());
+}
+
+static inline int pthread_join(pthread_t m, void *to)
+{
+    int result = 0;
+    if (WaitForSingleObject(m, to ? *((DWORD *)to) : INFINITE) != WAIT_OBJECT_0)
+        result = -1;
+    if (CloseHandle(m) == 0) {
+        berr("Thread join failed: %d\n", GetLastError());
+        result = -1;
+    }
+    return result;
+}
+
+static inline void pthread_mutex_lock(pthread_mutex_t *m)
+{
+    WaitForSingleObject(*m, INFINITE);
+}
+
+static inline void pthread_mutex_unlock(pthread_mutex_t *m)
+{
+    if (!ReleaseMutex(*m))
+        berr("Error while unlocking mutex: %d\n", GetLastError());
+}
+
+static inline int pthread_create(pthread_t *t, void *args, void *(*method)(void *), void *user_args)
+{
+    *t = CreateThread(args, 0, (LPTHREAD_START_ROUTINE)method, user_args, 0, NULL);
+    if (*t == NULL)
+        berr("CreateThread failed: %d\n", GetLastError());
+    return *t ? 0 : -1;
+}
+
+/* ==== */
 
 static inline long os_atomic_inc_long(volatile long *val)
 {

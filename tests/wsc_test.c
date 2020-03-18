@@ -23,7 +23,11 @@ int main()
 {
     obs_wsc_init();
     obs_wsc_connection_t *c = obs_wsc_connect(NULL);
-    obs_wsc_auth_data_t auth = {};
+    obs_wsc_auth_data_t auth;
+    auth.salt = NULL;
+    auth.required = false;
+    auth.challenge = NULL;
+    auth.auth_response = NULL;
 
     assert(c);
     assert(obs_wsc_auth_required(c, &auth));
@@ -34,7 +38,8 @@ int main()
         assert(obs_wsc_prepare_auth(&auth, "1234qwer"));
         assert(obs_wsc_authenticate(c, &auth));
     }
+
     obs_wsc_disconnect(c);
-    obs_wsc_shutdown();
+    assert(obs_wsc_shutdown() == 0);
     return 0;
 }

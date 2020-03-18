@@ -29,7 +29,7 @@ bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *addit
     json_error_t err;
 
     if (!conn || !conn->connection || !conn->connected || !request)
-        return NULL;
+        return false;
 
     char *msg_id = util_random_id(conn);
     req = json_pack_ex(&err, 0, "{ss,ss}", "request-type", request, "message-id", msg_id);
@@ -47,7 +47,7 @@ bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *addit
         conn->message_ids = brealloc(conn->message_ids, sizeof(char *) * (conn->message_ids_len + 1));
         conn->message_ids[conn->message_ids_len++] = msg_id;
 
-        uint64_t request_start = os_get_time_ns();
+        uint64_t request_start = os_gettime_ns();
         if (!send_json(conn, req)) {
             berr("Sending request json failed");
             goto fail;
@@ -78,7 +78,7 @@ bool send_json(const obs_wsc_connection_t *conn, const json_t *json)
 
     char *dmp = json_dumps(json, 0);
     bool result = send_str(conn, dmp);
-    free(dmp); /* jansson doesn't use bmem */
+    bfree(dmp);
     return result;
 }
 
@@ -112,7 +112,7 @@ bool wait_timeout(obs_wsc_connection_t *conn, uint64_t start)
     int32_t max_timeout = conn->timeout;
     int32_t timeout = 0;
 
-    bdebug("Waiting for message after %li", start);
+    bdebug("Waiting for message after %llu", start);
 
     while (keep_waiting) {
         if (timeout >= max_timeout)

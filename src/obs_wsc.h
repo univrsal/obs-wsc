@@ -110,6 +110,26 @@ EXPORT long obs_wsc_shutdown();
  */
 EXPORT void obs_wsc_set_allocator(struct base_allocator *defs);
 
+/**
+ * @brief Get logging function
+ * @param handler Pointer to save the log function to
+ * @param param Pointer to save the custom parameter to
+ */
+EXPORT void obs_wsc_get_logger(log_handler_t *handler, void **param);
+
+/**
+ * @brief Set the logging function
+ * @param handler The log function
+ * @param param Custom paramter
+ */
+EXPORT void obs_wsc_set_logger(log_handler_t handler, void *param);
+
+/**
+ * @brief Set the function to call if obs_wsc crashes
+ * @param handler The handler function
+ * @param param Custom parameter
+ */
+EXPORT void obs_wsc_set_crash_handler(void (*handler)(const char *, va_list, void *), void *param);
 #ifdef __cplusplus
 }
 #endif

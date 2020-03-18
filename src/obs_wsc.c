@@ -36,6 +36,7 @@ void obs_wsc_init()
     /* rand() is only used for generating message ids */
     time_t t;
     srand((unsigned)time(&t));
+    json_set_alloc_funcs(bzalloc, bfree);
 }
 
 long obs_wsc_shutdown()
@@ -48,6 +49,21 @@ long obs_wsc_shutdown()
 void obs_wsc_set_allocator(struct base_allocator *defs)
 {
     base_set_allocator(defs);
+}
+
+void obs_wsc_get_logger(log_handler_t *handler, void **param)
+{
+    base_get_log_handler(handler, param);
+}
+
+void obs_wsc_set_logger(log_handler_t handler, void *param)
+{
+    base_set_log_handler(handler, param);
+}
+
+void obs_wsc_set_crash_handler(void (*handler)(const char *, va_list, void *), void *param)
+{
+    base_set_crash_handler(handler, param);
 }
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
@@ -83,8 +99,8 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
         break;
     case MG_EV_WEBSOCKET_FRAME:
         wm = ev_data;
-        time = os_get_time_ns();
-        binfo("Received message at %lu: %.*s", time, (int)wm->size, wm->data);
+        time = os_gettime_ns();
+        binfo("Received message at %llu: %.*s", time, (int)wm->size, wm->data);
 
         json_decref(conn->last_message.data);
         conn->last_message.data = recv_json(wm->data, wm->size);
@@ -115,7 +131,7 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr)
         addr = local_host;
 
     obs_wsc_connection_t *n = bzalloc(sizeof(obs_wsc_connection_t));
-    n->timeout = 100;
+    n->timeout = 500;
 
     mg_mgr_init(&n->manager, n);
     n->connection = mg_connect_ws(&n->manager, ev_handler, addr, "websocket", NULL);
@@ -143,11 +159,15 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr)
     /* Wait for connection */
     uint32_t wait = 0;
     while (!n->connected && wait < 1000) {
+        if (!n->thread_flag) {
+            berr("Thread exited before handshake completed");
+            break;
+        }
         wait += 10;
         os_sleep_ms(10);
     }
 
-    if (wait >= 1000) {
+    if (wait >= 1000 || !n->thread_flag) {
         berr("Timed out while waiting for handshake response");
         goto fail;
     }
@@ -234,10 +254,12 @@ void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data)
     if (data) {
         bfree(data->salt);
         bfree(data->challenge);
+        data->salt = NULL;
+        data->challenge = NULL;
     }
 }
 
-EXPORT bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password)
+bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password)
 {
     struct dstr pw_salt, pw_salt_hash, pw_salt_hash_b64, final;
     dstr_init(&pw_salt);
@@ -250,17 +272,22 @@ EXPORT bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password
     dstr_copy(&pw_salt, password);
     dstr_cat(&pw_salt, auth->salt);
 
+    bdebug("PW/Salt Step 1: %s", pw_salt.array);
+
     /* Step 2: Hash it */
     SHA256_CTX ctx;
     sha256_init(&ctx);
     sha256_update(&ctx, (BYTE *)pw_salt.array, pw_salt.len);
     sha256_final(&ctx, sha256);
-    dstr_from_sha256(&pw_salt_hash, sha256);
+
+    dstr_from_sha256(&pw_salt_hash, sha256); /* Only for debug */
+    bdebug("SHA256 Step 2: %s", pw_salt_hash.array);
 
     /* Step 3: base64 encode it */
-    size_t len = base64_encode((BYTE *)pw_salt_hash.array, NULL, pw_salt_hash.len, 1);
+    size_t len = base64_encode(sha256, NULL, SHA256_BLOCK_SIZE, 0);
     dstr_resize(&pw_salt_hash_b64, len);
-    base64_encode((BYTE *)pw_salt_hash.array, (BYTE *)pw_salt_hash_b64.array, pw_salt_hash.len, 1);
+    base64_encode(sha256, (BYTE *)pw_salt_hash_b64.array, SHA256_BLOCK_SIZE, 0);
+    bdebug("Base64 Step 3: %s", pw_salt_hash_b64.array);
 
     /* Step 4: Concatenate it with the challenge */
     dstr_cat(&pw_salt_hash_b64, auth->challenge);
@@ -269,13 +296,15 @@ EXPORT bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password
     sha256_init(&ctx);
     sha256_update(&ctx, (BYTE *)pw_salt_hash_b64.array, pw_salt_hash_b64.len);
     sha256_final(&ctx, sha256);
-    dstr_free(&pw_salt_hash);
+
     dstr_from_sha256(&pw_salt_hash, sha256);
+    bdebug("SHA256 Step 5: %s", pw_salt_hash.array);
 
     /* Step 6: base64 encode it again */
-    len = base64_encode((BYTE *)pw_salt_hash.array, NULL, pw_salt_hash.len, 0);
-    dstr_reserve(&final, len);
-    base64_encode((BYTE *)pw_salt_hash.array, (BYTE *)final.array, pw_salt_hash.len, 1);
+    len = base64_encode(sha256, NULL, SHA256_BLOCK_SIZE, 0);
+    dstr_resize(&final, len);
+    base64_encode(sha256, (BYTE *)final.array, SHA256_BLOCK_SIZE, 0);
+    bdebug("Base64 Step 6: %s", final.array);
 
     auth->auth_response = bstrdup(final.array);
 
@@ -301,6 +330,9 @@ bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth)
     bool result = false;
     json_error_t err;
     json_t *auth_response = json_pack_ex(&err, 0, "{ss}", "auth", auth->auth_response);
+    char *s = json_dumps(auth_response, JSON_INDENT(4));
+    bdebug("Auth msg: %s", s);
+    bfree(s);
 
     if (!auth_response) {
         berr("Error packing auth response json: %s at line %i", err.text, err.line);

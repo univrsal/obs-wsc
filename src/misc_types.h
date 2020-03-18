@@ -19,6 +19,8 @@
 #pragma once
 #include "external/c99defs.h"
 
+typedef void (*log_handler_t)(int lvl, const char *msg, va_list args, void *p);
+
 typedef struct obs_wsc_auth_data_s {
     char *challenge;
     char *salt;

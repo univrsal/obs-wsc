@@ -20,6 +20,7 @@
 
 #include "external/base.h"
 #include "external/mongoose.h"
+#include "external/threading.h"
 #include <jansson.h>
 
 typedef struct obs_wsc_msg_s {

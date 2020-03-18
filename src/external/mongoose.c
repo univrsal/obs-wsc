@@ -167,20 +167,22 @@ MG_INTERNAL int mg_sntp_parse_reply(const char *buf, int len, struct mg_sntp_mes
 extern "C" {
 #endif
 
+#include "bmem.h"
+
 #ifndef MG_MALLOC
-#define MG_MALLOC malloc
+#define MG_MALLOC bmalloc
 #endif
 
 #ifndef MG_CALLOC
-#define MG_CALLOC calloc
+#define MG_CALLOC bcalloc
 #endif
 
 #ifndef MG_REALLOC
-#define MG_REALLOC realloc
+#define MG_REALLOC brealloc
 #endif
 
 #ifndef MG_FREE
-#define MG_FREE free
+#define MG_FREE bfree
 #endif
 
 #ifdef __cplusplus

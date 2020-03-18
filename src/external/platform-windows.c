@@ -13,8 +13,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 #include <intrin.h>
 #include <Windows.h>
+#include "base.h"
 
 static bool have_clockfreq = false;
 static LARGE_INTEGER clock_freq;
@@ -26,10 +28,6 @@ void os_breakpoint(void)
 
 void os_sleep_ms(uint32_t duration)
 {
-    /* windows 8+ appears to have decreased sleep precision */
-    if (get_winver() >= 0x0602 && duration > 0)
-        duration--;
-
     Sleep(duration);
 }
 

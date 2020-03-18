@@ -15,6 +15,8 @@ external use.
 #ifndef CHEAT_H
 #define CHEAT_H
 
+#if WIN32
+#endif
 #ifndef __BASE_FILE__ /* This is indented so that older compilers ignore it. */
 #error "the __BASE_FILE__ preprocessor directive is not defined"
 #endif

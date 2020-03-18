@@ -14,6 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#pragma once
+
 #include "base.h"
 #ifdef _WIN32
 #include "threading-windows.h"
@@ -21,6 +23,10 @@
 #include "threading-posix.h"
 #endif
 
+#ifdef WIN32
+/* This has no use on windows */
+#define pthread_mutex_init_value UNUSED_PARAMETER
+#else
 /* this may seem strange, but you can't use it unless it's an initializer */
 static inline void pthread_mutex_init_value(pthread_mutex_t *mutex)
 {
@@ -30,3 +36,4 @@ static inline void pthread_mutex_init_value(pthread_mutex_t *mutex)
 
     *mutex = init_val;
 }
+#endif
