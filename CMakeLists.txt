@@ -18,12 +18,15 @@ set(obs_wsc_SRC
     src/misc_types.h
     src/send.c
     src/send.h
+    src/messages/requests/general.c
+    src/messages/requests/general.h
     src/external/mongoose.h
     src/external/mongoose.c
     src/external/bmem.h
     src/external/bmem.c
     src/external/dstr.h
     src/external/dstr.c
+    src/external/darray.h
     src/external/utf8.c
     src/external/utf8.h
     src/external/lexer.c

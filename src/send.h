@@ -20,8 +20,10 @@
 #include <stdbool.h>
 #include <jansson.h>
 #include "opaque.h"
+#include "external/bmem.h"
 
-bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *additional_data);
+bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *additional_data, request_callback_t cb,
+                  void *cb_data);
 
 bool send_json(const obs_wsc_connection_t *conn, const json_t *json);
 
@@ -29,6 +31,16 @@ bool send_str(const obs_wsc_connection_t *conn, const char *str);
 
 json_t *recv_json(unsigned char *data, size_t len);
 
-bool parse_basic_json(json_t *j, const char *last_msg_id);
+bool parse_basic_json(json_t *j);
 
-bool wait_timeout(obs_wsc_connection_t *conn, uint64_t start);
+bool wait_timeout(obs_wsc_connection_t *conn, request_t *rq);
+
+static inline bool send_request_no_cb(obs_wsc_connection_t *conn, const char *req, json_t *additional_data)
+{
+    return send_request(conn, req, additional_data, NULL, NULL);
+}
+
+static inline bool send_request_simple(obs_wsc_connection_t *conn, const char *req)
+{
+    return send_request(conn, req, NULL, NULL, NULL);
+}

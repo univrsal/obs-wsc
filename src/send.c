@@ -23,16 +23,71 @@
 #include "external/bmem.h"
 #include <string.h>
 
-bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *additional_data)
+request_result_t default_callback(json_t *j, void *d)
 {
-    json_t *req = NULL;
-    json_error_t err;
+    UNUSED_PARAMETER(d);
+    char *id = NULL;
+    json_unpack(j, "{ss}", "message-id", &id);
+    bdebug("Request with id %s fulfilled", id);
+    return REQUEST_OK;
+}
 
+request_t *add_request(obs_wsc_connection_t *conn, char *msg_id, request_callback_t cb, void *cb_data)
+{
+    darray_push_back(sizeof(char *), &conn->ids.da, msg_id);
+    request_t *rq = bzalloc(sizeof(request_t));
+
+    if (cb)
+        rq->cb = cb;
+    else
+        rq->cb = default_callback;
+
+    rq->cb_data = cb_data;
+    rq->id = msg_id;
+    rq->request_start = os_gettime_ns();
+    rq->next = conn->first_active_request;
+
+    if (conn->first_active_request)
+        conn->first_active_request->prev = rq;
+    conn->first_active_request = rq;
+    return rq;
+}
+
+void remove_request(obs_wsc_connection_t *conn, char *msg_id)
+{
+    request_t *r = conn->first_active_request;
+
+    while (r) {
+        if (strcmp(r->id, msg_id) == 0) {
+            if (r->prev)
+                r->prev->next = r->next;
+            if (r->next)
+                r->next->prev = r->prev;
+            bfree(r);
+            break;
+        }
+        r = r->next;
+    }
+}
+
+bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *additional_data, request_callback_t cb,
+                  void *cb_data)
+{
     if (!conn || !conn->connection || !conn->connected || !request)
         return false;
 
-    char *msg_id = util_random_id(conn);
+    json_t *req = NULL;
+    json_error_t err;
+    bool result = false;
+
+    bdebug("Sending %s request", request);
+
+    pthread_mutex_lock(&conn->poll_mutex);
+    char *msg_id = bstrdup(util_random_id(&conn->ids.da));
+    pthread_mutex_lock(&conn->poll_mutex);
+
     req = json_pack_ex(&err, 0, "{ss,ss}", "request-type", request, "message-id", msg_id);
+
     if (req) {
         if (additional_data) {
             const char *key;
@@ -44,31 +99,24 @@ bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *addit
             }
         }
 
-        conn->message_ids = brealloc(conn->message_ids, sizeof(char *) * (conn->message_ids_len + 1));
-        conn->message_ids[conn->message_ids_len++] = msg_id;
+        pthread_mutex_lock(&conn->poll_mutex);
 
-        uint64_t request_start = os_gettime_ns();
-        if (!send_json(conn, req)) {
+        if (send_json(conn, req)) {
+            request_t *rq = add_request(conn, msg_id, cb, cb_data);
+            result = wait_timeout(conn, rq);
+        } else {
             berr("Sending request json failed");
-            goto fail;
         }
-        conn->last_message.message_id = msg_id;
 
-        if (!wait_timeout(conn, request_start))
-            goto fail;
+        remove_request(conn, msg_id);
+        pthread_mutex_unlock(&conn->poll_mutex);
     } else {
         berr("Packing request json for %s failed with %s at line %i", request, err.text, err.line);
-        goto free;
+        bfree(msg_id);
     }
 
     json_decref(req);
-    return true;
-
-free:
-    bfree(msg_id);
-fail:
-    json_decref(req);
-    return false;
+    return result;
 }
 
 bool send_json(const obs_wsc_connection_t *conn, const json_t *json)
@@ -99,61 +147,64 @@ json_t *recv_json(unsigned char *data, size_t len)
     json_error_t err;
     json_t *loaded = json_loadb((char *)data, len, 0, &err);
 
-    if (!loaded) {
-        berr("Failed to parse response json: %s at line %i", err.text, err.line);
-        return NULL;
-    }
-    return loaded;
+    if (loaded)
+        return loaded;
+    berr("Failed to parse response json: %s at line %i", err.text, err.line);
+    return NULL;
 }
 
-bool wait_timeout(obs_wsc_connection_t *conn, uint64_t start)
+bool wait_timeout(obs_wsc_connection_t *conn, request_t *rq)
 {
     bool keep_waiting = true;
-    int32_t max_timeout = conn->timeout;
     int32_t timeout = 0;
+    pthread_mutex_lock(&conn->poll_mutex);
+    int32_t max_timeout = conn->timeout;
+    char *id = bstrdup(rq->id);
+    pthread_mutex_unlock(&conn->poll_mutex);
 
-    bdebug("Waiting for message after %llu", start);
+    bdebug("Waiting for message after %lu", rq->request_start);
 
-    while (keep_waiting) {
-        if (timeout >= max_timeout)
-            keep_waiting = false;
-
-        if (!keep_waiting) {
-            berr("Waiting for response exceeded timeout of %i ms", max_timeout);
-        }
+    while (timeout <= max_timeout && keep_waiting) {
 
         pthread_mutex_lock(&conn->poll_mutex);
-        if (conn->last_message.time > start) {
-            bdebug("Received message within timeout");
-            pthread_mutex_unlock(&conn->poll_mutex);
-            break;
+        if (rq->status != REQUEST_PENDING) {
+            bdebug("Received response for %s within timeout, process status:"
+                   "%s",
+                   rq->id, rq->status == REQUEST_OK ? "OK" : "FAILED");
+            keep_waiting = false;
         }
         pthread_mutex_unlock(&conn->poll_mutex);
 
-        timeout += 10;
-        os_sleep_ms(10);
+        timeout += 2;
+        os_sleep_ms(2);
     }
-    return keep_waiting;
+
+    if (keep_waiting)
+        berr("Request %s timed out", id);
+
+    bfree(id);
+    return timeout <= max_timeout;
 }
 
-bool parse_basic_json(json_t *j, const char *last_msg_id)
+bool parse_basic_json(json_t *j)
 {
     if (!j)
         return false;
+
+    /* Message id isn't matched since the poll thread only
+     * calls the callback on requests with a matching id */
     json_error_t err;
-    char *msg_id = NULL, *status = NULL;
+    char *status = NULL;
+    bool status_ok = false;
 
-    if (json_unpack_ex(j, &err, 0, "{ss, ss}", "message-id", &msg_id, "status", &status) != 0) {
+    if (json_unpack_ex(j, &err, 0, "{ss}", "status", &status)) {
         berr("Error while parsing basic json: '%s' at line %i", err.text, err.line);
-    }
-    bool match_id = strcmp(msg_id, last_msg_id) == 0;
-    bool status_ok = strcmp(status, "ok") == 0;
-
-    if (!match_id) {
-        berr("Mismatching id between sent (%s) and received (%s)!", last_msg_id, msg_id);
+    } else {
+        status_ok = strcmp(status, "ok") == 0;
     }
 
     if (!status_ok)
         berr("Status %s is not ok", status);
-    return match_id && status_ok;
+
+    return status_ok;
 }

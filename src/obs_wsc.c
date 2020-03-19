@@ -66,8 +66,28 @@ void obs_wsc_set_crash_handler(void (*handler)(const char *, va_list, void *), v
     base_set_crash_handler(handler, param);
 }
 
+void notify_request(obs_wsc_connection_t *con, json_t *j)
+{
+    request_t *f = con->first_active_request;
+    char *msg_id = NULL;
+
+    if (json_unpack(j, "{ss}", "message-id", &msg_id)) {
+        berr("Couldn't get message id form response json");
+        return;
+    }
+
+    while (f) {
+        if (strcmp(f->id, msg_id) == 0) {
+            f->status = f->cb(j, f->cb_data);
+            break;
+        }
+        f = f->next;
+    }
+}
+
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
 {
+    static json_t *data = NULL;
     obs_wsc_connection_t *conn = nc->user_data;
     int status;
     uint64_t time;
@@ -101,10 +121,9 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
         wm = ev_data;
         time = os_gettime_ns();
         binfo("Received message at %llu: %.*s", time, (int)wm->size, wm->data);
-
-        json_decref(conn->last_message.data);
-        conn->last_message.data = recv_json(wm->data, wm->size);
-        conn->last_message.time = time;
+        data = recv_json(wm->data, wm->size);
+        notify_request(conn, data);
+        json_decref(data);
         break;
     }
 
@@ -172,6 +191,8 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr)
         goto fail;
     }
 
+    darray_init(&n->ids.da);
+
     return n;
 
 fail:
@@ -193,10 +214,6 @@ void obs_wsc_disconnect(obs_wsc_connection_t *conn)
     if (!conn)
         return;
 
-    for (size_t i = 0; i < conn->message_ids_len; i++)
-        bfree(conn->message_ids[i]);
-    bfree(conn->message_ids);
-
     conn->thread_flag = false;
 
     if (pthread_join(conn->poll_thread, NULL))
@@ -204,49 +221,22 @@ void obs_wsc_disconnect(obs_wsc_connection_t *conn)
 
     mg_mgr_free(&conn->manager);
     pthread_mutex_destroy(&conn->poll_mutex);
+
     if (conn->domain)
         bfree(conn->domain);
-    json_decref(conn->last_message.data);
-    bfree(conn);
-}
 
-bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth)
-{
-    if (!conn || !conn->connection || !auth)
-        return false;
+    for (size_t i = 0; i < conn->ids.num; i++)
+        bfree(conn->ids.array[i]);
+    darray_free(&conn->ids.da);
 
-    bool result = false;
-    if (send_request(conn, "GetAuthRequired", NULL)) {
-        pthread_mutex_lock(&conn->poll_mutex);
-        json_t *response = json_copy(conn->last_message.data);
-        char *last_msg_id = bstrdup(conn->last_message.message_id);
-        pthread_mutex_unlock(&conn->poll_mutex);
-
-        json_error_t err;
-        char *challenge = NULL, *salt = NULL;
-
-        if (parse_basic_json(response, last_msg_id) &&
-            json_unpack_ex(response, &err, 0, "{sb}", "authRequired", &auth->required) == 0) {
-
-            if (auth->required) {
-                if (json_unpack_ex(response, &err, 0, "{ss,ss}", "challenge", &challenge, "salt", &salt) == 0) {
-                    auth->challenge = bstrdup(challenge);
-                    auth->salt = bstrdup(salt);
-                    result = true;
-                } else {
-                    berr("Couldn't unpack auth json: %s at line %i", err.text, err.line);
-                }
-            } else {
-                result = true;
-            }
-        } else {
-            berr("Error while unpacking json: %s at line %i", err.text, err.line);
-        }
-
-        json_decref(response);
-        bfree(last_msg_id);
+    request_t *f = conn->first_active_request;
+    while (f) {
+        request_t *n = f->next;
+        bfree(f);
+        f = n;
     }
-    return result;
+
+    bfree(conn);
 }
 
 void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data)
@@ -266,9 +256,8 @@ bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password)
     if (!auth || !auth->required || !password || !auth->salt || !auth->challenge)
         return false;
 
-    struct dstr pw_salt, pw_salt_hash, pw_salt_hash_b64, final;
+    struct dstr pw_salt, pw_salt_hash_b64, final;
     dstr_init(&pw_salt);
-    dstr_init(&pw_salt_hash);
     dstr_init(&pw_salt_hash_b64);
     dstr_init(&final);
     BYTE sha256[SHA256_BLOCK_SIZE];
@@ -277,22 +266,16 @@ bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password)
     dstr_copy(&pw_salt, password);
     dstr_cat(&pw_salt, auth->salt);
 
-    bdebug("PW/Salt Step 1: %s", pw_salt.array);
-
     /* Step 2: Hash it */
     SHA256_CTX ctx;
     sha256_init(&ctx);
     sha256_update(&ctx, (BYTE *)pw_salt.array, pw_salt.len);
     sha256_final(&ctx, sha256);
 
-    dstr_from_sha256(&pw_salt_hash, sha256); /* Only for debug */
-    bdebug("SHA256 Step 2: %s", pw_salt_hash.array);
-
     /* Step 3: base64 encode it */
     size_t len = base64_encode(sha256, NULL, SHA256_BLOCK_SIZE, 0);
     dstr_resize(&pw_salt_hash_b64, len);
     base64_encode(sha256, (BYTE *)pw_salt_hash_b64.array, SHA256_BLOCK_SIZE, 0);
-    bdebug("Base64 Step 3: %s", pw_salt_hash_b64.array);
 
     /* Step 4: Concatenate it with the challenge */
     dstr_cat(&pw_salt_hash_b64, auth->challenge);
@@ -302,58 +285,24 @@ bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password)
     sha256_update(&ctx, (BYTE *)pw_salt_hash_b64.array, pw_salt_hash_b64.len);
     sha256_final(&ctx, sha256);
 
-    dstr_from_sha256(&pw_salt_hash, sha256);
-    bdebug("SHA256 Step 5: %s", pw_salt_hash.array);
-
     /* Step 6: base64 encode it again */
     len = base64_encode(sha256, NULL, SHA256_BLOCK_SIZE, 0);
     dstr_resize(&final, len);
     base64_encode(sha256, (BYTE *)final.array, SHA256_BLOCK_SIZE, 0);
-    bdebug("Base64 Step 6: %s", final.array);
 
     auth->auth_response = bstrdup(final.array);
 
     /* Clean up */
     dstr_free(&pw_salt);
-    dstr_free(&pw_salt_hash);
     dstr_free(&pw_salt_hash_b64);
     dstr_free(&final);
-    bool result = strlen(auth->auth_response);
+    bool result = auth->auth_response && strlen(auth->auth_response);
+
     if (result) {
         bfree(auth->salt);
         bfree(auth->challenge);
         auth->salt = NULL;
         auth->challenge = NULL;
     }
-    return result;
-}
-
-bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth)
-{
-    if (!conn || !conn->connection || !auth || !auth->auth_response)
-        return false;
-    bool result = false;
-    json_error_t err;
-    json_t *auth_json = json_pack_ex(&err, 0, "{ss}", "auth", auth->auth_response);
-
-    if (!auth_json) {
-        berr("Error packing auth response json: %s at line %i", err.text, err.line);
-    } else if (send_request(conn, "Authenticate", auth_json)) {
-        pthread_mutex_lock(&conn->poll_mutex);
-        json_t *response = json_copy(conn->last_message.data);
-        char *last_msg_id = bstrdup(conn->last_message.message_id);
-        pthread_mutex_unlock(&conn->poll_mutex);
-
-        result = parse_basic_json(response, last_msg_id);
-        if (result) {
-            bfree(auth->auth_response);
-            auth->auth_response = NULL;
-        }
-
-        bfree(last_msg_id);
-        json_decref(response);
-        json_decref(auth_json);
-    }
-
     return result;
 }

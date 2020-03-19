@@ -24,7 +24,9 @@ extern "C" {
 typedef struct obs_wsc_connection_s obs_wsc_connection_t;
 
 #include "misc_types.h"
+#include "messages/requests/general.h"
 #include "external/base.h"
+
 /**
  * @brief Opens a new connection to an obs websocket instance
  * @param addr The address (eg. ws://127.0.0.1:4444)
@@ -45,40 +47,10 @@ EXPORT void obs_wsc_disconnect(obs_wsc_connection_t *conn);
 EXPORT void obs_wsc_set_timeout(obs_wsc_connection_t *conn, int32_t ms);
 
 /**
- * @brief Send a request to the websocket API
- * @param conn The connection
- * @param req The request id
- * @param additional_data Optional data if needed for the request
- * @return the servers response or null on failure
- */
-//EXPORT  *obs_wcs_send_request(obs_wsc_connection_t *conn, const char *req,
-//                                 const json_t *additional_data);
-
-/**
- * @brief Checks if the connections needs a password
- * @param conn The connection
- * @param auth Pointer to a data struct which will receive a challange and a
- *        salt or required will be set to false.
- *        The salt and challange have to be freed with obs_wsc_free_auth_data
- *        if it's not used for obs_wsc_prepare_auth
- * @return true on success
- */
-EXPORT bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth);
-
-/**
  * @brief Frees the challange and salt strings
  * @param data the data to free
  */
 void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data);
-
-/**
- * @brief Tries to autenticate with the server with the provided data
- * @param conn The connection
- * @param auth The authentication data
- * @see obs_wsc_prepare_auth
- * @return true on success
- */
-EXPORT bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth);
 
 /**
  * @brief Creates the auth response, by hashing the password and encoding it

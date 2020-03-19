@@ -18,6 +18,8 @@
 
 #pragma once
 
+#define MSG_ID_LENGTH 17
 #include "opaque.h"
+#include "external/darray.h"
 
-char *util_random_id(const obs_wsc_connection_t *conn);
+char *util_random_id(const struct darray *ids);

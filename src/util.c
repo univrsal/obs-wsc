@@ -21,31 +21,35 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *util_random_id(const obs_wsc_connection_t *conn)
+char *util_random_id(const struct darray *ids)
 {
-    char *new_id = bzalloc(sizeof(char) * 17);
+    static char id[MSG_ID_LENGTH];
     int idx = 0;
     bool unique = false;
 
     while (!unique) {
-        while (idx < 16) {
+        while (idx < MSG_ID_LENGTH) {
             int rnd = rand() % (26 + 26 + 10);
             if (rnd < 26)
-                new_id[idx] = 'a' + rnd;
+                id[idx] = (char)('a' + rnd);
             else if (rnd < 26 + 26)
-                new_id[idx] = 'A' + rnd - 26;
+                id[idx] = (char)('A' + rnd - 26);
             else
-                new_id[idx] = '0' + rnd - 26 - 26;
+                id[idx] = (char)('0' + rnd - 26 - 26);
             idx++;
         }
+
+        id[MSG_ID_LENGTH - 1] = '\0';
+
         unique = true;
-        for (size_t i = 0; i < conn->message_ids_len; i++) {
-            if (strcmp(conn->message_ids[i], new_id) == 0) {
+        char **arr = ids->array;
+        for (size_t i = 0; i < ids->num; i++) {
+            if (strcmp(arr[i], id) == 0) {
                 unique = false;
                 break;
             }
         }
     }
 
-    return new_id;
+    return id;
 }

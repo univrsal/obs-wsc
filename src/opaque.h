@@ -19,26 +19,44 @@
 #pragma once
 
 #include "external/base.h"
+#include "external/darray.h"
 #include "external/mongoose.h"
 #include "external/threading.h"
 #include <jansson.h>
 
-typedef struct obs_wsc_msg_s {
-    json_t *data;
-    uint64_t time;
-    char *message_id;
-} obs_wsc_msg_t;
+typedef enum { REQUEST_PENDING, REQUEST_OK, REQUEST_ERROR } request_result_t;
+
+/**
+ * Each request comes with a callback
+ * which is called, once the server sends a reply
+ * with the matching message id, the callback will
+ * return wether it succeeded
+ */
+typedef request_result_t (*request_callback_t)(json_t *response, void *request_data);
+
+typedef struct request_s {
+    request_callback_t cb;
+    void *cb_data;
+    char *id;
+    request_result_t status;
+    struct request_s *next;
+    struct request_s *prev;
+    uint64_t request_start;
+} request_t;
 
 typedef struct obs_wsc_connection_s {
     int32_t timeout;
     char *domain;
+
     struct mg_mgr manager;
     struct mg_connection *connection;
-    char **message_ids;
-    size_t message_ids_len;
+
     volatile bool thread_flag;
     volatile bool connected;
+
+    DARRAY(char *) ids;
+    request_t *first_active_request;
+
     pthread_t poll_thread;
     pthread_mutex_t poll_mutex;
-    obs_wsc_msg_t last_message;
 } obs_wsc_connection_t;
