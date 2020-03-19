@@ -120,7 +120,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
     case MG_EV_WEBSOCKET_FRAME:
         wm = ev_data;
         time = os_gettime_ns();
-        binfo("Received message at %llu: %.*s", time, (int)wm->size, wm->data);
+        binfo("Received message at %lu: %.*s", time, (int)wm->size, wm->data);
         data = recv_json(wm->data, wm->size);
         notify_request(conn, data);
         json_decref(data);
