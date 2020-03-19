@@ -254,8 +254,10 @@ void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data)
     if (data) {
         bfree(data->salt);
         bfree(data->challenge);
+        bfree(data->auth_response);
         data->salt = NULL;
         data->challenge = NULL;
+        data->auth_response = NULL;
     }
 }
 
@@ -332,25 +334,26 @@ bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth)
         return false;
     bool result = false;
     json_error_t err;
-    json_t *auth_response = json_pack_ex(&err, 0, "{ss}", "auth", auth->auth_response);
-    char *s = json_dumps(auth_response, JSON_INDENT(4));
-    bdebug("Auth msg: %s", s);
-    bfree(s);
+    json_t *auth_json = json_pack_ex(&err, 0, "{ss}", "auth", auth->auth_response);
 
-    if (!auth_response) {
+    if (!auth_json) {
         berr("Error packing auth response json: %s at line %i", err.text, err.line);
-    } else if (send_request(conn, "Authenticate", auth_response)) {
+    } else if (send_request(conn, "Authenticate", auth_json)) {
         pthread_mutex_lock(&conn->poll_mutex);
         json_t *response = json_copy(conn->last_message.data);
         char *last_msg_id = bstrdup(conn->last_message.message_id);
         pthread_mutex_unlock(&conn->poll_mutex);
 
         result = parse_basic_json(response, last_msg_id);
-        json_decref(response);
         if (result) {
             bfree(auth->auth_response);
             auth->auth_response = NULL;
         }
+
+        bfree(last_msg_id);
+        json_decref(response);
+        json_decref(auth_json);
     }
+
     return result;
 }

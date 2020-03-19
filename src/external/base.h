@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <stdarg.h>
 #include "misc_types.h"
 
 /*
