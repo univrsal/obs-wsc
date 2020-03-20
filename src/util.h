@@ -23,3 +23,12 @@
 #include "external/darray.h"
 
 char *util_random_id(const struct darray *ids);
+
+static inline void util_strncpy(char *dest, size_t len, const char *src, size_t max)
+{
+#ifdef WIN32
+    strncpy_s(dest, len, src, max);
+#else
+    strncpy(dest, src, max);
+#endif
+}

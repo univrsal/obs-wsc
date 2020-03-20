@@ -33,12 +33,19 @@ EXPORT bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_
 
 /**
  * @brief Tries to autenticate with the server with the provided data
- * @param conn The connection
  * @param auth The authentication data
  * @see obs_wsc_prepare_auth
  * @return true on success
  */
 EXPORT bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth);
+
+/**
+ * @brief Request obs-studio, websocket, available requests and supported image
+ *        formats information
+ * @param inf pointer to version info structure
+ * @return true on success
+ */
+EXPORT bool obs_wsc_get_version_info(obs_wsc_connection_t *conn, obs_wsc_version_info_t *inf);
 
 /**
  * @brief Request basic OBS video info

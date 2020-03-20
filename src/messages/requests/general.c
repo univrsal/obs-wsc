@@ -18,6 +18,7 @@
 
 #include "general.h"
 #include "../../send.h"
+#include "../../util.h"
 
 bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth)
 {
@@ -76,6 +77,40 @@ bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth
     return send_request(conn, "GetAuthRequired", NULL, auth_required_callback, auth);
 }
 
+request_result_t version_info_callback(json_t *response, void *data)
+{
+    char *obs = NULL, *ws = NULL, *reqs = NULL, *formats = NULL;
+    obs_wsc_version_info_t *inf = data;
+    json_error_t err;
+    bool basic = parse_basic_json(response);
+    request_result_t result = REQUEST_ERROR;
+
+    if (basic &&
+        json_unpack_ex(response, &err, 0, "{sf,ss,ss,ss}", "version", &inf->api_version, "obs-websocket-version", &ws,
+                       "obs-studio-version", &obs, "available-requests", &reqs) == 0) {
+        util_strncpy(inf->obs_version, STR_LEN, obs, STR_LEN);
+        util_strncpy(inf->obs_websocket_version, STR_LEN, ws, STR_LEN);
+        util_strncpy(inf->available_requests, LONG_STR_LEN, reqs, LONG_STR_LEN);
+
+        /* this doesn't seem to be sent currently so no error checking for it */
+        json_unpack(response, "{ss}", "supported-image-export-formats", &formats);
+        if (formats)
+            util_strncpy(inf->supported_image_formats, STR_LEN, formats, STR_LEN);
+        result = REQUEST_OK;
+    } else if (basic) {
+        berr("Error unpacking response for GetVersion: %s at %i", err.text, err.line);
+    }
+    return result;
+}
+
+bool obs_wsc_get_version_info(obs_wsc_connection_t *conn, obs_wsc_version_info_t *inf)
+{
+    if (!conn || !inf)
+        return false;
+
+    return send_request(conn, "GetVersion", NULL, version_info_callback, inf);
+}
+
 request_result_t video_info_callback(json_t *response, void *data)
 {
     char *scale_type, *video_format, *color_space, *color_range;
@@ -88,10 +123,10 @@ request_result_t video_info_callback(json_t *response, void *data)
                                 "baseHeight", &inf->base_height, "outputWidth", &inf->output_width, "outputHeight",
                                 &inf->output_height, "fps", &inf->fps, "scaleType", &scale_type, "videoFormat",
                                 &video_format, "colorSpace", &color_space, "colorRange", &color_range) == 0) {
-        strncpy(inf->scale_type, scale_type, 33);
-        strncpy(inf->video_format, video_format, 33);
-        strncpy(inf->color_range, color_range, 33);
-        strncpy(inf->color_space, color_space, 33);
+        util_strncpy(inf->scale_type, STR_LEN, scale_type, STR_LEN);
+        util_strncpy(inf->video_format, STR_LEN, video_format, STR_LEN);
+        util_strncpy(inf->color_range, STR_LEN, color_range, STR_LEN);
+        util_strncpy(inf->color_space, STR_LEN, color_space, STR_LEN);
         result = REQUEST_OK;
     } else if (basic) {
         berr("Error unpacking response for GetVideoInfo: %s at %i", err.text, err.line);

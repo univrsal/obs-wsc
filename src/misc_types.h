@@ -20,6 +20,9 @@
 #include "external/c99defs.h"
 #include <stdarg.h>
 
+#define STR_LEN 33
+#define LONG_STR_LEN 2048
+
 #define obs_wsc_auth_init()                                                       \
     {                                                                             \
         .salt = NULL, .required = false, .challenge = NULL, .auth_response = NULL \
@@ -29,6 +32,12 @@
     {                                                                                                    \
         .base_width = 0, .base_height = 0, .output_width = 0, .output_height = 0, .scale_type[0] = '\0', \
         .video_format[0] = '\0', .color_space[0] = '\0', .fps = 0                                        \
+    }
+
+#define obs_wsc_version_info_init()                                                                   \
+    {                                                                                                 \
+        .obs_version[0] = '\0', .supported_image_formats[0] = '\0', .obs_websocket_version[0] = '\0', \
+        .available_requests[0] = '\0', .api_version = 0                                               \
     }
 
 typedef void (*log_handler_t)(int lvl, const char *msg, va_list args, void *p);
@@ -47,8 +56,15 @@ struct base_allocator {
 };
 
 /* Request data types */
+
 typedef struct obs_wsc_video_info_s {
     int32_t base_width, base_height, output_width, output_height;
-    char scale_type[33], video_format[33], color_space[33], color_range[33];
+    char scale_type[STR_LEN], video_format[STR_LEN], color_space[STR_LEN], color_range[STR_LEN];
     double fps;
 } obs_wsc_video_info_t;
+
+typedef struct obs_wsc_version_info_s {
+    double api_version;
+    char obs_version[STR_LEN], obs_websocket_version[STR_LEN], available_requests[LONG_STR_LEN],
+        supported_image_formats[STR_LEN];
+} obs_wsc_version_info_t;
