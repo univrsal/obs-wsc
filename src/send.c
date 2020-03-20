@@ -34,7 +34,11 @@ request_result_t default_callback(json_t *j, void *d)
 
 request_t *add_request(obs_wsc_connection_t *conn, char *msg_id, request_callback_t cb, void *cb_data)
 {
-    darray_push_back(sizeof(char *), &conn->ids.da, msg_id);
+    darray_resize(sizeof(char *), &conn->ids.da, conn->ids.num + 1);
+    conn->ids.array[conn->ids.num - 1] = msg_id;
+
+    char *test = conn->ids.array[conn->ids.num - 1];
+
     request_t *rq = bzalloc(sizeof(request_t));
 
     if (cb)
@@ -44,17 +48,18 @@ request_t *add_request(obs_wsc_connection_t *conn, char *msg_id, request_callbac
 
     rq->cb_data = cb_data;
     rq->id = msg_id;
-    rq->request_start = os_gettime_ns();
     rq->next = conn->first_active_request;
 
     if (conn->first_active_request)
         conn->first_active_request->prev = rq;
     conn->first_active_request = rq;
+    conn->request_count++;
     return rq;
 }
 
 void remove_request(obs_wsc_connection_t *conn, char *msg_id)
 {
+    pthread_mutex_lock(&conn->poll_mutex);
     request_t *r = conn->first_active_request;
 
     while (r) {
@@ -64,10 +69,14 @@ void remove_request(obs_wsc_connection_t *conn, char *msg_id)
             if (r->next)
                 r->next->prev = r->prev;
             bfree(r);
+
+            if (--conn->request_count < 1)
+                conn->first_active_request = NULL;
             break;
         }
         r = r->next;
     }
+    pthread_mutex_unlock(&conn->poll_mutex);
 }
 
 bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *additional_data, request_callback_t cb,
@@ -84,7 +93,7 @@ bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *addit
 
     pthread_mutex_lock(&conn->poll_mutex);
     char *msg_id = bstrdup(util_random_id(&conn->ids.da));
-    pthread_mutex_lock(&conn->poll_mutex);
+    pthread_mutex_unlock(&conn->poll_mutex);
 
     req = json_pack_ex(&err, 0, "{ss,ss}", "request-type", request, "message-id", msg_id);
 
@@ -92,14 +101,12 @@ bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *addit
         if (additional_data) {
             const char *key;
             json_t *value;
+            json_incref(additional_data);
+            /* Stealing the reference here, results in Heap warnings */
             json_object_foreach (additional_data, key, value) {
-                /* Just steal the reference here, we don't need the data
-                 * beyond the request */
-                json_object_set_new(req, key, value);
+                json_object_set(req, key, value);
             }
         }
-
-        pthread_mutex_lock(&conn->poll_mutex);
 
         if (send_json(conn, req)) {
             request_t *rq = add_request(conn, msg_id, cb, cb_data);
@@ -109,7 +116,7 @@ bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *addit
         }
 
         remove_request(conn, msg_id);
-        pthread_mutex_unlock(&conn->poll_mutex);
+        json_decref(additional_data);
     } else {
         berr("Packing request json for %s failed with %s at line %i", request, err.text, err.line);
         bfree(msg_id);
@@ -119,7 +126,7 @@ bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *addit
     return result;
 }
 
-bool send_json(const obs_wsc_connection_t *conn, const json_t *json)
+bool send_json(obs_wsc_connection_t *conn, const json_t *json)
 {
     if (!conn || !json)
         return false;
@@ -130,14 +137,16 @@ bool send_json(const obs_wsc_connection_t *conn, const json_t *json)
     return result;
 }
 
-bool send_str(const obs_wsc_connection_t *conn, const char *str)
+bool send_str(obs_wsc_connection_t *conn, const char *str)
 {
     size_t len = strlen(str) + 1; /* Include \0 */
 
     if (!conn || !conn->connection || !conn->connected || !str || len < 1)
         return false;
 
+    pthread_mutex_lock(&conn->poll_mutex);
     mg_send_websocket_frame(conn->connection, WEBSOCKET_OP_TEXT, str, len);
+    pthread_mutex_unlock(&conn->poll_mutex);
 
     return true;
 }
@@ -162,13 +171,11 @@ bool wait_timeout(obs_wsc_connection_t *conn, request_t *rq)
     char *id = bstrdup(rq->id);
     pthread_mutex_unlock(&conn->poll_mutex);
 
-    bdebug("Waiting for message after %lu", rq->request_start);
-
     while (timeout <= max_timeout && keep_waiting) {
 
         pthread_mutex_lock(&conn->poll_mutex);
         if (rq->status != REQUEST_PENDING) {
-            bdebug("Received response for %s within timeout, process status:"
+            bdebug("Received response for %s within timeout, callback status: "
                    "%s",
                    rq->id, rq->status == REQUEST_OK ? "OK" : "FAILED");
             keep_waiting = false;
@@ -203,8 +210,14 @@ bool parse_basic_json(json_t *j)
         status_ok = strcmp(status, "ok") == 0;
     }
 
-    if (!status_ok)
+    if (!status_ok) {
         berr("Status %s is not ok", status);
+        if (strcmp(status, "error") == 0) {
+            char *err = NULL;
+            json_unpack(j, "{ss}", "error", &err);
+            berr("Error message: %s", err);
+        }
+    }
 
     return status_ok;
 }

@@ -29,8 +29,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-typedef struct obs_wsc_connection_s obs_wsc_connection_t;
-
 void obs_wsc_init()
 {
     /* rand() is only used for generating message ids */
@@ -90,7 +88,6 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
     static json_t *data = NULL;
     obs_wsc_connection_t *conn = nc->user_data;
     int status;
-    uint64_t time;
     struct http_message *msg;
     struct websocket_message *wm;
 
@@ -119,8 +116,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
         break;
     case MG_EV_WEBSOCKET_FRAME:
         wm = ev_data;
-        time = os_gettime_ns();
-        binfo("Received message at %lu: %.*s", time, (int)wm->size, wm->data);
+        bdebug("Received message: %.*s", (int)wm->size, wm->data);
         data = recv_json(wm->data, wm->size);
         notify_request(conn, data);
         json_decref(data);
@@ -135,8 +131,8 @@ static void *wsc_thread(void *arg)
     obs_wsc_connection_t *conn = arg;
 
     while (conn->thread_flag) {
-        mg_mgr_poll(&conn->manager, conn->timeout - 20);
-        os_sleep_ms(20);
+        mg_mgr_poll(&conn->manager, conn->poll_time);
+        os_sleep_ms(10);
     }
 
     return NULL;
@@ -150,7 +146,8 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr)
         addr = local_host;
 
     obs_wsc_connection_t *n = bzalloc(sizeof(obs_wsc_connection_t));
-    n->timeout = 500;
+    n->timeout = 2000;
+    n->poll_time = 100;
 
     mg_mgr_init(&n->manager, n);
     n->connection = mg_connect_ws(&n->manager, ev_handler, addr, "websocket", NULL);
@@ -205,6 +202,15 @@ void obs_wcs_set_timeout(obs_wsc_connection_t *conn, int32_t ms)
     if (conn) {
         pthread_mutex_lock(&conn->poll_mutex);
         conn->timeout = ms;
+        pthread_mutex_unlock(&conn->poll_mutex);
+    }
+}
+
+void obs_wsc_set_poll_time(obs_wsc_connection_t *conn, int32_t ms)
+{
+    if (conn) {
+        pthread_mutex_lock(&conn->poll_mutex);
+        conn->poll_time = max(ms, 10);
         pthread_mutex_unlock(&conn->poll_mutex);
     }
 }

@@ -42,9 +42,8 @@ char *util_random_id(const struct darray *ids)
         id[MSG_ID_LENGTH - 1] = '\0';
 
         unique = true;
-        char **arr = ids->array;
         for (size_t i = 0; i < ids->num; i++) {
-            if (strcmp(arr[i], id) == 0) {
+            if (strcmp(darray_item(sizeof(char *), ids, i), id) == 0) {
                 unique = false;
                 break;
             }

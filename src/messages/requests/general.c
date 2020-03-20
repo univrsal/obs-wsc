@@ -28,8 +28,12 @@ bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth)
     json_t *auth_json = json_pack_ex(&err, 0, "{ss}", "auth", auth->auth_response);
 
     if (auth_json) {
+        /* we make a copy of the json here and then
+         * free it in the callback */
         result = send_request_no_cb(conn, "Authenticate", auth_json);
         json_decref(auth_json);
+        bfree(auth->auth_response);
+        auth->auth_response = NULL;
     } else {
         berr("Error packing auth response json: %s at line %i", err.text, err.line);
     }
@@ -77,19 +81,19 @@ request_result_t video_info_callback(json_t *response, void *data)
     char *scale_type, *video_format, *color_space, *color_range;
     obs_wsc_video_info_t *inf = data;
     json_error_t err;
+    bool basic = parse_basic_json(response);
     request_result_t result = REQUEST_ERROR;
 
-    if (parse_basic_json(response) &&
-        json_unpack_ex(response, &err, 0, "{si,si,si,si,si,ss,sf,ss,ss,ss}", "baseWidth", &inf->base_width,
-                       "baseHeight", &inf->base_height, "outputWidth", &inf->output_width, "outputHeight",
-                       &inf->output_height, "fps", &inf->fps, "scaleType", &scale_type, "videoFormat", &video_format,
-                       "colorSpace", &color_space, "colorRange", &color_range)) {
+    if (basic && json_unpack_ex(response, &err, 0, "{si,si,si,si,sf,ss,ss,ss,ss}", "baseWidth", &inf->base_width,
+                                "baseHeight", &inf->base_height, "outputWidth", &inf->output_width, "outputHeight",
+                                &inf->output_height, "fps", &inf->fps, "scaleType", &scale_type, "videoFormat",
+                                &video_format, "colorSpace", &color_space, "colorRange", &color_range) == 0) {
         strncpy(inf->scale_type, scale_type, 33);
         strncpy(inf->video_format, video_format, 33);
-        strncpy(inf->color_range, color_space, 33);
+        strncpy(inf->color_range, color_range, 33);
         strncpy(inf->color_space, color_space, 33);
         result = REQUEST_OK;
-    } else {
+    } else if (basic) {
         berr("Error unpacking response for GetVideoInfo: %s at %i", err.text, err.line);
     }
     return result;

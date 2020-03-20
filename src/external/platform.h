@@ -16,6 +16,10 @@
 
 #include "c99defs.h"
 
+#ifndef max
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+#endif
+
 void os_breakpoint(void);
 
 void os_sleep_ms(uint32_t duratiion);

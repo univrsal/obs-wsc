@@ -47,10 +47,17 @@ EXPORT void obs_wsc_disconnect(obs_wsc_connection_t *conn);
 EXPORT void obs_wsc_set_timeout(obs_wsc_connection_t *conn, int32_t ms);
 
 /**
+ * @brief Set the amount of time per tick on polling
+ * @param conn The connection
+ * @param ms The time spent on polling in miliseconds, minimum is 10ms
+ */
+EXPORT void obs_wsc_set_poll_time(obs_wsc_connection_t *conn, int32_t ms);
+
+/**
  * @brief Frees the challange and salt strings
  * @param data the data to free
  */
-void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data);
+EXPORT void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data);
 
 /**
  * @brief Creates the auth response, by hashing the password and encoding it

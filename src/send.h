@@ -25,9 +25,9 @@
 bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *additional_data, request_callback_t cb,
                   void *cb_data);
 
-bool send_json(const obs_wsc_connection_t *conn, const json_t *json);
+bool send_json(obs_wsc_connection_t *conn, const json_t *json);
 
-bool send_str(const obs_wsc_connection_t *conn, const char *str);
+bool send_str(obs_wsc_connection_t *conn, const char *str);
 
 json_t *recv_json(unsigned char *data, size_t len);
 

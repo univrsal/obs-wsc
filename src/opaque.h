@@ -41,11 +41,11 @@ typedef struct request_s {
     request_result_t status;
     struct request_s *next;
     struct request_s *prev;
-    uint64_t request_start;
 } request_t;
 
 typedef struct obs_wsc_connection_s {
     int32_t timeout;
+    int32_t poll_time;
     char *domain;
 
     struct mg_mgr manager;
@@ -55,6 +55,8 @@ typedef struct obs_wsc_connection_s {
     volatile bool connected;
 
     DARRAY(char *) ids;
+
+    size_t request_count;
     request_t *first_active_request;
 
     pthread_t poll_thread;
