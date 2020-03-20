@@ -40,6 +40,11 @@ EXPORT obs_wsc_connection_t *obs_wsc_connect(const char *addr);
 EXPORT void obs_wsc_disconnect(obs_wsc_connection_t *conn);
 
 /**
+ * @brief Free any memory that was allocated by obs_wsc
+ */
+EXPORT void obs_wsc_free(void *ptr);
+
+/**
  * @brief Set the wait timeout when waiting for responses, use -1 for no timeout
  * @param conn The connection
  * @param ms The timeout in miliseconds

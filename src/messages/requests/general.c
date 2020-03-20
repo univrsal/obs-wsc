@@ -74,7 +74,7 @@ bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth
     if (!conn || !conn->connection || !auth)
         return false;
 
-    return send_request(conn, "GetAuthRequired", NULL, auth_required_callback, auth);
+    return send_request_no_data(conn, "GetAuthRequired", auth_required_callback, auth);
 }
 
 request_result_t version_info_callback(json_t *response, void *data)
@@ -140,4 +140,48 @@ bool obs_wsc_get_video_info(obs_wsc_connection_t *conn, obs_wsc_video_info_t *in
         return false;
 
     return send_request(conn, "GetVideoInfo", NULL, video_info_callback, inf);
+}
+
+bool obs_wsc_set_heartbeat(obs_wsc_connection_t *conn, bool state)
+{
+    if (!conn)
+        return false;
+    json_t *state_json = json_pack("{sb}", "enable", state);
+    bool result = send_request_no_cb(conn, "SetHeartbeat", state_json);
+    json_decref(state_json);
+    return result;
+}
+
+bool obs_wsc_set_filename_format(obs_wsc_connection_t *conn, const char *format)
+{
+    if (!conn)
+        return false;
+    json_t *format_json = json_pack("{ss}", "enable", format);
+    bool result = send_request_no_cb(conn, "SetFilenameFormatting", format_json);
+    json_decref(format_json);
+    return result;
+}
+
+request_result_t filename_format_callback(json_t *response, void *data)
+{
+    request_result_t result = REQUEST_ERROR;
+    json_error_t err;
+    char **fn = data;
+    char *tmp = NULL;
+    bool basic = parse_basic_json(response);
+
+    if (basic && json_unpack_ex(response, &err, 0, "{ss}", &tmp) == 0) {
+        *fn = bstrdup(tmp);
+        result = REQUEST_OK;
+    } else if (basic) {
+        berr("Error unpacking response for GetFilenameFormatting: %s at %i", err.text, err.line);
+    }
+    return result;
+}
+
+bool obs_wsc_get_filename_format(obs_wsc_connection_t *conn, char **format)
+{
+    if (!conn || !format || *format)
+        return false;
+    return send_request_no_data(conn, "GetFilenameFormatting", filename_format_callback, format);
 }

@@ -53,3 +53,22 @@ EXPORT bool obs_wsc_get_version_info(obs_wsc_connection_t *conn, obs_wsc_version
  * @return true on success
  */
 EXPORT bool obs_wsc_get_video_info(obs_wsc_connection_t *conn, obs_wsc_video_info_t *inf);
+
+/**
+ * @brief Set the sending of the Heartbeat event
+ * @return true on success
+ */
+EXPORT bool obs_wsc_set_heartbeat(obs_wsc_connection_t *conn, bool state);
+
+/**
+ * @brief Set the filename formatting string
+ * @return true on success
+ */
+EXPORT bool obs_wsc_set_filename_format(obs_wsc_connection_t *conn, const char *format);
+
+/**
+ * @brief Get the filename formatting string
+ * @param format A pointer to an empty string, free it with obs_wsc_free
+ * @return true on success
+ */
+EXPORT bool obs_wsc_get_filename_format(obs_wsc_connection_t *conn, char **format);

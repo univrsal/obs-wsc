@@ -64,6 +64,11 @@ void obs_wsc_set_crash_handler(void (*handler)(const char *, va_list, void *), v
     base_set_crash_handler(handler, param);
 }
 
+void obs_wsc_free(void *ptr)
+{
+    bfree(ptr);
+}
+
 void notify_request(obs_wsc_connection_t *con, json_t *j)
 {
     request_t *f = con->first_active_request;

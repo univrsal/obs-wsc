@@ -35,6 +35,12 @@ bool parse_basic_json(json_t *j);
 
 bool wait_timeout(obs_wsc_connection_t *conn, request_t *rq);
 
+static inline bool send_request_no_data(obs_wsc_connection_t *conn, const char *req, request_callback_t cb,
+                                        void *cb_data)
+{
+    return send_request(conn, req, NULL, cb, cb_data);
+}
+
 static inline bool send_request_no_cb(obs_wsc_connection_t *conn, const char *req, json_t *additional_data)
 {
     return send_request(conn, req, additional_data, NULL, NULL);
