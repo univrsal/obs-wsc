@@ -26,6 +26,7 @@ int main()
     obs_wsc_auth_data_t auth = obs_wsc_auth_init();
     obs_wsc_video_info_t vinf = obs_wsc_video_info_init();
     obs_wsc_version_info_t ver = obs_wsc_version_info_init();
+    obs_wsc_stats_t stats = obs_wsc_stats_init();
 
     assert(c);
     assert(obs_wsc_auth_required(c, &auth));
@@ -40,6 +41,7 @@ int main()
     /* Test messages */
     assert(obs_wsc_get_video_info(c, &vinf));
     assert(obs_wsc_get_version_info(c, &ver));
+    assert(obs_wsc_get_stats(c, &stats));
 
     /* Clean up */
     obs_wsc_disconnect(c);

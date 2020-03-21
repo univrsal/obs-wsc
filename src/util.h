@@ -32,3 +32,7 @@ static inline void util_strncpy(char *dest, size_t len, const char *src, size_t 
     strncpy(dest, src, max);
 #endif
 }
+
+char *util_qt_geometry_string(const obs_wsc_geometry_t *geo);
+
+const char *util_projector_type(enum obs_wsc_projector_type t);

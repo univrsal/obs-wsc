@@ -20,6 +20,8 @@ set(obs_wsc_SRC
     src/send.h
     src/messages/requests/general.c
     src/messages/requests/general.h
+    src/external/buffer.c
+    src/external/buffer.h
     src/external/mongoose.h
     src/external/mongoose.c
     src/external/bmem.h

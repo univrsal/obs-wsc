@@ -23,6 +23,7 @@
 #define STR_LEN 33
 #define LONG_STR_LEN 2048
 
+/* For Windows which doesn't support the {} initializer */
 #define obs_wsc_auth_init()                                                       \
     {                                                                             \
         .salt = NULL, .required = false, .challenge = NULL, .auth_response = NULL \
@@ -38,6 +39,12 @@
     {                                                                                                 \
         .obs_version[0] = '\0', .supported_image_formats[0] = '\0', .obs_websocket_version[0] = '\0', \
         .available_requests[0] = '\0', .api_version = 0                                               \
+    }
+
+#define obs_wsc_stats_init()                                                                                      \
+    {                                                                                                             \
+        .fps = 0, .average_frame_time = 0, .cpu_usage = 0, .memory_usage = 0, .free_disk_space = 0,               \
+        .render_total_frames = 0, .render_missed_frames = 0, .output_total_frames = 0, .output_skipped_frames = 0 \
     }
 
 typedef void (*log_handler_t)(int lvl, const char *msg, va_list args, void *p);
@@ -56,6 +63,33 @@ struct base_allocator {
 };
 
 /* Request data types */
+
+enum obs_wsc_projector_type {
+    WSC_PROJECTOR_PREVIEW,
+    WSC_PROJECTOR_SOURCE,
+    WSC_PROJECTOR_SCENE,
+    WSC_PROJECTOR_STUDIO_PROGRAM,
+    WSC_PROJECTOR_MULTIVIEW
+};
+
+/* This is a data struct containing
+ * all information in the order it
+ * is saved in Qt when saving the
+ * state of a widget
+ */
+typedef struct obs_wsc_geometry_s {
+    uint32_t magic_number;
+    uint16_t version_major, version_minor;
+
+    struct obs_wsc_rect_s {
+        int32_t x, y, w, h;
+    } frame_geometry, normal_geometry;
+
+    int32_t screen_number;
+    bool maximized, fullscreen;
+    int32_t screen_width;
+    struct obs_wsc_rect_s geometry;
+} obs_wsc_geometry_t;
 
 typedef struct obs_wsc_video_info_s {
     int32_t base_width, base_height, output_width, output_height;

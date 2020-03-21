@@ -72,3 +72,43 @@ EXPORT bool obs_wsc_set_filename_format(obs_wsc_connection_t *conn, const char *
  * @return true on success
  */
 EXPORT bool obs_wsc_get_filename_format(obs_wsc_connection_t *conn, char **format);
+
+/**
+ * @brief Get current obs statistics
+ * @param stats A pointer to a statistics struct
+ * @return true on success
+ */
+EXPORT bool obs_wsc_get_stats(obs_wsc_connection_t *conn, obs_wsc_stats_t *stats);
+
+/**
+ * @brief Broadcast custom message to all connected WebSocket clients
+ * @param realm Identifier for this client
+ * @param data Custom message data json string
+ * @return true on success
+ */
+EXPORT bool obs_wsc_broadcast_message(obs_wsc_connection_t *conn, const char *realm, const char *data);
+
+/**
+ * @brief Sets the version and magic number, all other
+ * parameters are set to zero
+ */
+EXPORT void obs_wsc_prepare_geomery(obs_wsc_geometry_t *geo);
+
+/**
+ * @brief Open a projector window or create a projector on a monitor
+ *        (currently unreleased)
+ * @param t The type of projector to open
+ * @param monitor The monitor to open the projector on
+ * @param geo The geometry of the projector, use obs_wsc_prepare_geometry to
+ *        configure it (optional)
+ * @param src_name The name of the source or scene to be displayed (optional)
+ * @return true on success
+ */
+EXPORT bool obs_wsc_open_projector2(obs_wsc_connection_t *conn, enum obs_wsc_projector_type t, int32_t monitor,
+                                    const obs_wsc_geometry_t *geo, const char *name);
+/**
+ * @brief Just opens a projector
+ * @param conn
+ * @return true on success
+ */
+EXPORT bool obs_wsc_open_projector(obs_wsc_connection_t *conn);

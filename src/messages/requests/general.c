@@ -185,3 +185,113 @@ bool obs_wsc_get_filename_format(obs_wsc_connection_t *conn, char **format)
         return false;
     return send_request_no_data(conn, "GetFilenameFormatting", filename_format_callback, format);
 }
+
+request_result_t stats_callback(json_t *response, void *data)
+{
+    request_result_t result = REQUEST_ERROR;
+    obs_wsc_stats_t *stats = data;
+    bool basic = parse_basic_json(response);
+    json_error_t err;
+    json_t *stats_obj = NULL;
+
+    if (basic && json_unpack_ex(response, &err, 0, "{so}", "stats", &stats_obj) == 0) {
+        if (json_unpack_ex(stats_obj, &err, 0, "{sf,si,si,si,si,sf,sf,sf,sf}", "fps", &stats->fps,
+                           "render-total-frames", &stats->render_total_frames, "render-missed-frames",
+                           &stats->render_missed_frames, "output-total-frames", &stats->output_total_frames,
+                           "output-skipped-frames", &stats->output_skipped_frames, "average-frame-time",
+                           &stats->average_frame_time, "cpu-usage", &stats->cpu_usage, "memory-usage",
+                           &stats->memory_usage, "free-disk-space", &stats->free_disk_space) == 0) {
+            result = REQUEST_OK;
+        } else {
+            berr("Error unpacking response for GetStats: %s at %i", err.text, err.line);
+        }
+    } else if (basic) {
+        berr("Error unpacking response for GetStats: %s at %i", err.text, err.line);
+    }
+    return result;
+}
+
+bool obs_wsc_get_stats(obs_wsc_connection_t *conn, obs_wsc_stats_t *stats)
+{
+    if (!conn || !stats)
+        return false;
+    return send_request_no_data(conn, "GetStats", stats_callback, stats);
+}
+
+bool obs_wsc_broadcast_message(obs_wsc_connection_t *conn, const char *realm, const char *data)
+{
+    if (!conn || !realm)
+        return false;
+
+    json_error_t err;
+    json_t *d = NULL;
+    json_t *ad = json_loads(data, 0, &err);
+
+    if (!ad) {
+        bwarn("obs_wsc_broadcast_message was provided with invalid json: %s at %i", err.text, err.line);
+    }
+
+    d = json_pack_ex(&err, 0, "{ss,so?}", "realm", realm, "data", ad);
+
+    if (!d) {
+        bwarn("Packing json for BroadcastCustomMessage failed: %s at %i", err.text, err.line);
+    }
+
+    bool result = send_request_no_cb(conn, "BroadcastCustomMessage", d);
+    json_decref(ad);
+    json_decref(d);
+    return result;
+}
+
+void obs_wsc_prepare_geomery(obs_wsc_geometry_t *geo)
+{
+    if (geo) {
+        memset(geo, 0, sizeof(obs_wsc_geometry_t));
+        geo->magic_number = 0x1D9D0CB;
+        geo->version_major = 3;
+        geo->version_minor = 0;
+    }
+}
+
+bool obs_wsc_open_projector(obs_wsc_connection_t *conn)
+{
+    return obs_wsc_open_projector2(conn, WSC_PROJECTOR_PREVIEW, -1, NULL, NULL);
+}
+
+bool obs_wsc_open_projector2(obs_wsc_connection_t *conn, enum obs_wsc_projector_type t, int32_t monitor,
+                             const obs_wsc_geometry_t *geo, const char *name)
+{
+    if (!conn)
+        return false;
+    if (monitor < 0 && !geo)
+        return false;
+    if ((t == WSC_PROJECTOR_SCENE || t == WSC_PROJECTOR_SOURCE) && !name)
+        return false;
+
+    bool result = false;
+    char *b64_geo = NULL;
+    const char *type = util_projector_type(t);
+    if (geo)
+        b64_geo = util_qt_geometry_string(geo);
+    json_error_t err;
+    json_t *data = NULL;
+
+    if (b64_geo && name) {
+        data =
+            json_pack_ex(&err, 0, "{ss,si,ss,ss}", "type", type, "monitor", monitor, "geometry", b64_geo, "name", name);
+    } else if (b64_geo) {
+        data = json_pack_ex(&err, 0, "{ss,si,ss}", "type", type, "monitor", monitor, "geometry", b64_geo);
+    } else {
+        data = json_pack_ex(&err, 0, "{ss,si,ss}", "type", type, "monitor", monitor);
+    }
+
+    if (data) {
+        result = send_request_no_cb(conn, "OpenProjector", data);
+        json_decref(data);
+    } else {
+        berr("Failed to pack json for OpenProjector: %s at %i", err.text, err.line);
+    }
+
+    bfree(b64_geo);
+    return result;
+}
