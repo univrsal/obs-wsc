@@ -87,12 +87,12 @@ static void a_free(void *ptr)
 #endif
 }
 
-static struct base_allocator alloc = {a_malloc, a_realloc, a_free};
+static struct wsc_allocator alloc = {a_malloc, a_realloc, a_free};
 static long num_allocs = 0;
 
-void base_set_allocator(struct base_allocator *defs)
+void base_set_allocator(struct wsc_allocator *defs)
 {
-    memcpy(&alloc, defs, sizeof(struct base_allocator));
+    memcpy(&alloc, defs, sizeof(struct wsc_allocator));
 }
 
 void *bmalloc(size_t size)
@@ -102,7 +102,7 @@ void *bmalloc(size_t size)
         ptr = alloc.malloc(1);
     if (!ptr) {
         os_breakpoint();
-        bcrash("Out of memory while trying to allocate %lu bytes", (unsigned long)size);
+        wcrash("Out of memory while trying to allocate %lu bytes", (unsigned long)size);
     }
 
     os_atomic_inc_long(&num_allocs);
@@ -119,7 +119,7 @@ void *brealloc(void *ptr, size_t size)
         ptr = alloc.realloc(ptr, 1);
     if (!ptr) {
         os_breakpoint();
-        bcrash("Out of memory while trying to allocate %lu bytes", (unsigned long)size);
+        wcrash("Out of memory while trying to allocate %lu bytes", (unsigned long)size);
     }
 
     return ptr;

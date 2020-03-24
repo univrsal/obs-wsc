@@ -21,7 +21,7 @@
 #include "base.h"
 
 #ifdef _DEBUG
-static int log_output_level = LOG_DEBUG;
+static int log_output_level = WLOG_DEBUG;
 #else
 static int log_output_level = LOG_INFO;
 #endif
@@ -37,22 +37,22 @@ static void def_log_handler(int log_level, const char *format, va_list args, voi
 
     if (log_level <= log_output_level) {
         switch (log_level) {
-        case LOG_DEBUG:
+        case WLOG_DEBUG:
             fprintf(stdout, "debug: %s\n", out);
             fflush(stdout);
             break;
 
-        case LOG_INFO:
+        case WLOG_INFO:
             fprintf(stdout, "info: %s\n", out);
             fflush(stdout);
             break;
 
-        case LOG_WARNING:
+        case WLOG_WARNING:
             fprintf(stdout, "warning: %s\n", out);
             fflush(stdout);
             break;
 
-        case LOG_ERROR:
+        case WLOG_ERROR:
             fprintf(stderr, "error: %s\n", out);
             fflush(stderr);
         }
@@ -75,10 +75,10 @@ NORETURN static void def_crash_handler(const char *format, va_list args, void *p
     UNUSED_PARAMETER(param);
 }
 
-static log_handler_t log_handler = def_log_handler;
+static wsc_log_handler_t log_handler = def_log_handler;
 static void (*crash_handler)(const char *, va_list, void *) = def_crash_handler;
 
-void base_get_log_handler(log_handler_t *handler, void **param)
+void base_get_log_handler(wsc_log_handler_t *handler, void **param)
 {
     if (handler)
         *handler = log_handler;
@@ -86,7 +86,7 @@ void base_get_log_handler(log_handler_t *handler, void **param)
         *param = log_param;
 }
 
-void base_set_log_handler(log_handler_t handler, void *param)
+void base_set_log_handler(wsc_log_handler_t handler, void *param)
 {
     if (!handler)
         handler = def_log_handler;
@@ -101,7 +101,7 @@ void base_set_crash_handler(void (*handler)(const char *, va_list, void *), void
     crash_handler = handler;
 }
 
-void bcrash(const char *format, ...)
+void wcrash(const char *format, ...)
 {
     va_list args;
 
@@ -116,16 +116,16 @@ void bcrash(const char *format, ...)
     va_end(args);
 }
 
-void blogva(int log_level, const char *format, va_list args)
+void wlogva(int log_level, const char *format, va_list args)
 {
     log_handler(log_level, format, args, log_param);
 }
 
-void blog(int log_level, const char *format, ...)
+void wlog(int log_level, const char *format, ...)
 {
     va_list args;
 
     va_start(args, format);
-    blogva(log_level, format, args);
+    wlogva(log_level, format, args);
     va_end(args);
 }

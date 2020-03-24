@@ -18,45 +18,27 @@
 
 #pragma once
 #include "external/c99defs.h"
+#include "data.h"
 #include <stdarg.h>
 
 #define STR_LEN 33
 #define LONG_STR_LEN 2048
 
 /* For Windows which doesn't support the {} initializer */
-#define obs_wsc_auth_init()                                                       \
-    {                                                                             \
-        .salt = NULL, .required = false, .challenge = NULL, .auth_response = NULL \
-    }
+#define wsc_init_struct(t, n) \
+    t n;                      \
+    memset(&n, 0, sizeof(t))
 
-#define obs_wsc_video_info_init()                                                                        \
-    {                                                                                                    \
-        .base_width = 0, .base_height = 0, .output_width = 0, .output_height = 0, .scale_type[0] = '\0', \
-        .video_format[0] = '\0', .color_space[0] = '\0', .fps = 0                                        \
-    }
+typedef void (*wsc_log_handler_t)(int lvl, const char *msg, va_list args, void *p);
 
-#define obs_wsc_version_info_init()                                                                   \
-    {                                                                                                 \
-        .obs_version[0] = '\0', .supported_image_formats[0] = '\0', .obs_websocket_version[0] = '\0', \
-        .available_requests[0] = '\0', .api_version = 0                                               \
-    }
-
-#define obs_wsc_stats_init()                                                                                      \
-    {                                                                                                             \
-        .fps = 0, .average_frame_time = 0, .cpu_usage = 0, .memory_usage = 0, .free_disk_space = 0,               \
-        .render_total_frames = 0, .render_missed_frames = 0, .output_total_frames = 0, .output_skipped_frames = 0 \
-    }
-
-typedef void (*log_handler_t)(int lvl, const char *msg, va_list args, void *p);
-
-typedef struct obs_wsc_auth_data_s {
+typedef struct wsc_auth_data_s {
     char *challenge;
     char *salt;
     char *auth_response;
     bool required;
-} obs_wsc_auth_data_t;
+} wsc_auth_data_t;
 
-struct base_allocator {
+struct wsc_allocator {
     void *(*malloc)(size_t);
     void *(*realloc)(void *, size_t);
     void (*free)(void *);
@@ -64,7 +46,7 @@ struct base_allocator {
 
 /* Request data types */
 
-enum obs_wsc_projector_type {
+enum wsc_projector_type {
     WSC_PROJECTOR_PREVIEW,
     WSC_PROJECTOR_SOURCE,
     WSC_PROJECTOR_SCENE,
@@ -77,35 +59,35 @@ enum obs_wsc_projector_type {
  * is saved in Qt when saving the
  * state of a widget
  */
-typedef struct obs_wsc_geometry_s {
+typedef struct wsc_geometry_s {
     uint32_t magic_number;
     uint16_t version_major, version_minor;
 
-    struct obs_wsc_rect_s {
+    struct wsc_rect_s {
         int32_t x, y, w, h;
     } frame_geometry, normal_geometry;
 
     int32_t screen_number;
     bool maximized, fullscreen;
     int32_t screen_width;
-    struct obs_wsc_rect_s geometry;
-} obs_wsc_geometry_t;
+    struct wsc_rect_s geometry;
+} wsc_geometry_t;
 
-typedef struct obs_wsc_video_info_s {
+typedef struct wsc_video_info_s {
     int32_t base_width, base_height, output_width, output_height;
     char scale_type[STR_LEN], video_format[STR_LEN], color_space[STR_LEN], color_range[STR_LEN];
     double fps;
-} obs_wsc_video_info_t;
+} wsc_video_info_t;
 
-typedef struct obs_wsc_version_info_s {
+typedef struct wsc_version_info_s {
     double api_version;
     char obs_version[STR_LEN], obs_websocket_version[STR_LEN], available_requests[LONG_STR_LEN],
         supported_image_formats[STR_LEN];
-} obs_wsc_version_info_t;
+} wsc_version_info_t;
 
-typedef struct obs_wsc_scene_item_s {
+typedef struct wsc_scene_item_s {
     int32_t cx, cy, id, source_cx, source_cy, volume, x, y;
-    enum obs_wsc_align {
+    enum wsc_align {
         WSC_ALIGN_INVALID = -1,
         WSC_ALIGN_CENTER,
         WSC_ALIGN_LEFT = 1 << 0,
@@ -118,26 +100,26 @@ typedef struct obs_wsc_scene_item_s {
     char parent_group_name[STR_LEN];
     bool visible, muted, locked;
 
-    struct obs_wsc_scene_item_s *group_children;
+    struct wsc_scene_item_s *group_children;
     size_t num_children;
-} obs_wsc_scene_item_t;
+} wsc_scene_item_t;
 
-typedef struct obs_wsc_scene_item_transform_s {
-    struct obs_wsc_pos_s {
+typedef struct wsc_scene_item_transform_s {
+    struct wsc_pos_s {
         int32_t x, y;
-        enum obs_wsc_align alignment;
+        enum wsc_align alignment;
     } position;
 
-    struct obs_wsc_scale_s {
+    struct wsc_scale_s {
         double x, y;
     } scale;
 
-    struct obs_wsc_crop_s {
+    struct wsc_crop_s {
         int32_t top, right, bottom, left;
     } crop;
 
-    struct obs_wsc_bounds_s {
-        enum obs_wsc_bound_type {
+    struct wsc_bounds_s {
+        enum wsc_bound_type {
             WSC_BOUNDS_NONE,
             WSC_BOUNDS_STRETCH,
             WSC_BOUNDS_SCALE_INNER,
@@ -147,7 +129,7 @@ typedef struct obs_wsc_scene_item_transform_s {
             WSC_BOUNDS_MAX_ONLY
         } type;
 
-        enum obs_wsc_align alignment;
+        enum wsc_align alignment;
         double cx, cy;
     } bounds;
 
@@ -155,36 +137,40 @@ typedef struct obs_wsc_scene_item_transform_s {
     bool visible, locked;
     char parent_group_name[STR_LEN];
 
-    struct obs_wsc_scene_item_transform_s *group_children;
+    struct wsc_scene_item_transform_s *group_children;
     size_t num_children;
-} obs_wsc_scene_item_transform_t;
+} wsc_scene_item_transform_t;
 
-typedef struct obs_wsc_stats_s {
+typedef struct wsc_stats_s {
     double fps, average_frame_time, cpu_usage, memory_usage, free_disk_space;
     uint32_t render_total_frames, render_missed_frames, output_total_frames, output_skipped_frames;
-} obs_wsc_stats_t;
+} wsc_stats_t;
 
-typedef struct obs_wsc_output_s {
+typedef struct wsc_output_s {
     char name[STR_LEN];
     char type[STR_LEN];
-    uint32_t widht, height;
+    uint32_t width, height;
 
-    struct obs_wsc_output_flags_s {
+    struct wsc_output_flags_s {
         uint16_t raw_value;
         bool audio, video, encoded, multi_track, service;
     } flags;
 
-    /* settings ? */
-
+    wsc_data_t *settings;
     bool active, reconnecting;
     double congestion;
 
-    uint64_t total_frames, dropped_frames, total_bytes;
-} obs_wsc_output_t;
+    int64_t total_frames, dropped_frames, total_bytes;
+} wsc_output_t;
 
-typedef struct obs_wsc_scene_s {
+typedef struct wsc_outputs_s {
+    size_t count;
+    wsc_output_t *arr;
+} wsc_ouputs_t;
+
+typedef struct wsc_scene_s {
     char scene_name[STR_LEN];
 
-    obs_wsc_scene_item_t *sources;
+    wsc_scene_item_t *sources;
     size_t num_sources;
-} obs_wsc_scene_t;
+} wsc_scene_t;

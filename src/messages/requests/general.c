@@ -20,9 +20,9 @@
 #include "../../send.h"
 #include "../../util.h"
 
-bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth)
+bool wsc_authenticate(wsc_connection_t *conn, wsc_auth_data_t *auth)
 {
-    if (!conn || !conn->connection || !auth || !auth->auth_response)
+    if (!auth || !auth->auth_response)
         return false;
     bool result = false;
     json_error_t err;
@@ -36,7 +36,7 @@ bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth)
         bfree(auth->auth_response);
         auth->auth_response = NULL;
     } else {
-        berr("Error packing auth response json: %s at line %i", err.text, err.line);
+        werr("Error packing auth response json: %s at line %i", err.text, err.line);
     }
 
     return result;
@@ -44,7 +44,7 @@ bool obs_wsc_authenticate(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth)
 
 request_result_t auth_required_callback(json_t *response, void *data)
 {
-    obs_wsc_auth_data_t *auth = data;
+    wsc_auth_data_t *auth = data;
     json_error_t err;
     request_result_t result = REQUEST_ERROR;
     char *salt = NULL, *challenge = NULL;
@@ -54,10 +54,10 @@ request_result_t auth_required_callback(json_t *response, void *data)
         auth->auth_response = NULL;
 
         if (json_unpack_ex(response, &err, 0, "{sb}", "authRequired", &auth->required)) {
-            berr("Error unpacking auth response json: %s at %i", err.text, err.line);
+            werr("Error unpacking auth response json: %s at %i", err.text, err.line);
         } else if (auth->required) {
             if (json_unpack_ex(response, &err, 0, "{ss,ss}", "challenge", &challenge, "salt", &salt)) {
-                berr("Couldn't unpack auth json: %s at line %i", err.text, err.line);
+                werr("Couldn't unpack auth json: %s at line %i", err.text, err.line);
             } else {
                 auth->challenge = bstrdup(challenge);
                 auth->salt = bstrdup(salt);
@@ -69,9 +69,9 @@ request_result_t auth_required_callback(json_t *response, void *data)
     return result;
 }
 
-bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth)
+bool wsc_auth_required(wsc_connection_t *conn, wsc_auth_data_t *auth)
 {
-    if (!conn || !conn->connection || !auth)
+    if (!auth)
         return false;
 
     return send_request_no_data(conn, "GetAuthRequired", auth_required_callback, auth);
@@ -80,7 +80,7 @@ bool obs_wsc_auth_required(obs_wsc_connection_t *conn, obs_wsc_auth_data_t *auth
 request_result_t version_info_callback(json_t *response, void *data)
 {
     char *obs = NULL, *ws = NULL, *reqs = NULL, *formats = NULL;
-    obs_wsc_version_info_t *inf = data;
+    wsc_version_info_t *inf = data;
     json_error_t err;
     bool basic = parse_basic_json(response);
     request_result_t result = REQUEST_ERROR;
@@ -98,14 +98,14 @@ request_result_t version_info_callback(json_t *response, void *data)
             util_strncpy(inf->supported_image_formats, STR_LEN, formats, STR_LEN);
         result = REQUEST_OK;
     } else if (basic) {
-        berr("Error unpacking response for GetVersion: %s at %i", err.text, err.line);
+        werr("Error unpacking response for GetVersion: %s at %i", err.text, err.line);
     }
     return result;
 }
 
-bool obs_wsc_get_version_info(obs_wsc_connection_t *conn, obs_wsc_version_info_t *inf)
+bool wsc_get_version_info(wsc_connection_t *conn, wsc_version_info_t *inf)
 {
-    if (!conn || !inf)
+    if (!inf)
         return false;
 
     return send_request(conn, "GetVersion", NULL, version_info_callback, inf);
@@ -114,7 +114,7 @@ bool obs_wsc_get_version_info(obs_wsc_connection_t *conn, obs_wsc_version_info_t
 request_result_t video_info_callback(json_t *response, void *data)
 {
     char *scale_type, *video_format, *color_space, *color_range;
-    obs_wsc_video_info_t *inf = data;
+    wsc_video_info_t *inf = data;
     json_error_t err;
     bool basic = parse_basic_json(response);
     request_result_t result = REQUEST_ERROR;
@@ -129,20 +129,20 @@ request_result_t video_info_callback(json_t *response, void *data)
         util_strncpy(inf->color_space, STR_LEN, color_space, STR_LEN);
         result = REQUEST_OK;
     } else if (basic) {
-        berr("Error unpacking response for GetVideoInfo: %s at %i", err.text, err.line);
+        werr("Error unpacking response for GetVideoInfo: %s at %i", err.text, err.line);
     }
     return result;
 }
 
-bool obs_wsc_get_video_info(obs_wsc_connection_t *conn, obs_wsc_video_info_t *inf)
+bool wsc_get_video_info(wsc_connection_t *conn, wsc_video_info_t *inf)
 {
-    if (!conn || !inf)
+    if (!inf)
         return false;
 
     return send_request(conn, "GetVideoInfo", NULL, video_info_callback, inf);
 }
 
-bool obs_wsc_set_heartbeat(obs_wsc_connection_t *conn, bool state)
+bool wsc_set_heartbeat(wsc_connection_t *conn, bool state)
 {
     if (!conn)
         return false;
@@ -152,11 +152,9 @@ bool obs_wsc_set_heartbeat(obs_wsc_connection_t *conn, bool state)
     return result;
 }
 
-bool obs_wsc_set_filename_format(obs_wsc_connection_t *conn, const char *format)
+bool wsc_set_filename_format(wsc_connection_t *conn, const char *format)
 {
-    if (!conn)
-        return false;
-    json_t *format_json = json_pack("{ss}", "enable", format);
+    json_t *format_json = json_pack("{ss}", "filename-formatting", format);
     bool result = send_request_no_cb(conn, "SetFilenameFormatting", format_json);
     json_decref(format_json);
     return result;
@@ -168,20 +166,21 @@ request_result_t filename_format_callback(json_t *response, void *data)
     json_error_t err;
     char **fn = data;
     char *tmp = NULL;
+    *fn = NULL;
     bool basic = parse_basic_json(response);
 
-    if (basic && json_unpack_ex(response, &err, 0, "{ss}", &tmp) == 0) {
+    if (basic && json_unpack_ex(response, &err, 0, "{ss}", "filename-formatting", &tmp) == 0) {
         *fn = bstrdup(tmp);
         result = REQUEST_OK;
     } else if (basic) {
-        berr("Error unpacking response for GetFilenameFormatting: %s at %i", err.text, err.line);
+        werr("Error unpacking response for GetFilenameFormatting: %s at %i", err.text, err.line);
     }
     return result;
 }
 
-bool obs_wsc_get_filename_format(obs_wsc_connection_t *conn, char **format)
+bool wsc_get_filename_format(wsc_connection_t *conn, char **format)
 {
-    if (!conn || !format || *format)
+    if (!format || *format)
         return false;
     return send_request_no_data(conn, "GetFilenameFormatting", filename_format_callback, format);
 }
@@ -189,7 +188,7 @@ bool obs_wsc_get_filename_format(obs_wsc_connection_t *conn, char **format)
 request_result_t stats_callback(json_t *response, void *data)
 {
     request_result_t result = REQUEST_ERROR;
-    obs_wsc_stats_t *stats = data;
+    wsc_stats_t *stats = data;
     bool basic = parse_basic_json(response);
     json_error_t err;
     json_t *stats_obj = NULL;
@@ -203,22 +202,22 @@ request_result_t stats_callback(json_t *response, void *data)
                            &stats->memory_usage, "free-disk-space", &stats->free_disk_space) == 0) {
             result = REQUEST_OK;
         } else {
-            berr("Error unpacking response for GetStats: %s at %i", err.text, err.line);
+            werr("Error unpacking response for GetStats: %s at %i", err.text, err.line);
         }
     } else if (basic) {
-        berr("Error unpacking response for GetStats: %s at %i", err.text, err.line);
+        werr("Error unpacking response for GetStats: %s at %i", err.text, err.line);
     }
     return result;
 }
 
-bool obs_wsc_get_stats(obs_wsc_connection_t *conn, obs_wsc_stats_t *stats)
+bool wsc_get_stats(wsc_connection_t *conn, wsc_stats_t *stats)
 {
-    if (!conn || !stats)
+    if (!stats)
         return false;
     return send_request_no_data(conn, "GetStats", stats_callback, stats);
 }
 
-bool obs_wsc_broadcast_message(obs_wsc_connection_t *conn, const char *realm, const char *data)
+bool wsc_broadcast_message(wsc_connection_t *conn, const char *realm, const char *data)
 {
     if (!conn || !realm)
         return false;
@@ -226,43 +225,45 @@ bool obs_wsc_broadcast_message(obs_wsc_connection_t *conn, const char *realm, co
     json_error_t err;
     json_t *d = NULL;
     json_t *ad = json_loads(data, 0, &err);
+    bool result = false;
 
     if (!ad) {
-        bwarn("obs_wsc_broadcast_message was provided with invalid json: %s at %i", err.text, err.line);
+        wwarn("wsc_broadcast_message was provided with invalid json: %s at %i", err.text, err.line);
+        goto end;
     }
 
     d = json_pack_ex(&err, 0, "{ss,so?}", "realm", realm, "data", ad);
 
     if (!d) {
-        bwarn("Packing json for BroadcastCustomMessage failed: %s at %i", err.text, err.line);
+        wwarn("Packing json for BroadcastCustomMessage failed: %s at %i", err.text, err.line);
+        goto end;
     }
 
-    bool result = send_request_no_cb(conn, "BroadcastCustomMessage", d);
+    result = send_request_no_cb(conn, "BroadcastCustomMessage", d);
+end:
     json_decref(ad);
     json_decref(d);
     return result;
 }
 
-void obs_wsc_prepare_geomery(obs_wsc_geometry_t *geo)
+void wsc_prepare_geomery(wsc_geometry_t *geo)
 {
     if (geo) {
-        memset(geo, 0, sizeof(obs_wsc_geometry_t));
+        memset(geo, 0, sizeof(wsc_geometry_t));
         geo->magic_number = 0x1D9D0CB;
         geo->version_major = 3;
         geo->version_minor = 0;
     }
 }
 
-bool obs_wsc_open_projector(obs_wsc_connection_t *conn)
+bool wsc_open_projector(wsc_connection_t *conn)
 {
-    return obs_wsc_open_projector2(conn, WSC_PROJECTOR_PREVIEW, -1, NULL, NULL);
+    return wsc_open_projector2(conn, WSC_PROJECTOR_PREVIEW, -1, NULL, NULL);
 }
 
-bool obs_wsc_open_projector2(obs_wsc_connection_t *conn, enum obs_wsc_projector_type t, int32_t monitor,
-                             const obs_wsc_geometry_t *geo, const char *name)
+bool wsc_open_projector2(wsc_connection_t *conn, enum wsc_projector_type t, int32_t monitor, const wsc_geometry_t *geo,
+                         const char *name)
 {
-    if (!conn)
-        return false;
     if (monitor < 0 && !geo)
         return false;
     if ((t == WSC_PROJECTOR_SCENE || t == WSC_PROJECTOR_SOURCE) && !name)
@@ -289,7 +290,7 @@ bool obs_wsc_open_projector2(obs_wsc_connection_t *conn, enum obs_wsc_projector_
         result = send_request_no_cb(conn, "OpenProjector", data);
         json_decref(data);
     } else {
-        berr("Failed to pack json for OpenProjector: %s at %i", err.text, err.line);
+        werr("Failed to pack json for OpenProjector: %s at %i", err.text, err.line);
     }
 
     bfree(b64_geo);

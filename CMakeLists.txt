@@ -9,7 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 add_subdirectory(deps)
 
-set(obs_wsc_SRC
+set(wsc_SRC
     src/obs_wsc.c
     src/obs_wsc.h
     src/opaque.h
@@ -20,6 +20,8 @@ set(obs_wsc_SRC
     src/send.h
     src/messages/requests/general.c
     src/messages/requests/general.h
+    src/messages/requests/outputs.c
+    src/messages/requests/outputs.h
     src/external/buffer.c
     src/external/buffer.h
     src/external/mongoose.h
@@ -31,6 +33,8 @@ set(obs_wsc_SRC
     src/external/darray.h
     src/external/utf8.c
     src/external/utf8.h
+    src/data.c
+    src/data.h
     src/external/lexer.c
     src/external/lexer.h
     src/external/base64.h
@@ -45,39 +49,40 @@ set(obs_wsc_SRC
     src/external/platform.c
     src/external/threading.h)
 
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
+
 if (MSVC)
-    set(obs_wsc_PLATFORM_SRC
+    set(wsc_PLATFORM_SRC
         src/external/platform-windows.c
         src/external/threading-windows.h)
 
 elseif (UNIX)
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
-    set(obs_wsc_PLATFORM_SRC
+    set(wsc_PLATFORM_SRC
         src/external/platform-nix.c
         src/external/threading-posix.h)
     add_definitions(-DUNIX=1)
-    set(obs_wsc_PLATFORM_DEPS
+    set(wsc_PLATFORM_DEPS
         pthread)
 endif()
 
-add_library("obs_wsc" SHARED
-    ${obs_wsc_SRC}
-    ${obs_wsc_PLATFORM_SRC})
+add_library("wsc" SHARED
+    ${wsc_SRC}
+    ${wsc_PLATFORM_SRC})
 
-target_include_directories("obs_wsc" PUBLIC
+target_include_directories("wsc" PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/
     ${JANSSON_INCLUDE_DIRS})
 
-target_link_libraries("obs_wsc" ${JANSSON_IMPORT} ${obs_wsc_PLATFORM_DEPS})
+target_link_libraries("wsc" ${JANSSON_IMPORT} ${wsc_PLATFORM_DEPS})
 
 # Tests
 add_executable("wsc_unit_tests"
     tests/wsc_unit_tests.c)
-add_dependencies("wsc_unit_tests" "obs_wsc")
-target_link_libraries("wsc_unit_tests" "obs_wsc")
+add_dependencies("wsc_unit_tests" "wsc")
+target_link_libraries("wsc_unit_tests" "wsc")
 target_include_directories("wsc_unit_tests" PUBLIC ${CHEAT_INCLUDE_DIRS})
 
 add_executable("wsc_test"
     tests/wsc_test.c)
-add_dependencies("wsc_test" "obs_wsc")
-target_link_libraries("wsc_test" "obs_wsc")
+add_dependencies("wsc_test" "wsc")
+target_link_libraries("wsc_test" "wsc")

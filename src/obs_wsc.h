@@ -21,99 +21,99 @@
 extern "C" {
 #endif
 
-typedef struct obs_wsc_connection_s obs_wsc_connection_t;
+typedef struct wsc_connection_s wsc_connection_t;
 
 #include "misc_types.h"
 #include "messages/requests/general.h"
-#include "external/base.h"
+#include "messages/requests/outputs.h"
 
 /**
  * @brief Opens a new connection to an obs websocket instance
  * @param addr The address (eg. ws://127.0.0.1:4444)
  * @return the new connection or NULL on error
  */
-EXPORT obs_wsc_connection_t *obs_wsc_connect(const char *addr);
+EXPORT wsc_connection_t *wsc_connect(const char *addr);
 
 /**
  * @brief Close an active connection
  */
-EXPORT void obs_wsc_disconnect(obs_wsc_connection_t *conn);
+EXPORT void wsc_disconnect(wsc_connection_t *conn);
 
 /**
- * @brief Free any memory that was allocated by obs_wsc
+ * @brief Free any memory that was allocated by wsc
  */
-EXPORT void obs_wsc_free(void *ptr);
+EXPORT void wsc_free(void *ptr);
 
 /**
  * @brief Set the wait timeout when waiting for responses, use -1 for no timeout
  * @param conn The connection
  * @param ms The timeout in miliseconds
  */
-EXPORT void obs_wsc_set_timeout(obs_wsc_connection_t *conn, int32_t ms);
+EXPORT void wsc_set_timeout(wsc_connection_t *conn, int32_t ms);
 
 /**
  * @brief Set the amount of time per tick on polling
  * @param conn The connection
  * @param ms The time spent on polling in miliseconds, minimum is 10ms
  */
-EXPORT void obs_wsc_set_poll_time(obs_wsc_connection_t *conn, int32_t ms);
+EXPORT void wsc_set_poll_time(wsc_connection_t *conn, int32_t ms);
 
 /**
  * @brief Frees the challange and salt strings
  * @param data the data to free
  */
-EXPORT void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data);
+EXPORT void wsc_free_auth_data(wsc_auth_data_t *data);
 
 /**
  * @brief Creates the auth response, by hashing the password and encoding it
  *        as required by the protocol. This will free the salt and challange
- *        returned in obs_wsc_auth_required afterwards
+ *        returned in wsc_auth_required afterwards
  * @param auth The auth data struct containing a challange and a salt from
  *        obs_wcs_auth_required
  * @see obs_wcs_auth_required
  * @param password The password to login
  * @return true on success
  */
-EXPORT bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password);
+EXPORT bool wsc_prepare_auth(wsc_auth_data_t *auth, const char *password);
 
 /**
- * @brief Initialize obs_wsc
+ * @brief Initialize wsc
  * @return true on success
  */
-EXPORT void obs_wsc_init();
+EXPORT void wsc_init();
 
 /**
  * @brief Check for memory leaks
  * @return The amount of memory leaks
  */
-EXPORT long obs_wsc_shutdown();
+EXPORT long wsc_shutdown();
 
 /**
  * @brief Make obs-wsc use different allocators
  * @param defs Structure with pointers to memory allocation functions
  */
-EXPORT void obs_wsc_set_allocator(struct base_allocator *defs);
+EXPORT void wsc_set_allocator(struct wsc_allocator *defs);
 
 /**
  * @brief Get logging function
  * @param handler Pointer to save the log function to
  * @param param Pointer to save the custom parameter to
  */
-EXPORT void obs_wsc_get_logger(log_handler_t *handler, void **param);
+EXPORT void wsc_get_logger(wsc_log_handler_t *handler, void **param);
 
 /**
  * @brief Set the logging function
  * @param handler The log function
  * @param param Custom paramter
  */
-EXPORT void obs_wsc_set_logger(log_handler_t handler, void *param);
+EXPORT void wsc_set_logger(wsc_log_handler_t handler, void *param);
 
 /**
- * @brief Set the function to call if obs_wsc crashes
+ * @brief Set the function to call if wsc crashes
  * @param handler The handler function
  * @param param Custom parameter
  */
-EXPORT void obs_wsc_set_crash_handler(void (*handler)(const char *, va_list, void *), void *param);
+EXPORT void wsc_set_crash_handler(void (*handler)(const char *, va_list, void *), void *param);
 #ifdef __cplusplus
 }
 #endif

@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-void obs_wsc_init()
+void wsc_init()
 {
     /* rand() is only used for generating message ids */
     time_t t;
@@ -37,45 +37,45 @@ void obs_wsc_init()
     json_set_alloc_funcs(bzalloc, bfree);
 }
 
-long obs_wsc_shutdown()
+long wsc_shutdown()
 {
     if (bnum_allocs() > 0)
-        bwarn("Number of memory leaks: %li", bnum_allocs());
+        wwarn("Number of memory leaks: %li", bnum_allocs());
     return bnum_allocs();
 }
 
-void obs_wsc_set_allocator(struct base_allocator *defs)
+void wsc_set_allocator(struct wsc_allocator *defs)
 {
     base_set_allocator(defs);
 }
 
-void obs_wsc_get_logger(log_handler_t *handler, void **param)
+void wsc_get_logger(wsc_log_handler_t *handler, void **param)
 {
     base_get_log_handler(handler, param);
 }
 
-void obs_wsc_set_logger(log_handler_t handler, void *param)
+void wsc_set_logger(wsc_log_handler_t handler, void *param)
 {
     base_set_log_handler(handler, param);
 }
 
-void obs_wsc_set_crash_handler(void (*handler)(const char *, va_list, void *), void *param)
+void wsc_set_crash_handler(void (*handler)(const char *, va_list, void *), void *param)
 {
     base_set_crash_handler(handler, param);
 }
 
-void obs_wsc_free(void *ptr)
+void wsc_free(void *ptr)
 {
     bfree(ptr);
 }
 
-void notify_request(obs_wsc_connection_t *con, json_t *j)
+void notify_request(wsc_connection_t *con, json_t *j)
 {
     request_t *f = con->first_active_request;
     char *msg_id = NULL;
 
     if (json_unpack(j, "{ss}", "message-id", &msg_id)) {
-        berr("Couldn't get message id form response json");
+        werr("Couldn't get message id form response json");
         return;
     }
 
@@ -91,7 +91,7 @@ void notify_request(obs_wsc_connection_t *con, json_t *j)
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
 {
     static json_t *data = NULL;
-    obs_wsc_connection_t *conn = nc->user_data;
+    wsc_connection_t *conn = nc->user_data;
     int status;
     struct http_message *msg;
     struct websocket_message *wm;
@@ -102,26 +102,26 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
     case MG_EV_CONNECT:
         status = *((int *)ev_data);
         if (status != 0) {
-            berr("Connection for %s failed with code %i", conn->domain, status);
+            werr("Connection for %s failed with code %i", conn->domain, status);
         }
         break;
     case MG_EV_WEBSOCKET_HANDSHAKE_DONE:
         msg = (struct http_message *)ev_data;
         if (msg->resp_code == 101) {
-            binfo("Connected to %s", conn->domain);
+            winfo("Connected to %s", conn->domain);
             conn->connected = true;
         }
         break;
     case MG_EV_CLOSE:
         if (conn->connected)
-            binfo("Disconnected from %s", conn->domain);
+            winfo("Disconnected from %s", conn->domain);
 
         conn->connected = false;
         conn->thread_flag = false;
         break;
     case MG_EV_WEBSOCKET_FRAME:
         wm = ev_data;
-        bdebug("Received message: %.*s", (int)wm->size, wm->data);
+        wdebug("Received message: %.*s", (int)wm->size, wm->data);
         data = recv_json(wm->data, wm->size);
         notify_request(conn, data);
         json_decref(data);
@@ -133,7 +133,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
 
 static void *wsc_thread(void *arg)
 {
-    obs_wsc_connection_t *conn = arg;
+    wsc_connection_t *conn = arg;
 
     while (conn->thread_flag) {
         mg_mgr_poll(&conn->manager, conn->poll_time);
@@ -143,14 +143,14 @@ static void *wsc_thread(void *arg)
     return NULL;
 }
 
-obs_wsc_connection_t *obs_wsc_connect(const char *addr)
+wsc_connection_t *wsc_connect(const char *addr)
 {
     static const char *local_host = "ws://127.0.0.1:4444";
 
     if (!addr)
         addr = local_host;
 
-    obs_wsc_connection_t *n = bzalloc(sizeof(obs_wsc_connection_t));
+    wsc_connection_t *n = bzalloc(sizeof(wsc_connection_t));
     n->timeout = 2000;
     n->poll_time = 100;
 
@@ -158,13 +158,13 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr)
     n->connection = mg_connect_ws(&n->manager, ev_handler, addr, "websocket", NULL);
 
     if (!n->connection) {
-        berr("mg_connect_ws faild for %s", addr);
+        werr("mg_connect_ws faild for %s", addr);
         goto fail;
     }
 
     pthread_mutex_init_value(&n->poll_mutex);
     if (pthread_mutex_init(&n->poll_mutex, NULL)) {
-        berr("Couldn't initialize poll mutex");
+        werr("Couldn't initialize poll mutex");
         goto fail;
     }
 
@@ -173,7 +173,7 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr)
     n->domain = bstrdup(addr);
 
     if (pthread_create(&n->poll_thread, NULL, wsc_thread, n)) {
-        berr("Couldn't initialize poll thread");
+        werr("Couldn't initialize poll thread");
         goto fail;
     }
 
@@ -181,7 +181,7 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr)
     uint32_t wait = 0;
     while (!n->connected && wait < 1000) {
         if (!n->thread_flag) {
-            berr("Thread exited before handshake completed");
+            werr("Thread exited before handshake completed");
             break;
         }
         wait += 10;
@@ -189,7 +189,7 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr)
     }
 
     if (wait >= 1000 || !n->thread_flag) {
-        berr("Timed out while waiting for handshake response");
+        werr("Timed out while waiting for handshake response");
         goto fail;
     }
 
@@ -198,11 +198,11 @@ obs_wsc_connection_t *obs_wsc_connect(const char *addr)
     return n;
 
 fail:
-    obs_wsc_disconnect(n);
+    wsc_disconnect(n);
     return NULL;
 }
 
-void obs_wcs_set_timeout(obs_wsc_connection_t *conn, int32_t ms)
+void obs_wcs_set_timeout(wsc_connection_t *conn, int32_t ms)
 {
     if (conn) {
         pthread_mutex_lock(&conn->poll_mutex);
@@ -211,7 +211,7 @@ void obs_wcs_set_timeout(obs_wsc_connection_t *conn, int32_t ms)
     }
 }
 
-void obs_wsc_set_poll_time(obs_wsc_connection_t *conn, int32_t ms)
+void wsc_set_poll_time(wsc_connection_t *conn, int32_t ms)
 {
     if (conn) {
         pthread_mutex_lock(&conn->poll_mutex);
@@ -220,7 +220,7 @@ void obs_wsc_set_poll_time(obs_wsc_connection_t *conn, int32_t ms)
     }
 }
 
-void obs_wsc_disconnect(obs_wsc_connection_t *conn)
+void wsc_disconnect(wsc_connection_t *conn)
 {
     if (!conn)
         return;
@@ -228,7 +228,7 @@ void obs_wsc_disconnect(obs_wsc_connection_t *conn)
     conn->thread_flag = false;
 
     if (pthread_join(conn->poll_thread, NULL))
-        berr("Failed to join poll thread for %s", conn->domain);
+        werr("Failed to join poll thread for %s", conn->domain);
 
     mg_mgr_free(&conn->manager);
     pthread_mutex_destroy(&conn->poll_mutex);
@@ -250,7 +250,7 @@ void obs_wsc_disconnect(obs_wsc_connection_t *conn)
     bfree(conn);
 }
 
-void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data)
+void wsc_free_auth_data(wsc_auth_data_t *data)
 {
     if (data) {
         bfree(data->salt);
@@ -262,7 +262,7 @@ void obs_wsc_free_auth_data(obs_wsc_auth_data_t *data)
     }
 }
 
-bool obs_wsc_prepare_auth(obs_wsc_auth_data_t *auth, const char *password)
+bool wsc_prepare_auth(wsc_auth_data_t *auth, const char *password)
 {
     if (!auth || !auth->required || !password || !auth->salt || !auth->challenge)
         return false;

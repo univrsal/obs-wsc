@@ -20,24 +20,24 @@
 #include <obs_wsc.h>
 
 //CHEAT_TEST(init,
-//    obs_wsc_init();
+//    wsc_init();
 //)
 
 //CHEAT_TEST(connect,
-//    obs_wsc_connection_t *conn = NULL;
-//    cheat_assert((conn = obs_wsc_connect(NULL)) != NULL);
-//    obs_wsc_disconnect(conn);
+//    wsc_connection_t *conn = NULL;
+//    cheat_assert((conn = wsc_connect(NULL)) != NULL);
+//    wsc_disconnect(conn);
 //)
 
 //CHEAT_TEST(auth_required,
-//    obs_wsc_connection_t *conn = obs_wsc_connect(NULL);
-//    obs_wsc_auth_data_t auth;
-//    cheat_assert(obs_wsc_auth_required(conn, &auth));
-//    obs_wsc_disconnect(conn);
+//    wsc_connection_t *conn = wsc_connect(NULL);
+//    wsc_auth_data_t auth;
+//    cheat_assert(wsc_auth_required(conn, &auth));
+//    wsc_disconnect(conn);
 //)
 
 //CHEAT_TEST(shutdown,
-//    obs_wsc_shutdown();
+//    wsc_shutdown();
 //)
 
 int main()

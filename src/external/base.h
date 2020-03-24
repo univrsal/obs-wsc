@@ -33,10 +33,15 @@ extern "C" {
 #define INT_CUR_LINE __LINE__
 #define FILE_LINE __FILE__ " (" S__LINE__ "): "
 
-#define bdebug(format, ...) blog(LOG_DEBUG, format, ##__VA_ARGS__)
-#define binfo(format, ...) blog(LOG_INFO, format, ##__VA_ARGS__)
-#define bwarn(format, ...) blog(LOG_WARNING, format, ##__VA_ARGS__)
-#define berr(format, ...) blog(LOG_ERROR, format, ##__VA_ARGS__)
+#ifdef _DEBUG
+#define wdebug(format, ...) wlog(WLOG_DEBUG, format, ##__VA_ARGS__)
+#else
+#define wdebug(format, ...) UNUSED_PARAMETER(format)
+#endif
+
+#define winfo(format, ...) wlog(WLOG_INFO, format, ##__VA_ARGS__)
+#define wwarn(format, ...) wlog(WLOG_WARNING, format, ##__VA_ARGS__)
+#define werr(format, ...) wlog(WLOG_ERROR, format, ##__VA_ARGS__)
 
 enum {
     /**
@@ -46,7 +51,7 @@ enum {
      * Use in creation functions and core subsystem functions.  Places that
      * should definitely not fail.
      */
-    LOG_ERROR = 100,
+    WLOG_ERROR = 100,
 
     /**
      * Use if a problem occurs that doesn't affect the program and is
@@ -55,25 +60,25 @@ enum {
      * Use in places where failure isn't entirely unexpected, and can
      * be handled safely.
      */
-    LOG_WARNING = 200,
+    WLOG_WARNING = 200,
 
     /**
      * Informative message to be displayed in the log.
      */
-    LOG_INFO = 300,
+    WLOG_INFO = 300,
 
     /**
      * Debug message to be used mostly by developers.
      */
-    LOG_DEBUG = 400
+    WLOG_DEBUG = 400
 };
 
-void base_get_log_handler(log_handler_t *handler, void **param);
-void base_set_log_handler(log_handler_t handler, void *param);
+void base_get_log_handler(wsc_log_handler_t *handler, void **param);
+void base_set_log_handler(wsc_log_handler_t handler, void *param);
 
 void base_set_crash_handler(void (*handler)(const char *, va_list, void *), void *param);
 
-void blogva(int log_level, const char *format, va_list args);
+void wlogva(int log_level, const char *format, va_list args);
 
 #if !defined(_MSC_VER) && !defined(SWIG)
 #define PRINTFATTR(f, a) __attribute__((__format__(__printf__, f, a)))
@@ -82,9 +87,9 @@ void blogva(int log_level, const char *format, va_list args);
 #endif
 
 PRINTFATTR(2, 3)
-void blog(int log_level, const char *format, ...);
+void wlog(int log_level, const char *format, ...);
 PRINTFATTR(1, 2)
-void bcrash(const char *format, ...);
+void wcrash(const char *format, ...);
 
 #undef PRINTFATTR
 

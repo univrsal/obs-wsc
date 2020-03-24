@@ -28,11 +28,11 @@ request_result_t default_callback(json_t *j, void *d)
     UNUSED_PARAMETER(d);
     char *id = NULL;
     json_unpack(j, "{ss}", "message-id", &id);
-    bdebug("Request with id %s fulfilled", id);
+    wdebug("Request with id %s fulfilled", id);
     return REQUEST_OK;
 }
 
-request_t *add_request(obs_wsc_connection_t *conn, char *msg_id, request_callback_t cb, void *cb_data)
+request_t *add_request(wsc_connection_t *conn, char *msg_id, request_callback_t cb, void *cb_data)
 {
     darray_resize(sizeof(char *), &conn->ids.da, conn->ids.num + 1);
     conn->ids.array[conn->ids.num - 1] = msg_id;
@@ -57,7 +57,7 @@ request_t *add_request(obs_wsc_connection_t *conn, char *msg_id, request_callbac
     return rq;
 }
 
-void remove_request(obs_wsc_connection_t *conn, char *msg_id)
+void remove_request(wsc_connection_t *conn, char *msg_id)
 {
     pthread_mutex_lock(&conn->poll_mutex);
     request_t *r = conn->first_active_request;
@@ -79,17 +79,19 @@ void remove_request(obs_wsc_connection_t *conn, char *msg_id)
     pthread_mutex_unlock(&conn->poll_mutex);
 }
 
-bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *additional_data, request_callback_t cb,
+bool send_request(wsc_connection_t *conn, const char *request, json_t *additional_data, request_callback_t cb,
                   void *cb_data)
 {
-    if (!conn || !conn->connection || !conn->connected || !request)
+    if (!conn || !conn->connection || !conn->connected || !request) {
+        werr("Invalid arguments provided to send_request");
         return false;
+    }
 
     json_t *req = NULL;
     json_error_t err;
     bool result = false;
 
-    bdebug("Sending %s request", request);
+    wdebug("Sending %s request", request);
 
     pthread_mutex_lock(&conn->poll_mutex);
     char *msg_id = bstrdup(util_random_id(&conn->ids.da));
@@ -112,13 +114,13 @@ bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *addit
             request_t *rq = add_request(conn, msg_id, cb, cb_data);
             result = wait_timeout(conn, rq);
         } else {
-            berr("Sending request json failed");
+            werr("Sending request json failed");
         }
 
         remove_request(conn, msg_id);
         json_decref(additional_data);
     } else {
-        berr("Packing request json for %s failed with %s at line %i", request, err.text, err.line);
+        werr("Packing request json for %s failed with %s at line %i", request, err.text, err.line);
         bfree(msg_id);
     }
 
@@ -126,7 +128,7 @@ bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *addit
     return result;
 }
 
-bool send_json(obs_wsc_connection_t *conn, const json_t *json)
+bool send_json(wsc_connection_t *conn, const json_t *json)
 {
     if (!conn || !json)
         return false;
@@ -137,7 +139,7 @@ bool send_json(obs_wsc_connection_t *conn, const json_t *json)
     return result;
 }
 
-bool send_str(obs_wsc_connection_t *conn, const char *str)
+bool send_str(wsc_connection_t *conn, const char *str)
 {
     size_t len = strlen(str) + 1; /* Include \0 */
 
@@ -158,11 +160,11 @@ json_t *recv_json(unsigned char *data, size_t len)
 
     if (loaded)
         return loaded;
-    berr("Failed to parse response json: %s at line %i", err.text, err.line);
+    werr("Failed to parse response json: %s at line %i", err.text, err.line);
     return NULL;
 }
 
-bool wait_timeout(obs_wsc_connection_t *conn, request_t *rq)
+bool wait_timeout(wsc_connection_t *conn, request_t *rq)
 {
     bool keep_waiting = true;
     int32_t timeout = 0;
@@ -175,7 +177,7 @@ bool wait_timeout(obs_wsc_connection_t *conn, request_t *rq)
 
         pthread_mutex_lock(&conn->poll_mutex);
         if (rq->status != REQUEST_PENDING) {
-            bdebug("Received response for %s within timeout, callback status: "
+            wdebug("Received response for %s within timeout, callback status: "
                    "%s",
                    rq->id, rq->status == REQUEST_OK ? "OK" : "FAILED");
             keep_waiting = false;
@@ -187,7 +189,7 @@ bool wait_timeout(obs_wsc_connection_t *conn, request_t *rq)
     }
 
     if (keep_waiting)
-        berr("Request %s timed out", id);
+        werr("Request %s timed out", id);
 
     bfree(id);
     return timeout <= max_timeout;
@@ -205,17 +207,17 @@ bool parse_basic_json(json_t *j)
     bool status_ok = false;
 
     if (json_unpack_ex(j, &err, 0, "{ss}", "status", &status)) {
-        berr("Error while parsing basic json: '%s' at line %i", err.text, err.line);
+        werr("Error while parsing basic json: '%s' at line %i", err.text, err.line);
     } else {
         status_ok = strcmp(status, "ok") == 0;
     }
 
     if (!status_ok) {
-        berr("Status %s is not ok", status);
+        werr("Status %s is not ok", status);
         if (strcmp(status, "error") == 0) {
             char *err = NULL;
             json_unpack(j, "{ss}", "error", &err);
-            berr("Error message: %s", err);
+            werr("Error message: %s", err);
         }
     }
 

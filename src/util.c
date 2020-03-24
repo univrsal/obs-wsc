@@ -55,9 +55,9 @@ char *util_random_id(const struct darray *ids)
     return id;
 }
 
-char *util_qt_geometry_string(const obs_wsc_geometry_t *geo)
+char *util_qt_geometry_string(const wsc_geometry_t *geo)
 {
-    struct libs_buffer *buf = libs_buffer(sizeof(obs_wsc_geometry_t));
+    struct libs_buffer *buf = libs_buffer(sizeof(wsc_geometry_t));
     /* I hope the QDataStream works like this */
     libs_buffer_write_u32(buf, geo->magic_number);
     libs_buffer_write_u16(buf, geo->version_major);
@@ -91,7 +91,7 @@ char *util_qt_geometry_string(const obs_wsc_geometry_t *geo)
     return ret;
 }
 
-const char *util_projector_type(enum obs_wsc_projector_type t)
+const char *util_projector_type(enum wsc_projector_type t)
 {
     switch (t) {
     case WSC_PROJECTOR_SCENE:

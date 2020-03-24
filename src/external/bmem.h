@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-void base_set_allocator(struct base_allocator *defs);
+void base_set_allocator(struct wsc_allocator *defs);
 
 void *bmalloc(size_t size);
 void *brealloc(void *ptr, size_t size);

@@ -22,31 +22,30 @@
 #include "opaque.h"
 #include "external/bmem.h"
 
-bool send_request(obs_wsc_connection_t *conn, const char *request, json_t *additional_data, request_callback_t cb,
+bool send_request(wsc_connection_t *conn, const char *request, json_t *additional_data, request_callback_t cb,
                   void *cb_data);
 
-bool send_json(obs_wsc_connection_t *conn, const json_t *json);
+bool send_json(wsc_connection_t *conn, const json_t *json);
 
-bool send_str(obs_wsc_connection_t *conn, const char *str);
+bool send_str(wsc_connection_t *conn, const char *str);
 
 json_t *recv_json(unsigned char *data, size_t len);
 
 bool parse_basic_json(json_t *j);
 
-bool wait_timeout(obs_wsc_connection_t *conn, request_t *rq);
+bool wait_timeout(wsc_connection_t *conn, request_t *rq);
 
-static inline bool send_request_no_data(obs_wsc_connection_t *conn, const char *req, request_callback_t cb,
-                                        void *cb_data)
+static inline bool send_request_no_data(wsc_connection_t *conn, const char *req, request_callback_t cb, void *cb_data)
 {
     return send_request(conn, req, NULL, cb, cb_data);
 }
 
-static inline bool send_request_no_cb(obs_wsc_connection_t *conn, const char *req, json_t *additional_data)
+static inline bool send_request_no_cb(wsc_connection_t *conn, const char *req, json_t *additional_data)
 {
     return send_request(conn, req, additional_data, NULL, NULL);
 }
 
-static inline bool send_request_simple(obs_wsc_connection_t *conn, const char *req)
+static inline bool send_request_simple(wsc_connection_t *conn, const char *req)
 {
     return send_request(conn, req, NULL, NULL, NULL);
 }

@@ -43,7 +43,7 @@ typedef struct request_s {
     struct request_s *prev;
 } request_t;
 
-typedef struct obs_wsc_connection_s {
+typedef struct wsc_connection_s {
     int32_t timeout;
     int32_t poll_time;
     char *domain;
@@ -61,4 +61,4 @@ typedef struct obs_wsc_connection_s {
 
     pthread_t poll_thread;
     pthread_mutex_t poll_mutex;
-} obs_wsc_connection_t;
+} wsc_connection_t;

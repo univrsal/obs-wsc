@@ -17,22 +17,17 @@
  *************************************************************************/
 
 #pragma once
+#include "../../misc_types.h"
 
-#define MSG_ID_LENGTH 17
-#include "opaque.h"
-#include "external/darray.h"
+typedef struct wsc_connection_s wsc_connection_t;
+/**
+ * @brief Free a list of outputs populated by wsc_list_outputs
+ */
+EXPORT void wsc_free_outputs(wsc_ouputs_t *o);
 
-char *util_random_id(const struct darray *ids);
-
-static inline void util_strncpy(char *dest, size_t len, const char *src, size_t max)
-{
-#ifdef WIN32
-    strncpy_s(dest, len, src, max);
-#else
-    strncpy(dest, src, max);
-#endif
-}
-
-char *util_qt_geometry_string(const wsc_geometry_t *geo);
-
-const char *util_projector_type(enum wsc_projector_type t);
+/**
+ * @brief List existing outputs
+ * @param o Pointer to outputs structure, free with wsc_free_outputs
+ * @return true on success
+ */
+EXPORT bool wsc_list_outputs(wsc_connection_t *conn, wsc_ouputs_t *o);

@@ -18,33 +18,50 @@
 
 #include <obs_wsc.h>
 #include <assert.h>
+#include <string.h>
 
 int main()
 {
-    obs_wsc_init();
-    obs_wsc_connection_t *c = obs_wsc_connect(NULL);
-    obs_wsc_auth_data_t auth = obs_wsc_auth_init();
-    obs_wsc_video_info_t vinf = obs_wsc_video_info_init();
-    obs_wsc_version_info_t ver = obs_wsc_version_info_init();
-    obs_wsc_stats_t stats = obs_wsc_stats_init();
+    wsc_init();
+    wsc_connection_t *c = wsc_connect(NULL);
+    wsc_init_struct(wsc_auth_data_t, auth);
+    wsc_init_struct(wsc_video_info_t, vinf);
+    wsc_init_struct(wsc_version_info_t, ver);
+    wsc_init_struct(wsc_stats_t, stats);
+    wsc_init_struct(wsc_ouputs_t, outputs);
+
+    char *format = NULL;
 
     assert(c);
-    assert(obs_wsc_auth_required(c, &auth));
+    assert(wsc_auth_required(c, &auth));
 
     if (auth.required) {
         assert(auth.salt);
         assert(auth.challenge);
-        assert(obs_wsc_prepare_auth(&auth, "1234qwer"));
-        assert(obs_wsc_authenticate(c, &auth));
+        assert(wsc_prepare_auth(&auth, "1234qwer"));
+        assert(wsc_authenticate(c, &auth));
     }
 
     /* Test messages */
-    assert(obs_wsc_get_video_info(c, &vinf));
-    assert(obs_wsc_get_version_info(c, &ver));
-    assert(obs_wsc_get_stats(c, &stats));
+
+    /* General */
+    assert(wsc_get_video_info(c, &vinf));
+    assert(wsc_get_version_info(c, &ver));
+    assert(wsc_get_stats(c, &stats));
+    assert(wsc_set_filename_format(c, "%CCYY.%MM.%DD %hh.%mm.%ss"));
+    assert(wsc_get_filename_format(c, &format));
+    assert(strcmp(format, "%CCYY.%MM.%DD %hh.%mm.%ss") == 0);
+//    assert(wsc_set_heartbeat(c, true)); // TODO: Heartbeat event
+
+    /* Outputs */
+    assert(wsc_list_outputs(c, &outputs));
+    assert(outputs.arr);
+    assert(outputs.count);
 
     /* Clean up */
-    obs_wsc_disconnect(c);
-    assert(obs_wsc_shutdown() == 0);
+    wsc_free(format);
+    wsc_free_outputs(&outputs);
+    wsc_disconnect(c);
+    assert(wsc_shutdown() == 0);
     return 0;
 }
