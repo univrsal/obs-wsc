@@ -34,6 +34,7 @@ request_result_t default_callback(json_t *j, void *d)
 
 request_t *add_request(wsc_connection_t *conn, char *msg_id, request_callback_t cb, void *cb_data)
 {
+    pthread_mutex_lock(&conn->poll_mutex);
     darray_resize(sizeof(char *), &conn->ids.da, conn->ids.num + 1);
     conn->ids.array[conn->ids.num - 1] = msg_id;
 
@@ -54,6 +55,8 @@ request_t *add_request(wsc_connection_t *conn, char *msg_id, request_callback_t 
         conn->first_active_request->prev = rq;
     conn->first_active_request = rq;
     conn->request_count++;
+    pthread_mutex_unlock(&conn->poll_mutex);
+
     return rq;
 }
 

@@ -31,3 +31,25 @@ EXPORT void wsc_free_outputs(wsc_ouputs_t *o);
  * @return true on success
  */
 EXPORT bool wsc_list_outputs(wsc_connection_t *conn, wsc_ouputs_t *o);
+
+/**
+ * @brief Get information about a single output
+ * @param name the name of the output to query
+ * @param o Pointer to an output structure, free with wsc_free_output
+ * @return true on success
+ */
+EXPORT bool wsc_get_output_info(wsc_connection_t *conn, const char *name, wsc_output_t *o);
+
+/**
+ * @brief Start an output
+ * @return true on success
+ */
+EXPORT bool wsc_start_output(wsc_connection_t *conn, const char *name);
+
+/**
+ * @brief Stop an output
+ * @param name The name of the output
+ * @param force Force stop
+ * @return true on success
+ */
+EXPORT bool wsc_stop_output(wsc_connection_t *conn, const char *name, bool force);

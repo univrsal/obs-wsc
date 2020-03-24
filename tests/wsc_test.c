@@ -29,6 +29,7 @@ int main()
     wsc_init_struct(wsc_version_info_t, ver);
     wsc_init_struct(wsc_stats_t, stats);
     wsc_init_struct(wsc_ouputs_t, outputs);
+    wsc_init_struct(wsc_output_t, output);
 
     char *format = NULL;
 
@@ -42,7 +43,7 @@ int main()
         assert(wsc_authenticate(c, &auth));
     }
 
-    /* Test messages */
+    /* Test requests */
 
     /* General */
     assert(wsc_get_video_info(c, &vinf));
@@ -57,6 +58,11 @@ int main()
     assert(wsc_list_outputs(c, &outputs));
     assert(outputs.arr);
     assert(outputs.count);
+    assert(wsc_get_output_info(c, "preview", &output));
+    assert(wsc_start_output(c, "preview"));
+    assert(wsc_stop_output(c, "preview", false));
+
+    /* Profiles */
 
     /* Clean up */
     wsc_free(format);
