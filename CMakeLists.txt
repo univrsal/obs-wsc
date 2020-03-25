@@ -22,6 +22,8 @@ set(wsc_SRC
     src/messages/requests/general.h
     src/messages/requests/outputs.c
     src/messages/requests/outputs.h
+    src/messages/requests/profiles.c
+    src/messages/requests/profiles.h
     src/external/buffer.c
     src/external/buffer.h
     src/external/mongoose.h

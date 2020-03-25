@@ -22,40 +22,27 @@
 typedef struct wsc_connection_s wsc_connection_t;
 
 /**
- * @brief Free a list of outputs populated by wsc_list_outputs
+ * @brief Free a list of profiles populated by wsc_list_profiles
  */
-EXPORT void wsc_free_outputs(wsc_ouputs_t *o);
+EXPORT void wsc_free_profiles(wsc_profiles_t *p);
 
 /**
- * @brief Free a single output populated by wsc_get_output_info
- */
-EXPORT void wsc_free_output(wsc_output_t *o);
-
-/**
- * @brief List existing outputs
- * @param o Pointer to outputs structure, free with wsc_free_outputs
+ * @brief Set the currently active profile
+ * @param name The name of the profile to select
  * @return true on success
  */
-EXPORT bool wsc_list_outputs(wsc_connection_t *conn, wsc_ouputs_t *o);
+EXPORT bool wsc_set_current_profile(wsc_connection_t *conn, const char *name);
 
 /**
- * @brief Get information about a single output
- * @param name the name of the output to query
- * @param o Pointer to an output structure, free with wsc_free_output
+ * @brief Get the current active profile
+ * @param name Pointer to an empty string, free with wsc_free
  * @return true on success
  */
-EXPORT bool wsc_get_output_info(wsc_connection_t *conn, const char *name, wsc_output_t *o);
+EXPORT bool wsc_get_current_profile(wsc_connection_t *conn, char **name);
 
 /**
- * @brief Start an output
+ * @brief Get a list of available profiles
+ * @param profiles pointer to empty profiles struct
  * @return true on success
  */
-EXPORT bool wsc_start_output(wsc_connection_t *conn, const char *name);
-
-/**
- * @brief Stop an output
- * @param name The name of the output
- * @param force Force stop
- * @return true on success
- */
-EXPORT bool wsc_stop_output(wsc_connection_t *conn, const char *name, bool force);
+EXPORT bool wsc_list_profiles(wsc_connection_t *conn, wsc_profiles_t *profiles);

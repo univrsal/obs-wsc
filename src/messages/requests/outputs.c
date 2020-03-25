@@ -22,12 +22,17 @@
 #include "../../send.h"
 #include "../../util.h"
 
+void wsc_free_output(wsc_output_t *o)
+{
+    if (o)
+        wsc_data_release(o->settings);
+}
+
 void wsc_free_outputs(wsc_ouputs_t *o)
 {
     if (o) {
-        for (size_t i = 0; i < o->count; i++) {
+        for (size_t i = 0; i < o->count; i++)
             wsc_data_release(o->arr[i].settings);
-        }
 
         o->count = 0;
         bfree(o->arr);
@@ -107,7 +112,16 @@ bool wsc_list_outputs(wsc_connection_t *conn, wsc_ouputs_t *o)
 
 request_result_t output_callback(json_t *response, void *data)
 {
-    return unpack_output(response, data) ? REQUEST_OK : REQUEST_ERROR;
+    json_t *output_info = NULL;
+    json_error_t err;
+    request_result_t result = REQUEST_ERROR;
+    if (json_unpack_ex(response, &err, 0, "{ss}", "outputInfo", &output_info)) {
+        werr("Error getting output info from message response");
+    } else {
+        result = unpack_output(output_info, data) ? REQUEST_OK : REQUEST_ERROR;
+        json_decref(output_info);
+    }
+    return result;
 }
 
 bool wsc_get_output_info(wsc_connection_t *conn, const char *name, wsc_output_t *o)

@@ -19,6 +19,7 @@
 #include <obs_wsc.h>
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 int main()
 {
@@ -30,8 +31,9 @@ int main()
     wsc_init_struct(wsc_stats_t, stats);
     wsc_init_struct(wsc_ouputs_t, outputs);
     wsc_init_struct(wsc_output_t, output);
+    wsc_init_struct(wsc_profiles_t, profiles);
 
-    char *format = NULL;
+    char *format = NULL, *profile = NULL;
 
     assert(c);
     assert(wsc_auth_required(c, &auth));
@@ -58,14 +60,21 @@ int main()
     assert(wsc_list_outputs(c, &outputs));
     assert(outputs.arr);
     assert(outputs.count);
-    assert(wsc_get_output_info(c, "preview", &output));
-    assert(wsc_start_output(c, "preview"));
-    assert(wsc_stop_output(c, "preview", false));
+    assert(wsc_get_output_info(c, "adv_file_output", &output));
+    assert(wsc_start_output(c, "adv_file_output"));
+    assert(wsc_stop_output(c, "adv_file_output", false));
 
     /* Profiles */
+    assert(wsc_set_current_profile(c, "debug"));
+    assert(wsc_get_current_profile(c, &profile));
+    assert(strcmp(profile, "debug") == 0);
+    assert(wsc_list_profiles(c, &profiles));
 
     /* Clean up */
     wsc_free(format);
+    wsc_free(profile);
+    wsc_free_profiles(&profiles);
+    wsc_free_output(&output);
     wsc_free_outputs(&outputs);
     wsc_disconnect(c);
     assert(wsc_shutdown() == 0);

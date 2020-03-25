@@ -317,3 +317,20 @@ bool wsc_prepare_auth(wsc_auth_data_t *auth, const char *password)
     }
     return result;
 }
+
+typedef struct {
+    request_callback_t cb
+} request_instance_t;
+
+bool wsc_send_request(wsc_connection_t *conn, const char *request, ...)
+{
+    if (!conn || !request || strlen(request) < 1)
+        return false;
+    /* TODO */
+
+    va_list a_list;
+    va_start(a_list, request);
+
+    va_end(a_list);
+    return true;
+}

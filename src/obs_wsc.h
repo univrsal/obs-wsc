@@ -26,6 +26,7 @@ typedef struct wsc_connection_s wsc_connection_t;
 #include "misc_types.h"
 #include "messages/requests/general.h"
 #include "messages/requests/outputs.h"
+#include "messages/requests/profiles.h"
 
 /**
  * @brief Opens a new connection to an obs websocket instance
@@ -114,6 +115,13 @@ EXPORT void wsc_set_logger(wsc_log_handler_t handler, void *param);
  * @param param Custom parameter
  */
 EXPORT void wsc_set_crash_handler(void (*handler)(const char *, va_list, void *), void *param);
+
+/**
+ * @brief Send any request with mathching arguments
+ * @param request The request id
+ * @return true on success
+ */
+EXPORT bool wsc_send_request(wsc_connection_t *conn, const char *request, ...);
 #ifdef __cplusplus
 }
 #endif
