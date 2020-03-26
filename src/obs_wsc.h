@@ -28,6 +28,7 @@ typedef struct wsc_connection_s wsc_connection_t;
 #include "messages/requests/outputs.h"
 #include "messages/requests/profiles.h"
 #include "messages/requests/recording.h"
+#include "messages/requests/replay.h"
 
 /**
  * @brief Opens a new connection to an obs websocket instance

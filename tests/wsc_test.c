@@ -23,6 +23,11 @@
 
 int main()
 {
+    bool test_recording = false;
+    bool test_profiles = false;
+    bool test_replay = false;
+    bool test_outputs = false;
+
     wsc_init();
     wsc_connection_t *c = wsc_connect(NULL);
     wsc_init_struct(wsc_auth_data_t, auth);
@@ -57,36 +62,48 @@ int main()
 //    assert(wsc_set_heartbeat(c, true)); // TODO: Heartbeat event
 
     /* Profiles */
-    assert(wsc_set_current_profile(c, "debug"));
-    assert(wsc_get_current_profile(c, &profile));
-    assert(strcmp(profile, "debug") == 0);
-    assert(wsc_list_profiles(c, &profiles));
-
-    if (false) { /* Don't want to record everytime I runt the tests
-            /* Recording */
-            wsc_wait_ms(1000);
-            assert(wsc_start_recording(c));
-            wsc_wait_ms(1000);
-            assert(wsc_pause_recording(c));
-            wsc_wait_ms(1000);
-            assert(wsc_resume_recording(c));
-            wsc_wait_ms(1000);
-            assert(wsc_toggle_recording(c));
-            wsc_wait_ms(1000);
-            assert(!wsc_stop_recording(c));
-
-            /* Outputs */
-            wsc_wait_ms(1000);
-            assert(wsc_list_outputs(c, &outputs));
-            assert(outputs.arr);
-            assert(outputs.count);
-            assert(wsc_get_output_info(c, "adv_file_output", &output));
-
-            /* These only work if the recording has been started once before */
-            assert(wsc_start_output(c, "adv_file_output"));
-            wsc_wait_ms(1000);
-            assert(wsc_stop_output(c, "adv_file_output", false));
+    if (test_profiles) {
+        assert(wsc_set_current_profile(c, "debug"));
+        assert(wsc_get_current_profile(c, &profile));
+        assert(strcmp(profile, "debug") == 0);
+        assert(wsc_list_profiles(c, &profiles));
     }
+
+    if (test_recording) {
+        wsc_wait_ms(1000);
+        assert(wsc_start_recording(c));
+        wsc_wait_ms(1000);
+        assert(wsc_pause_recording(c));
+        wsc_wait_ms(1000);
+        assert(wsc_resume_recording(c));
+        wsc_wait_ms(1000);
+        assert(wsc_toggle_recording(c));
+        wsc_wait_ms(1000);
+        assert(!wsc_stop_recording(c));
+    }
+
+    if (test_outputs) {
+        wsc_wait_ms(1000);
+        assert(wsc_list_outputs(c, &outputs));
+        assert(outputs.arr);
+        assert(outputs.count);
+        assert(wsc_get_output_info(c, "adv_file_output", &output));
+
+        /* These only work if the recording has been started once before */
+        assert(wsc_start_output(c, "adv_file_output"));
+        wsc_wait_ms(1000);
+        assert(wsc_stop_output(c, "adv_file_output", false));
+    }
+
+    if (test_replay) {
+        assert(wsc_replay_starting(c));
+        wsc_wait_ms(1000);
+        assert(wsc_replay_started(c));
+        assert(wsc_replay_stopping(c));
+        wsc_wait_ms(1000);
+        assert(wsc_replay_stopped(c));
+    }
+
     /* Clean up */
     wsc_free(format);
     wsc_free(profile);
