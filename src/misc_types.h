@@ -175,6 +175,11 @@ typedef struct wsc_scene_s {
     size_t num_sources;
 } wsc_scene_t;
 
+typedef struct wsc_scene_collections_s {
+    char **names;
+    size_t num_names;
+} wsc_scene_collections_t;
+
 typedef struct wsc_profiles_s {
     char **profile_names;
     size_t num_profiles;

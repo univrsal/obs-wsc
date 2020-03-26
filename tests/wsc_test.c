@@ -100,12 +100,12 @@ int main()
     }
 
     if (test_replay) {
-        assert(wsc_replay_starting(c));
+        assert(wsc_start_replay_buffer(c));
         wsc_wait_ms(1000);
-        assert(wsc_replay_started(c));
-        assert(wsc_replay_stopping(c));
+        assert(wsc_save_replay_buffer(c));
+        assert(wsc_toggle_replay_buffer(c));
         wsc_wait_ms(1000);
-        assert(wsc_replay_stopped(c));
+        assert(!wsc_stop_replay_buffer(c));
     }
 
     /* Clean up */
