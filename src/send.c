@@ -26,10 +26,14 @@
 request_result_t default_callback(json_t *j, void *d)
 {
     UNUSED_PARAMETER(d);
+    request_result_t result = REQUEST_ERROR;
     char *id = NULL;
     json_unpack(j, "{ss}", "message-id", &id);
+
+    if (parse_basic_json(j))
+        result = REQUEST_OK;
     wdebug("Request with id %s fulfilled", id);
-    return REQUEST_OK;
+    return result;
 }
 
 request_t *add_request(wsc_connection_t *conn, char *msg_id, request_callback_t cb, void *cb_data)
@@ -195,7 +199,7 @@ bool wait_timeout(wsc_connection_t *conn, request_t *rq)
         werr("Request %s timed out", id);
 
     bfree(id);
-    return timeout <= max_timeout;
+    return timeout <= max_timeout && rq->status == REQUEST_OK;
 }
 
 bool parse_basic_json(json_t *j)

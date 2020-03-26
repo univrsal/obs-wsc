@@ -56,20 +56,37 @@ int main()
     assert(strcmp(format, "%CCYY.%MM.%DD %hh.%mm.%ss") == 0);
 //    assert(wsc_set_heartbeat(c, true)); // TODO: Heartbeat event
 
-    /* Outputs */
-    assert(wsc_list_outputs(c, &outputs));
-    assert(outputs.arr);
-    assert(outputs.count);
-    assert(wsc_get_output_info(c, "adv_file_output", &output));
-    assert(wsc_start_output(c, "adv_file_output"));
-    assert(wsc_stop_output(c, "adv_file_output", false));
-
     /* Profiles */
     assert(wsc_set_current_profile(c, "debug"));
     assert(wsc_get_current_profile(c, &profile));
     assert(strcmp(profile, "debug") == 0);
     assert(wsc_list_profiles(c, &profiles));
 
+    if (false) { /* Don't want to record everytime I runt the tests
+            /* Recording */
+            wsc_wait_ms(1000);
+            assert(wsc_start_recording(c));
+            wsc_wait_ms(1000);
+            assert(wsc_pause_recording(c));
+            wsc_wait_ms(1000);
+            assert(wsc_resume_recording(c));
+            wsc_wait_ms(1000);
+            assert(wsc_toggle_recording(c));
+            wsc_wait_ms(1000);
+            assert(!wsc_stop_recording(c));
+
+            /* Outputs */
+            wsc_wait_ms(1000);
+            assert(wsc_list_outputs(c, &outputs));
+            assert(outputs.arr);
+            assert(outputs.count);
+            assert(wsc_get_output_info(c, "adv_file_output", &output));
+
+            /* These only work if the recording has been started once before */
+            assert(wsc_start_output(c, "adv_file_output"));
+            wsc_wait_ms(1000);
+            assert(wsc_stop_output(c, "adv_file_output", false));
+    }
     /* Clean up */
     wsc_free(format);
     wsc_free(profile);

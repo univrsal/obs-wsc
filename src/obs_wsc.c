@@ -44,6 +44,11 @@ long wsc_shutdown()
     return bnum_allocs();
 }
 
+void wsc_wait_ms(uint32_t ms)
+{
+    os_sleep_ms(ms);
+}
+
 void wsc_set_allocator(struct wsc_allocator *defs)
 {
     base_set_allocator(defs);
@@ -319,7 +324,7 @@ bool wsc_prepare_auth(wsc_auth_data_t *auth, const char *password)
 }
 
 typedef struct {
-    request_callback_t cb
+    request_callback_t cb;
 } request_instance_t;
 
 bool wsc_send_request(wsc_connection_t *conn, const char *request, ...)

@@ -24,6 +24,8 @@ set(wsc_SRC
     src/messages/requests/outputs.h
     src/messages/requests/profiles.c
     src/messages/requests/profiles.h
+    src/messages/requests/recording.c
+    src/messages/requests/recording.h
     src/external/buffer.c
     src/external/buffer.h
     src/external/mongoose.h

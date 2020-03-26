@@ -27,6 +27,7 @@ typedef struct wsc_connection_s wsc_connection_t;
 #include "messages/requests/general.h"
 #include "messages/requests/outputs.h"
 #include "messages/requests/profiles.h"
+#include "messages/requests/recording.h"
 
 /**
  * @brief Opens a new connection to an obs websocket instance
@@ -44,6 +45,11 @@ EXPORT void wsc_disconnect(wsc_connection_t *conn);
  * @brief Free any memory that was allocated by wsc
  */
 EXPORT void wsc_free(void *ptr);
+
+/**
+ * @brief Wait for a provided amount of miliseconds
+ */
+EXPORT void wsc_wait_ms(uint32_t ms);
 
 /**
  * @brief Set the wait timeout when waiting for responses, use -1 for no timeout

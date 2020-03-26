@@ -63,6 +63,8 @@ request_result_t auth_required_callback(json_t *response, void *data)
                 auth->salt = bstrdup(salt);
                 result = REQUEST_OK;
             }
+        } else {
+            result = REQUEST_OK;
         }
     }
 

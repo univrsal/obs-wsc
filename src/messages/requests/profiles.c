@@ -22,7 +22,7 @@
 
 bool wsc_set_current_profile(wsc_connection_t *conn, const char *name)
 {
-    if (!conn || !name || strlen(name) < 1)
+    if (!name || strlen(name) < 1)
         return false;
     json_error_t err;
     bool result = false;
@@ -57,7 +57,7 @@ request_result_t get_profile_callback(json_t *response, void *data)
 
 bool wsc_get_current_profile(wsc_connection_t *conn, char **name)
 {
-    if (!conn || !name || *name)
+    if (!name || *name)
         return false;
     return send_request_no_data(conn, "GetCurrentProfile", get_profile_callback, name);
 }
@@ -103,7 +103,7 @@ request_result_t list_profiles_callback(json_t *response, void *data)
 
 bool wsc_list_profiles(wsc_connection_t *conn, wsc_profiles_t *profiles)
 {
-    if (!conn || !profiles)
+    if (!profiles)
         return false;
 
     return send_request_no_data(conn, "ListProfiles", list_profiles_callback, profiles);

@@ -115,7 +115,7 @@ request_result_t output_callback(json_t *response, void *data)
     json_t *output_info = NULL;
     json_error_t err;
     request_result_t result = REQUEST_ERROR;
-    if (json_unpack_ex(response, &err, 0, "{ss}", "outputInfo", &output_info)) {
+    if (json_unpack_ex(response, &err, 0, "{so}", "outputInfo", &output_info)) {
         werr("Error getting output info from message response");
     } else {
         result = unpack_output(output_info, data) ? REQUEST_OK : REQUEST_ERROR;
@@ -144,7 +144,7 @@ bool wsc_get_output_info(wsc_connection_t *conn, const char *name, wsc_output_t 
 
 bool wsc_start_output(wsc_connection_t *conn, const char *name)
 {
-    if (!conn || !name || strlen(name) < 1)
+    if (!name || strlen(name) < 1)
         return false;
     bool result = false;
     json_error_t err;
@@ -162,7 +162,7 @@ bool wsc_start_output(wsc_connection_t *conn, const char *name)
 
 bool wsc_stop_output(wsc_connection_t *conn, const char *name, bool force)
 {
-    if (!conn || !name || strlen(name) < 1)
+    if (!name || strlen(name) < 1)
         return false;
     bool result = false;
     json_error_t err;
