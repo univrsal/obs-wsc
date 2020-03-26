@@ -38,7 +38,7 @@ int main()
     wsc_init_struct(wsc_output_t, output);
     wsc_init_struct(wsc_profiles_t, profiles);
 
-    char *format = NULL, *profile = NULL;
+    char *format = NULL, *profile = NULL, *video_folder = NULL;
 
     assert(c);
     assert(wsc_auth_required(c, &auth));
@@ -82,6 +82,10 @@ int main()
         assert(!wsc_stop_recording(c));
     }
 
+    assert(wsc_set_recording_folder(c, "/home/usr/videos"));
+    assert(wsc_get_recording_folder(c, &video_folder));
+    assert(strcmp(video_folder, "/home/usr/videos"));
+
     if (test_outputs) {
         wsc_wait_ms(1000);
         assert(wsc_list_outputs(c, &outputs));
@@ -106,6 +110,7 @@ int main()
 
     /* Clean up */
     wsc_free(format);
+    wsc_free(video_folder);
     wsc_free(profile);
     wsc_free_profiles(&profiles);
     wsc_free_output(&output);

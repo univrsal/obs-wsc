@@ -22,25 +22,28 @@
 typedef struct wsc_connection_s wsc_connection_t;
 
 /**
- * @brief A request to start the replay buffer
+ * @brief Toggle the replay buffer on/off
  * @return true on success
  */
-EXPORT bool wsc_replay_starting(wsc_connection_t *conn);
+EXPORT bool wsc_toggle_replay_buffer(wsc_connection_t *conn);
 
 /**
- * @brief Replay buffer started successfully
+ * @brief Start recording the replay buffer, will error if it's already sarted
+ *        or when the "Save Replay Buffer" hotkey is not set in OBS
  * @return true on success
  */
-EXPORT bool wsc_replay_started(wsc_connection_t *conn);
+EXPORT bool wsc_start_replay_buffer(wsc_connection_t *conn);
 
 /**
- * @brief A request to stop the replay buffer
+ * @brief Stop recording into the replay buffer, will error if the replay buffer
+ *        is not active
  * @return true on success
  */
-EXPORT bool wsc_replay_stopping(wsc_connection_t *conn);
+EXPORT bool wsc_stop_replay_buffer(wsc_connection_t *conn);
 
 /**
- * @brief Replay buffer stopped successfully
+ * @brief Flush and save the contents of the replay buffer to disk, will error
+ *        if the replay buffer is not active
  * @return true on success
  */
-EXPORT bool wsc_replay_stopped(wsc_connection_t *conn);
+EXPORT bool wsc_save_replay_buffer(wsc_connection_t *conn);

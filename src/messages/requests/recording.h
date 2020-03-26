@@ -50,3 +50,17 @@ EXPORT bool wsc_pause_recording(wsc_connection_t *conn);
  * @return true on success
  */
 EXPORT bool wsc_resume_recording(wsc_connection_t *conn);
+
+/**
+ * @brief Set the recording output folder
+ * @param folder The target folder
+ * @return true on succcess
+ */
+EXPORT bool wsc_set_recording_folder(wsc_connection_t *conn, const char *folder);
+
+/**
+ * @brief Get the recording output folder
+ * @param folder Pointer to empty string, free with wsc_free
+ * @return true on succcess
+ */
+EXPORT bool wsc_get_recording_folder(wsc_connection_t *conn, char **folder);

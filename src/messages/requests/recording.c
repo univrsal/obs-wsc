@@ -43,3 +43,44 @@ bool wsc_resume_recording(wsc_connection_t *conn)
 {
     return send_request_simple(conn, "ResumeRecording");
 }
+
+bool wsc_set_recording_folder(wsc_connection_t *conn, const char *folder)
+{
+    if (!folder || strlen(folder) < 1)
+        return false;
+    json_t *data = NULL;
+    json_error_t err;
+    bool result = false;
+
+    if (json_pack_ex(&err, 0, "{ss}", "rec-folder", folder)) {
+        werr("Packing json for SetRecordingFolder: %s at %i", err.text, err.line);
+    } else {
+        result = send_request_no_cb(conn, "SetRecordingFolder", data);
+        json_decref(data);
+    }
+
+    return result;
+}
+
+request_result_t get_recording_folder_callback(json_t *data, void *d)
+{
+    char **f = d;
+    char *tmp = NULL;
+    request_result_t result = REQUEST_ERROR;
+    json_error_t err;
+
+    if (json_unpack_ex(data, &err, 0, "{ss}", "rec-folder", &tmp)) {
+        werr("Unpacking json for GetRecordingFolder: %s at %i", err.text, err.line);
+    } else {
+        *f = bstrdup(tmp);
+        result = REQUEST_OK;
+    }
+    return result;
+}
+
+bool wsc_get_recording_folder(wsc_connection_t *conn, char **folder)
+{
+    if (!folder || *folder)
+        return false;
+    return send_request_no_data(conn, "GetRecordingFolder", get_recording_folder_callback, folder);
+}

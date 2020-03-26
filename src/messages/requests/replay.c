@@ -19,22 +19,22 @@
 #include "replay.h"
 #include "send.h"
 
-bool wsc_replay_starting(wsc_connection_t *conn)
+bool wsc_toggle_replay_buffer(wsc_connection_t *conn)
 {
-    return send_request_simple(conn, "ReplayStarting");
+    return send_request_simple(conn, "StartStopReplayBuffer");
 }
 
-bool wsc_replay_started(wsc_connection_t *conn)
+bool wsc_start_replay_buffer(wsc_connection_t *conn)
 {
-    return send_request_simple(conn, "ReplayStarted");
+    return send_request_simple(conn, "StartReplayBuffer");
 }
 
-bool wsc_replay_stopping(wsc_connection_t *conn)
+bool wsc_stop_replay_buffer(wsc_connection_t *conn)
 {
-    return send_request_simple(conn, "ReplayStopping");
+    return send_request_simple(conn, "StopReplayBuffer");
 }
 
-bool wsc_replay_stopped(wsc_connection_t *conn)
+bool wsc_save_replay_buffer(wsc_connection_t *conn)
 {
-    return send_request_simple(conn, "ReplayStopped");
+    return send_request_simple(conn, "SaveReplayBuffer");
 }
