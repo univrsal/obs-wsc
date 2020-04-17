@@ -26,10 +26,14 @@ set(wsc_SRC
     src/messages/requests/profiles.h
     src/messages/requests/recording.c
     src/messages/requests/recording.h
+    src/messages/requests/streaming.c
+    src/messages/requests/streaming.h
     src/messages/requests/replay.c
     src/messages/requests/replay.h
     src/messages/requests/scenes.c
     src/messages/requests/scenes.h
+    src/messages/requests/scene_items.c
+    src/messages/requests/scene_items.h
     src/external/buffer.c
     src/external/buffer.h
     src/external/mongoose.h

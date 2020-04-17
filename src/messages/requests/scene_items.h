@@ -22,29 +22,24 @@
 typedef struct wsc_connection_s wsc_connection_t;
 
 /**
- * @brief Free a wsc_scene_collections structure populated
- *        by wsc_list_scene_collections
- */
-EXPORT void wsc_free_scene_collections(wsc_scene_collections_t *s);
-
-/**
- * @brief Change the active scene collection
- * @param name The name of the collection
+ * @brief Gets the scene specific properties of the specified source item
+ * @param i A pointer to an empty scene item structure
+ * @param item The name of the scene item
+ * @param id The scene item id (Optional, -1 if not used)
+ * @param scene The scene the item is in, if NULL defaults to the current scene
  * @return true on success
  */
-EXPORT bool wsc_set_current_scene_collection(wsc_connection_t *conn, const char *name);
+EXPORT bool wsc_get_scene_item_properties(wsc_connection_t *conn, wsc_scene_item_properties_t *i, const char *item,
+                                          int id, const char *scene);
 
 /**
- * @brief Get the name of the current scene collection
- * @param conn
- * @param name An empty string pointer
+ * @brief Sets the scene specific properties of the specified source item
+ * @param i A pointer to a valid scene item structure containing at least
+ *        the scene item's name
+ * @param item The name of the scene item
+ * @param id The scene item id (Optional, -1 if not used)
+ * @param scene The scene the item is in, if NULL defaults to the current scene
  * @return true on success
  */
-EXPORT bool wsc_get_current_scene_collection(wsc_connection_t *conn, char **name);
-
-/**
- * @brief Get a list of available scene collections
- * @param c An empty scene collection struct, use wsc_free_scene_collections to free
- * @return true on success
- */
-EXPORT bool wsc_list_scene_collections(wsc_connection_t *conn, wsc_scene_collections_t *c);
+EXPORT bool wsc_set_scene_item_properties(wsc_connection_t *conn, const wsc_scene_item_properties_t *i,
+                                          const char *scene);

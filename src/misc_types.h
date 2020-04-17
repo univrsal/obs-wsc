@@ -141,6 +141,20 @@ typedef struct wsc_scene_item_transform_s {
     size_t num_children;
 } wsc_scene_item_transform_t;
 
+typedef struct wsc_scene_item_properties_s {
+    char name[STR_LEN], parent_group_name[STR_LEN];
+    size_t num_children;
+    wsc_scene_item_transform_t *children;
+    double rotation;
+    struct wsc_pos_s position;
+    struct wsc_scale_s scale;
+    struct wsc_crop_s crop;
+    struct wsc_bounds_s bounds;
+    enum wsc_align alignment;
+    int32_t source_width, source_height, width, height, id;
+    bool visible, muted, locked;
+} wsc_scene_item_properties_t;
+
 typedef struct wsc_stats_s {
     double fps, average_frame_time, cpu_usage, memory_usage, free_disk_space;
     uint32_t render_total_frames, render_missed_frames, output_total_frames, output_skipped_frames;
@@ -184,3 +198,24 @@ typedef struct wsc_profiles_s {
     char **profile_names;
     size_t num_profiles;
 } wsc_profiles_t;
+
+typedef struct wsc_stream_status_s {
+    bool streaming;
+    bool recording;
+    char *stream_timecode;
+    char *rec_timecode;
+} wsc_stream_status_t;
+
+typedef struct wsc_stream_settings_s {
+    struct {
+        char *type;
+        char *metadata;
+    } stream;
+    struct {
+        char *server;
+        char *key;
+        bool use_auth;
+        char *username;
+        char *password;
+    } settings;
+} wsc_stream_settings_t;

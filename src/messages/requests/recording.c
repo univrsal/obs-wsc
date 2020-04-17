@@ -48,11 +48,11 @@ bool wsc_set_recording_folder(wsc_connection_t *conn, const char *folder)
 {
     if (!folder || strlen(folder) < 1)
         return false;
-    json_t *data = NULL;
     json_error_t err;
+    json_t *data = json_pack_ex(&err, 0, "{ss}", "rec-folder", folder);
     bool result = false;
 
-    if (json_pack_ex(&err, 0, "{ss}", "rec-folder", folder)) {
+    if (data) {
         werr("Packing json for SetRecordingFolder: %s at %i", err.text, err.line);
     } else {
         result = send_request_no_cb(conn, "SetRecordingFolder", data);

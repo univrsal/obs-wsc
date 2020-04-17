@@ -19,6 +19,17 @@
 #include "scenes.h"
 #include "send.h"
 
+void wsc_free_scene_collections(wsc_scene_collections_t *s)
+{
+    if (s) {
+        for (size_t i = 0; i < s->num_names; i++)
+            bfree(s->names[i]);
+        bfree(s->names);
+        s->names = NULL;
+        s->num_names = 0;
+    }
+}
+
 bool wsc_set_current_scene_collection(wsc_connection_t *conn, const char *name)
 {
     if (!name || strlen(name) < 1)
